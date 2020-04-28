@@ -14,7 +14,7 @@ model:
   activation: relu
 train:
   dropout: 0
-  epochs: 1
+  epochs: 100
   optimizer: adam
   patience: 15
   loss: mse
