@@ -1,0 +1,21 @@
+base_dir: log/conv2d/
+data:
+  batch_size: 200
+  dataset: data/conv2d_gsmap/npz/conv2d_gsmap.npz
+  test_batch_size: 1
+  test_size: 0.2
+  valid_size: 0.2
+log_level: INFO
+model:
+  input_dim: 6
+  output_dim: 1
+  rnn_units: 100
+  filters: 40
+  activation: relu
+train:
+  dropout: 0
+  epochs: 1
+  optimizer: adam
+  patience: 15
+  loss: mse
+
