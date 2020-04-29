@@ -128,12 +128,22 @@ class Conv2DSupervisor():
             input = input_test[i].copy()
             input = input.reshape(1, 72, 72, 3)
             predicted_data[i] = self.model.predict(input)
-        print(input_test[0,0,0])
-        print(input_test[0,0,1])
+        print(input_test[-1,0,0,0])
+        print(input_test[-1,0,0,1])
+
+        print(actual_data[-1,92,0,0])        
+        print(actual_data[-1,0,60,1])
+        
+        print(input_test[-4,0,0,2])
+        print(actual_data[-4,92,60,2])
+
+        print(input_test[-21,0,0,2])
+        print(actual_data[-21,92,60,2])
+
         actual_data = actual_data.flatten()
         predicted_data = predicted_data.flatten()
-        np.save(self.log_dir+'pd', predicted_data)
-        np.save(self.log_dir+'gt', actual_data)
+        # np.save(self.log_dir+'pd', predicted_data)
+        # np.save(self.log_dir+'gt', actual_data)
 
         common_util.mae(actual_data, predicted_data)
         common_util.mse(actual_data, predicted_data)

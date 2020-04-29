@@ -81,7 +81,7 @@ def set_gauge_data_to_gsmap():
                                        len(input_lat_arr), len(input_lon_arr)))
     for i in range(0, len(input_lat_arr)):
         os.system(
-            'cdo -outputtab,value -remapnn,lon={}_lat={} data/gsmap_2011_2018.nc > data/precip.csv'
+            'cdo -outputtab,value -remapnn,lon={}_lat={} data/conv2d_gsmap/gsmap_2011_2018.nc > data/precip.csv'
             .format(input_lon_arr[i], input_lat_arr[i]))
         precipitation = read_csv('data/precip.csv')
         precipitation = precipitation.to_numpy()

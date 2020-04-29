@@ -2,18 +2,18 @@ from netCDF4 import Dataset
 from datetime import datetime
 import numpy as np
 
-input_nc = Dataset('data/tmp.nc', 'r')
+# input_nc = Dataset('data/conv2d_gsmap/tmp.nc', 'r')
 
-# check dataset
-for i in input_nc.variables:
-    print(i, input_nc.variables[i].shape)
+# # check dataset
+# for i in input_nc.variables:
+#     print(i, input_nc.variables[i].shape)
 
-time = np.array(input_nc['time'][:])
-input_lon = np.array(input_nc['lon'][:])
-input_lat = np.array(input_nc['lat'][:])
-input_precip = np.array(input_nc['precip'][:])
+# time = np.array(input_nc['time'][:])
+# input_lon = np.array(input_nc['lon'][:])
+# input_lat = np.array(input_nc['lat'][:])
+# input_precip = np.array(input_nc['precip'][:])
 
-output_nc = Dataset('data/gsmap_2011_2018.nc', 'r')
+output_nc = Dataset('data/conv2d_gsmap/gsmap_2011_2018.nc', 'r')
 output_time = np.array(output_nc['time'][:])
 output_lon = np.array(output_nc['lon'][:])
 output_lat = np.array(output_nc['lat'][:])
@@ -30,6 +30,8 @@ print(output_precip[2,0,1])
 print(output_precip[2,0,2])
 print("Goc 3: ",output_precip[0,1,1]) 
 print("Goc 4: ",output_precip[9,1,2])
+print(output_lon[60])
+print(output_lat[92])
 np.savez('data/npz/conv2d_gsmap.npz',
          time=time,
          input_lon=input_lon,
