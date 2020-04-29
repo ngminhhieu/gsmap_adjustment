@@ -6,6 +6,7 @@ from model import common_util
 import model.utils.conv2d as utils_conv2d
 import os
 import yaml
+from pandas import read_csv
 
 
 class Conv2DSupervisor():
@@ -128,16 +129,19 @@ class Conv2DSupervisor():
             input = input_test[i].copy()
             input = input.reshape(1, 72, 72, 3)
             predicted_data[i] = self.model.predict(input)
-        print(input_test[-1,0,0,0])
-        print(input_test[-1,0,0,1])
+        
+        # print(input_test[-1,0,0,0])
+        # print(input_test[-1,0,0,1])
 
-        print(actual_data[-1,92,0,0])        
-        print(actual_data[-1,0,60,1])
+        # print(actual_data[-1,92,0,0])        
+        # print(actual_data[-1,0,60,1])
         
         print(input_test[-4,0,0,2])
+        print(predicted_data[-4,92,60,2])
         print(actual_data[-4,92,60,2])
 
         print(input_test[-21,0,0,2])
+        print(predicted_data[-4,92,60,2])
         print(actual_data[-21,92,60,2])
 
         actual_data = actual_data.flatten()
@@ -148,7 +152,44 @@ class Conv2DSupervisor():
         common_util.mae(actual_data, predicted_data)
         common_util.mse(actual_data, predicted_data)
         common_util.rmse(actual_data, predicted_data)
-            
+
+    def check(self):
+        print("Load model from: {}".format(self.log_dir))
+        self.model.load_weights(self.log_dir + 'best_model.hdf5')
+        self.model.compile(optimizer=self.optimizer,
+                           loss=self.loss)
+        input_test = self.input_test
+        actual_data = self.target_test
+        predicted_data = np.zeros(shape=(len(input_test), 160, 120, 3))
+
+        for i in range(0, len(input_test)):
+            input = input_test[i].copy()
+            input = input.reshape(1, 72, 72, 3)
+            predicted_data[i] = self.model.predict(input)
+        
+        # total_mae = 0
+        actual_arr = []
+        preds_arr = []
+        for lat in range(72):
+            for lon in range(72):
+                os.system(
+            'cdo -outputtab,value -remapnn,lon={}_lat={} data/conv2d_gsmap/gsmap_2011_2018.nc > data/test/precip.csv'
+            .format(input_test[-1, 0, lon, 1], input_test[-1, lat, 0, 0]))
+            precipitation = read_csv('data/test/precip.csv')
+            actual = precipitation.to_numpy()
+            actual = actual[-354:, 0]
+            print(actual)
+            actual_arr.append(actual)
+            preds = predicted_data[:, lat, lon, 2]
+            print(preds)
+            preds_arr.append(preds)
+            # mae = common_util.mae(actual, preds)
+            # total_mae = total_mae + mae
+        
+        common_util.mae(actual_arr.flatten(), preds_arr.flatten())
+        # print(total_mae)
+
+
     def plot_result(self):
         from matplotlib import pyplot as plt
         preds = np.load(self.log_dir+'pd.npy')
