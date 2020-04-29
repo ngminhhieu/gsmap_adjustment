@@ -42,12 +42,12 @@ if __name__ == '__main__':
             config = yaml.load(f)
 
     if args.mode == 'conv2d_train':
-        model = Conv2DSupervisor(is_training=True, **config)
+        model = Conv2DSupervisor(**config)
         model.train()
     elif args.mode == 'conv2d_test':
         # predict
-        model = Conv2DSupervisor(is_training=False, **config)
+        model = Conv2DSupervisor(**config)
         model.test()
-        model.plot_series()
+        model.plot_result()
     else:
         raise RuntimeError("Mode needs to be train/evaluate/test!")

@@ -3,6 +3,7 @@ import sys
 import os
 import time
 from keras.callbacks import ModelCheckpoint, EarlyStopping, Callback
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -101,9 +102,6 @@ def prepare_train_valid_test(data, test_size, valid_size):
 def _get_log_dir(kwargs):
     log_dir = kwargs['train'].get('log_dir')
     if log_dir is None:
-        # seq_len = kwargs['model'].get('seq_len')
-        # horizon = kwargs['model'].get('horizon')
-        # run_id = '%d_%d/' % (seq_len, horizon)
         run_id = 'default/'
         base_dir = kwargs.get('base_dir')
         log_dir = os.path.join(base_dir, run_id)
