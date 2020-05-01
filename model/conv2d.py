@@ -51,13 +51,21 @@ class Conv2DSupervisor():
         
         model.add(BatchNormalization())
 
-        model.add(
-            ConvLSTM2D(filters=32,
-                   kernel_size=(3, 3),
-                   padding='same',
-                   activation=self.activation,
-                   return_sequences=True))
-        model.add(BatchNormalization())
+        # model.add(
+        #     ConvLSTM2D(filters=32,
+        #            kernel_size=(3, 3),
+        #            padding='same',
+        #            activation=self.activation,
+        #            return_sequences=True))
+        # model.add(BatchNormalization())
+
+        # model.add(
+        #     ConvLSTM2D(filters=32,
+        #            kernel_size=(3, 3),
+        #            padding='same',
+        #            activation=self.activation,
+        #            return_sequences=True))
+        # model.add(BatchNormalization())
 
         model.add(
             ConvLSTM2D(filters=32,
@@ -66,16 +74,6 @@ class Conv2DSupervisor():
                    activation=self.activation,
                    return_sequences=True))
         model.add(BatchNormalization())
-
-        model.add(
-            ConvLSTM2D(filters=32,
-                   kernel_size=(3, 3),
-                   padding='same',
-                   activation=self.activation,
-                   return_sequences=True))
-        model.add(BatchNormalization())
-
-        # model.add(MaxPooling2D(pool_size=(2, 2)))
 
         model.add(
             Conv3D(
@@ -94,12 +92,6 @@ class Conv2DSupervisor():
                 strides=(1, 5, 4),
                 #  padding='same',
                 activation=self.activation))
-
-        # model.add(
-            # Conv2D(filters=32,
-            #        kernel_size=(3, 3),
-            #        padding='same',
-            #        activation=self.activation))
 
         # ((top_crop, bottom_crop), (left_crop, right_crop))
         model.add(Cropping3D(cropping=((4, 4), (10, 10), (12, 12))))
