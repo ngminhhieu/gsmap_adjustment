@@ -1,8 +1,8 @@
 base_dir: log/conv2d/
 data:
   batch_size: 200
-  dataset: ../drive/My Drive/conv2d_gsmap.npz
-  # dataset: data/conv2d_gsmap/npz/conv2d_gsmap.npz
+  # dataset: ../drive/My Drive/conv2d_gsmap.npz
+  dataset: data/conv2d_gsmap/npz/conv2d_gsmap.npz
   test_batch_size: 1
   test_size: 0.2
   valid_size: 0.2
@@ -14,7 +14,7 @@ model:
   horizon: 1
 train:
   dropout: 0
-  epochs: 300
+  epochs: 1
   optimizer: adam
   patience: 15
   loss: mse

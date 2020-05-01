@@ -1,5 +1,6 @@
 from keras.models import Sequential
-from keras.layers import Flatten, Dense, MaxPooling2D, Conv2D, Conv2DTranspose, UpSampling2D, Cropping2D
+from keras.layers import Flatten, Dense, MaxPooling2D, Conv2D, Conv2DTranspose, UpSampling2D, Cropping2D, Cropping3D, MaxPooling3D
+from keras.layers.convolutional import Conv3D, Conv3DTranspose
 from keras.layers.convolutional_recurrent import ConvLSTM2D
 from keras.layers.normalization import BatchNormalization
 import numpy as np
@@ -77,20 +78,20 @@ class Conv2DSupervisor():
         # model.add(MaxPooling2D(pool_size=(2, 2)))
 
         model.add(
-            Conv2D(
+            Conv3D(
                 filters=32,
-                kernel_size=(3, 3),
+                kernel_size=(3, 3, 3),
                 padding='same',
                 activation=self.activation,
             ))
-        model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(MaxPooling3D(pool_size=(1, 2, 2)))
 
         # scaling up
         model.add(
-            Conv2DTranspose(
+            Conv3DTranspose(
                 filters=32,
-                kernel_size=(3, 3),
-                strides=(5, 4),
+                kernel_size=(3, 3, 3),
+                strides=(1, 5, 4),
                 #  padding='same',
                 activation=self.activation))
 
@@ -101,11 +102,11 @@ class Conv2DSupervisor():
             #        activation=self.activation))
 
         # ((top_crop, bottom_crop), (left_crop, right_crop))
-        model.add(Cropping2D(cropping=((10, 10), (12, 12))))
+        model.add(Cropping3D(cropping=((4, 4), (10, 10), (12, 12))))
 
         model.add(
-            Conv2D(filters=1,
-                   kernel_size=(3, 3),
+            Conv3D(filters=3,
+                   kernel_size=(3, 3, 3),
                    padding='same',
                    activation=self.activation))
 
