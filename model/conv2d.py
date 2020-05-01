@@ -1,6 +1,7 @@
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, MaxPooling2D, Conv2D, Conv2DTranspose, UpSampling2D, Cropping2D
 from keras.layers.convolutional_recurrent import ConvLSTM2D
+from keras.layers.normalization import BatchNormalization
 import numpy as np
 import pylab as plt
 from model import common_util
