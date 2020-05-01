@@ -1,5 +1,6 @@
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, MaxPooling2D, Conv2D, Conv2DTranspose, UpSampling2D, Cropping2D
+from keras.layers.convolutional_recurrent import ConvLSTM2D
 import numpy as np
 import pylab as plt
 from model import common_util
@@ -30,6 +31,7 @@ class Conv2DSupervisor():
         self.batch_size = self.config_model['batch_size']
         self.epochs = self.config_model['epochs']
         self.callbacks = self.config_model['callbacks']
+        self.seq_len = self.config_model['seq_len']
 
         self.model = self.build_model()        
 
@@ -38,12 +40,40 @@ class Conv2DSupervisor():
 
         # extract useful information
         model.add(
-            Conv2D(filters=16,
+            ConvLSTM2D(filters=32,
                    kernel_size=(3, 3),
                    padding='same',
                    activation=self.activation,
-                   input_shape=(72, 72, 3)))
-        model.add(MaxPooling2D(pool_size=(2, 2)))
+                   return_sequences=True,
+                   input_shape=(self.seq_len, 72, 72, 3)))
+        
+        model.add(BatchNormalization())
+
+        model.add(
+            ConvLSTM2D(filters=32,
+                   kernel_size=(3, 3),
+                   padding='same',
+                   activation=self.activation,
+                   return_sequences=True))
+        model.add(BatchNormalization())
+
+        model.add(
+            ConvLSTM2D(filters=32,
+                   kernel_size=(3, 3),
+                   padding='same',
+                   activation=self.activation,
+                   return_sequences=True))
+        model.add(BatchNormalization())
+
+        model.add(
+            ConvLSTM2D(filters=32,
+                   kernel_size=(3, 3),
+                   padding='same',
+                   activation=self.activation,
+                   return_sequences=True))
+        model.add(BatchNormalization())
+
+        # model.add(MaxPooling2D(pool_size=(2, 2)))
 
         model.add(
             Conv2D(
@@ -59,24 +89,25 @@ class Conv2DSupervisor():
             Conv2DTranspose(
                 filters=32,
                 kernel_size=(3, 3),
-                strides=(10, 7),
+                strides=(5, 4),
                 #  padding='same',
                 activation=self.activation))
 
-        model.add(
-            Conv2D(filters=32,
-                   kernel_size=(3, 3),
-                   padding='same',
-                   activation=self.activation))
+        # model.add(
+            # Conv2D(filters=32,
+            #        kernel_size=(3, 3),
+            #        padding='same',
+            #        activation=self.activation))
 
         # ((top_crop, bottom_crop), (left_crop, right_crop))
-        model.add(Cropping2D(cropping=((10, 10), (3, 3))))
+        model.add(Cropping2D(cropping=((10, 10), (12, 12))))
 
         model.add(
-            Conv2D(filters=3,
+            Conv2D(filters=1,
                    kernel_size=(3, 3),
                    padding='same',
                    activation=self.activation))
+
         print(model.summary())
         
         # plot model
@@ -183,12 +214,8 @@ class Conv2DSupervisor():
             preds = predicted_data[:, lat, lon, 2]
             print(preds)
             preds_arr.append(preds)
-            # mae = common_util.mae(actual, preds)
-            # total_mae = total_mae + mae
         
         common_util.mae(actual_arr.flatten(), preds_arr.flatten())
-        # print(total_mae)
-
 
     def plot_result(self):
         from matplotlib import pyplot as plt

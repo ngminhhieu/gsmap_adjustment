@@ -5,7 +5,12 @@ from model import common_util
 def create_data(**kwargs):
 
     data_npz = kwargs['data'].get('dataset')
+    seq_len = kwargs['model'].get('seq_len')
+    horizon = kwargs['model'].get('horizon')
+
     time = np.load(data_npz)['time']
+    T = len(time) - seq_len - horizon
+
     lon = np.load(data_npz)['input_lon']
     lat = np.load(data_npz)['input_lat']
     precip = np.load(data_npz)['input_precip']
@@ -16,10 +21,11 @@ def create_data(**kwargs):
 
     channels = 3  # Two channels are lon, lat and precip
 
-    input_conv2d_gsmap = np.zeros(shape=(len(time), len(lat), len(lon),
-                                         channels))
-    target_conv2d_gsmap = np.zeros(shape=(len(time), len(target_lat),
-                                          len(target_lon), channels))
+    input_conv2d_gsmap = np.zeros(shape=(T, seq_len,
+                                         len(lat), len(lon), channels))
+    target_conv2d_gsmap = np.zeros(shape=(T, horizon,
+                                          len(target_lat), len(target_lon),
+                                          channels))
     """fill input_data"""
     # preprocessing data
     lon_res = lon.reshape(1, lon.shape[0])
@@ -28,16 +34,15 @@ def create_data(**kwargs):
     lat_dup = np.repeat(lat_res, len(lon), axis=1)
 
     # because lon and lat are the same over the period, therefore we duplicate
-    lon_dup = np.repeat(lon_dup[np.newaxis, :, :], len(time), axis=0)
-    lat_dup = np.repeat(lat_dup[np.newaxis, :, :], len(time), axis=0)
+    lon_dup = np.repeat(lon_dup[np.newaxis, :, :], seq_len, axis=0)
+    lat_dup = np.repeat(lat_dup[np.newaxis, :, :], seq_len, axis=0)
+
+    lon_dup = np.repeat(lon_dup[np.newaxis, :, :], T, axis=0)
+    lat_dup = np.repeat(lat_dup[np.newaxis, :, :], T, axis=0)
 
     # fill channels
-    input_conv2d_gsmap[:, :, :, 0] = lat_dup
-    input_conv2d_gsmap[:, :, :, 1] = lon_dup
-
-    # input for conv2d is (batch_size, (H,W), channels)
-    for i in range(0, len(time)):
-        input_conv2d_gsmap[i, :, :, 2] = precip[i]
+    input_conv2d_gsmap[:, :, :, :, 0] = lat_dup
+    input_conv2d_gsmap[:, :, :, :, 1] = lon_dup
     """fill target_data"""
     # preprocessing data
     target_lon_res = target_lon.reshape(1, target_lon.shape[0])
@@ -47,19 +52,31 @@ def create_data(**kwargs):
 
     # because lon and lat are the same over the period, therefore we duplicate
     target_lon_dup = np.repeat(target_lon_dup[np.newaxis, :, :],
-                               len(time),
+                               horizon,
                                axis=0)
     target_lat_dup = np.repeat(target_lat_dup[np.newaxis, :, :],
-                               len(time),
+                               horizon,
+                               axis=0)
+    target_lon_dup = np.repeat(target_lon_dup[np.newaxis, :, :],
+                               T,
+                               axis=0)
+    target_lat_dup = np.repeat(target_lat_dup[np.newaxis, :, :],
+                               T,
                                axis=0)
 
     # fill channels
-    target_conv2d_gsmap[:, :, :, 0] = target_lat_dup
-    target_conv2d_gsmap[:, :, :, 1] = target_lon_dup
+    target_conv2d_gsmap[:, :, :, :, 0] = target_lat_dup
+    target_conv2d_gsmap[:, :, :, :, 1] = target_lon_dup
 
-    # target for conv2d is (batch_size, (H,W), channels)
-    for i in range(0, len(time)):
-        target_conv2d_gsmap[i, :, :, 2] = target_precip[i]
+    # shape convlstm2d (batch_size, n_frames, height, width, channels)
+    _x = np.empty(shape=(seq_len, len(lat), len(lon), channels))
+    _y = np.empty(shape=(horizon, len(lat), len(lon), channels))
+    for i in range(0, T):
+        _x = precip[i:i + seq_len]
+        _y = target_precip[i + seq_len]
+
+        input_conv2d_gsmap[i, :, :, :, 2] = _x
+        target_conv2d_gsmap[i, :, :, :, 2] = _y
 
     return input_conv2d_gsmap, target_conv2d_gsmap
 
