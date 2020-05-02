@@ -8,10 +8,9 @@ data:
 log_level: INFO
 model:
   activation: relu
-  filters: 40
-  input_dim: 6
-  output_dim: 1
+  horizon: 1
   rnn_units: 100
+  seq_len: 7
 train:
   dropout: 0
   epochs: 300

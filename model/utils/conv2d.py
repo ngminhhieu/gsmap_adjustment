@@ -9,7 +9,8 @@ def create_data(**kwargs):
     horizon = kwargs['model'].get('horizon')
 
     time = np.load(data_npz)['time']
-    T = len(time) - seq_len - horizon
+    # horizon is in seq_len. the last
+    T = len(time) - seq_len
 
     lon = np.load(data_npz)['input_lon']
     lat = np.load(data_npz)['input_lat']
@@ -73,7 +74,7 @@ def create_data(**kwargs):
     _y = np.empty(shape=(horizon, len(lat), len(lon), channels))
     for i in range(0, T):
         _x = precip[i:i + seq_len]
-        _y = target_precip[i + seq_len]
+        _y = target_precip[i + seq_len - horizon]
 
         input_conv2d_gsmap[i, :, :, :, 2] = _x
         target_conv2d_gsmap[i, :, :, :, 2] = _y
