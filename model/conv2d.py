@@ -170,13 +170,19 @@ class Conv2DSupervisor():
         print("Load model from: {}".format(self.log_dir))
         self.model.load_weights(self.log_dir + 'best_model.hdf5')
         self.model.compile(optimizer=self.optimizer, loss=self.loss)
+
         input_test = self.input_test
         actual_data = self.target_test
-        predicted_data = np.zeros(shape=(len(input_test), 160, 120, 3))
-
-        for i in range(0, len(input_test)):
-            input = input_test[i].copy()
-            input = input.reshape(1, 72, 72, 3)
+        predicted_data = np.zeros(shape=(len(actual_data), self.horizon, 160,
+                                         120, 1))
+        from tqdm import tqdm
+        iterator = tqdm(
+            range(0,
+                  len(self.target_train) - self.seq_len - self.horizon,
+                  self.horizon))
+        for i in iterator:
+            input = np.zeros(shape=(1, self.seq_len, 72, 72, 1))
+            input[0, :, :, :, 0] = input_test[i, :, :, :, 2].copy()
             predicted_data[i] = self.model.predict(input)
 
         # total_mae = 0
@@ -193,7 +199,7 @@ class Conv2DSupervisor():
             actual = actual[-354:, 0]
             print(actual)
             actual_arr.append(actual)
-            preds = predicted_data[:, lat, lon, 2]
+            preds = predicted_data[:, 0, lat, lon, 0]
             print(preds)
             preds_arr.append(preds)
 
