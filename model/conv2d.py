@@ -47,7 +47,6 @@ class Conv2DSupervisor():
                 filters=32,
                 kernel_size=(3, 3),
                 padding='same',
-                #    activation=self.activation,
                 return_sequences=True,
                 input_shape=(self.seq_len, 72, 72, 3)))
 
@@ -76,7 +75,7 @@ class Conv2DSupervisor():
             Conv3D(filters=3,
                    kernel_size=(3, 3, 3),
                    padding='same',
-                   activaiton='sigmoid'))
+                   activation='sigmoid'))
 
         print(model.summary())
 
