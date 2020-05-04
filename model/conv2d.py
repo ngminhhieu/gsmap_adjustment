@@ -132,13 +132,14 @@ class Conv2DSupervisor():
         input_test = self.input_test
         input_train = self.input_train
         actual_data = self.target_test
-        predicted_data = np.zeros(shape=(len(actual_data), self.horizon, 160,
-                                         120, 3))
-
+        # predicted_data = np.zeros(shape=(len(actual_data), self.horizon, 160,
+        #                                  120, 3))
+        predicted_data = np.zeros(shape=(len(self.target_train), self.seq_len, 72,
+                                         72, 3))
         from tqdm import tqdm
         iterator = tqdm(
             range(0,
-                  len(actual_data) - self.seq_len - self.horizon,
+                  len(self.target_train) - self.seq_len - self.horizon,
                   self.horizon))
         for i in iterator:
             input = np.zeros(shape=(1, self.seq_len, 72, 72, 3))
