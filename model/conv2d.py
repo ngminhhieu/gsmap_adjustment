@@ -54,48 +54,32 @@ class Conv2DSupervisor():
 
         # model.add(
         #     ConvLSTM2D(filters=32,
-        #            kernel_size=(3, 3),
-        #            padding='same',
-        #            activation=self.activation,
-        #            return_sequences=True))
+        #                kernel_size=(3, 3),
+        #                padding='same',
+        #                activation=self.activation,
+        #                return_sequences=True))
         # model.add(BatchNormalization())
 
         # model.add(
-        #     ConvLSTM2D(filters=32,
-        #            kernel_size=(3, 3),
-        #            padding='same',
-        #            activation=self.activation,
-        #            return_sequences=True))
-        # model.add(BatchNormalization())
+        #     Conv3D(
+        #         filters=32,
+        #         kernel_size=(3, 3, 3),
+        #         padding='same',
+        #         activation=self.activation,
+        #     ))
+        # model.add(MaxPooling3D(pool_size=(1, 2, 2)))
 
-        model.add(
-            ConvLSTM2D(filters=32,
-                       kernel_size=(3, 3),
-                       padding='same',
-                       activation=self.activation,
-                       return_sequences=True))
-        model.add(BatchNormalization())
+        # # scaling up
+        # model.add(
+        #     Conv3DTranspose(
+        #         filters=32,
+        #         kernel_size=(3, 3, 3),
+        #         strides=(1, 5, 4),
+        #         #  padding='same',
+        #         activation=self.activation))
 
-        model.add(
-            Conv3D(
-                filters=32,
-                kernel_size=(3, 3, 3),
-                padding='same',
-                activation=self.activation,
-            ))
-        model.add(MaxPooling3D(pool_size=(1, 2, 2)))
-
-        # scaling up
-        model.add(
-            Conv3DTranspose(
-                filters=32,
-                kernel_size=(3, 3, 3),
-                strides=(1, 5, 4),
-                #  padding='same',
-                activation=self.activation))
-
-        # ((top_crop, bottom_crop), (left_crop, right_crop))
-        model.add(Cropping3D(cropping=((4, 4), (10, 10), (12, 12))))
+        # # ((top_crop, bottom_crop), (left_crop, right_crop))
+        # model.add(Cropping3D(cropping=((4, 4), (10, 10), (12, 12))))
 
         model.add(
             Conv3D(filters=3,
@@ -146,10 +130,10 @@ class Conv2DSupervisor():
         self.model.compile(optimizer=self.optimizer, loss=self.loss)
 
         input_test = self.input_test
+        input_train = self.input_train
         actual_data = self.target_test
         predicted_data = np.zeros(shape=(len(actual_data), self.horizon, 160,
                                          120, 3))
-        # predicted_data[0:self.seq_len] = actual_data[0:self.seq_len].copy()
 
         from tqdm import tqdm
         iterator = tqdm(
@@ -157,11 +141,13 @@ class Conv2DSupervisor():
                   len(actual_data) - self.seq_len - self.horizon,
                   self.horizon))
         for i in iterator:
-            input = input_test[i].copy()
-            input = input[np.newaxis, :, :, :, :]
+            input = np.zeros(shape=(1, self.seq_len, 72, 72, 3))
+            input[0, :, :, :, :] = input_train[i].copy()
+            # input = input[np.newaxis, :, :, :, :]
             predicted_data[i] = self.model.predict(input)
 
         print(predicted_data[predicted_data[:, :, :, :, 2] > 0])
+        print(predicted_data)
         np.save(self.log_dir + 'pd', predicted_data)
 
         actual_data = actual_data.flatten()

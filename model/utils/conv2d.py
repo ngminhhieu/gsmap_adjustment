@@ -78,8 +78,10 @@ def create_data(**kwargs):
 
         input_conv2d_gsmap[i, :, :, :, 2] = _x
         target_conv2d_gsmap[i, :, :, :, 2] = _y
+    
+    target_conv2d_gsmap_2 = input_conv2d_gsmap
 
-    return input_conv2d_gsmap, target_conv2d_gsmap
+    return input_conv2d_gsmap, target_conv2d_gsmap_2
 
 
 def load_dataset(**kwargs):
