@@ -178,7 +178,7 @@ class Conv2DSupervisor():
         from tqdm import tqdm
         iterator = tqdm(
             range(0,
-                  len(self.target_train) - self.seq_len - self.horizon,
+                  len(actual_data) - self.seq_len - self.horizon,
                   self.horizon))
         for i in iterator:
             input = np.zeros(shape=(1, self.seq_len, 72, 72, 1))
