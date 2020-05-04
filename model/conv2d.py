@@ -43,49 +43,36 @@ class Conv2DSupervisor():
 
         # extract useful information
         model.add(
-            ConvLSTM2D(filters=32,
-                       kernel_size=(3, 3),
-                       padding='same',
-                    #    activation=self.activation,
-                       return_sequences=True,
-                       input_shape=(self.seq_len, 72, 72, 3)))
+            ConvLSTM2D(
+                filters=32,
+                kernel_size=(3, 3),
+                padding='same',
+                #    activation=self.activation,
+                return_sequences=True,
+                input_shape=(self.seq_len, 72, 72, 3)))
 
         model.add(BatchNormalization())
 
-        # model.add(
-        #     ConvLSTM2D(filters=32,
-        #                kernel_size=(3, 3),
-        #                padding='same',
-        #                activation=self.activation,
-        #                return_sequences=True))
-        # model.add(BatchNormalization())
-
-        # model.add(
-        #     Conv3D(
-        #         filters=32,
-        #         kernel_size=(3, 3, 3),
-        #         padding='same',
-        #         activation=self.activation,
-        #     ))
-        # model.add(MaxPooling3D(pool_size=(1, 2, 2)))
-
-        # # scaling up
-        # model.add(
-        #     Conv3DTranspose(
-        #         filters=32,
-        #         kernel_size=(3, 3, 3),
-        #         strides=(1, 5, 4),
-        #         #  padding='same',
-        #         activation=self.activation))
-
-        # # ((top_crop, bottom_crop), (left_crop, right_crop))
-        # model.add(Cropping3D(cropping=((4, 4), (10, 10), (12, 12))))
-
         model.add(
-            Conv3D(filters=3,
-                   kernel_size=(3, 3, 3),
-                   padding='same'))
-                #    activation=self.activation))
+            ConvLSTM2D(filters=32,
+                       kernel_size=(3, 3),
+                       padding='same',
+                       return_sequences=True))
+        model.add(BatchNormalization())
+
+        model.add(Conv3D(filters=32, kernel_size=(3, 3, 3), padding='same'))
+        model.add(MaxPooling3D(pool_size=(1, 2, 2)))
+
+        # scaling up
+        model.add(
+            Conv3DTranspose(filters=32,
+                            kernel_size=(3, 3, 3),
+                            strides=(1, 5, 4)))
+
+        # ((top_crop, bottom_crop), (left_crop, right_crop))
+        model.add(Cropping3D(cropping=((4, 4), (10, 10), (12, 12))))
+
+        model.add(Conv3D(filters=3, kernel_size=(3, 3, 3), padding='same', activaiton = 'sigmoid'))
 
         print(model.summary())
 
@@ -134,8 +121,8 @@ class Conv2DSupervisor():
         actual_data = self.target_test
         # predicted_data = np.zeros(shape=(len(actual_data), self.horizon, 160,
         #                                  120, 3))
-        predicted_data = np.zeros(shape=(len(self.target_train), self.seq_len, 72,
-                                         72, 3))
+        predicted_data = np.zeros(shape=(len(self.target_train), self.seq_len,
+                                         72, 72, 3))
         from tqdm import tqdm
         iterator = tqdm(
             range(0,
