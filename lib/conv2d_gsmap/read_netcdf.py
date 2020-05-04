@@ -19,6 +19,9 @@ output_lon = np.array(output_nc['lon'][:])
 output_lat = np.array(output_nc['lat'][:])
 output_precip = np.array(output_nc['precip'][:])
 
+print(output_lat)
+print(output_lon)
+
 print(len(output_precip))
 
 # Test nearist grid point

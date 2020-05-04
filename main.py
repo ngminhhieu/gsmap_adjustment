@@ -49,6 +49,5 @@ if __name__ == '__main__':
         model = Conv2DSupervisor(**config)
         model.check()
         # model.test()
-        # model.plot_result()
     else:
         raise RuntimeError("Mode needs to be train/evaluate/test!")

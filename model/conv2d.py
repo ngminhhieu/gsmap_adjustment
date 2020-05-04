@@ -43,12 +43,11 @@ class Conv2DSupervisor():
 
         # extract useful information
         model.add(
-            ConvLSTM2D(
-                filters=32,
-                kernel_size=(3, 3),
-                padding='same',
-                return_sequences=True,
-                input_shape=(self.seq_len, 72, 72, 1)))
+            ConvLSTM2D(filters=32,
+                       kernel_size=(3, 3),
+                       padding='same',
+                       return_sequences=True,
+                       input_shape=(self.seq_len, 72, 72, 1)))
 
         model.add(BatchNormalization())
 
@@ -91,16 +90,19 @@ class Conv2DSupervisor():
                            loss=self.loss,
                            metrics=['mse', 'mae'])
 
-        input_train = np.zeros(shape=(len(self.input_train), self.seq_len, 72, 72, 1))
-        target_train = np.zeros(shape=(len(self.target_train), self.horizon, 160, 120, 1))
-        input_valid = np.zeros(shape=(len(self.input_valid), self.seq_len, 72, 72, 1))
-        target_valid = np.zeros(shape=(len(self.target_valid), self.horizon, 160, 120, 1))
+        input_train = np.zeros(shape=(len(self.input_train), self.seq_len, 72,
+                                      72, 1))
+        target_train = np.zeros(shape=(len(self.target_train), self.horizon,
+                                       160, 120, 1))
+        input_valid = np.zeros(shape=(len(self.input_valid), self.seq_len, 72,
+                                      72, 1))
+        target_valid = np.zeros(shape=(len(self.target_valid), self.horizon,
+                                       160, 120, 1))
 
         input_train[:, :, :, :, 0] = self.input_train[:, :, :, :, 2].copy()
         target_train[:, :, :, :, 0] = self.target_train[:, :, :, :, 2].copy()
         input_valid[:, :, :, :, 0] = self.input_valid[:, :, :, :, 2].copy()
         target_valid[:, :, :, :, 0] = self.target_valid[:, :, :, :, 2].copy()
-
 
         # training_history = self.model.fit(self.input_train[:,:,:,:,2],
         #                                   self.target_train[:,:,:,:,2],
@@ -111,7 +113,7 @@ class Conv2DSupervisor():
         #                                                    self.target_valid[:,:,:,:,2]),
         #                                   shuffle=True,
         #                                   verbose=2)
-        
+
         training_history = self.model.fit(input_train,
                                           target_train,
                                           batch_size=self.batch_size,
@@ -176,34 +178,35 @@ class Conv2DSupervisor():
         predicted_data = np.zeros(shape=(len(actual_data), self.horizon, 160,
                                          120, 1))
         from tqdm import tqdm
-        iterator = tqdm(
-            range(0,
-                  len(actual_data) - self.seq_len - self.horizon,
-                  self.horizon))
+        iterator = tqdm(range(0,len(actual_data)))
         for i in iterator:
             input = np.zeros(shape=(1, self.seq_len, 72, 72, 1))
             input[0, :, :, :, 0] = input_test[i, :, :, :, 2].copy()
             predicted_data[i] = self.model.predict(input)
-            print(predicted_data[i])
-            print(input[i])
 
         # total_mae = 0
         actual_arr = []
         preds_arr = []
-        for lat in range(72):
-            for lon in range(72):
+        for lat_index in range(72):
+            lat = input_test[-1, -1, lat_index, 0, 0]
+            
+            for lon_index in range(72):
+                lon = input_test[-1, -1, 0, lon_index, 1]
+                actual_precip = actual_data[:, :, lat_index, lon_index, 2]
                 os.system(
                     'cdo -outputtab,value -remapnn,lon={}_lat={} data/conv2d_gsmap/gsmap_2011_2018.nc > data/test/precip.csv'
-                    .format(input_test[-1, 0, lon, 1], input_test[-1, lat, 0,
-                                                                  0]))
-            precipitation = read_csv('data/test/precip.csv')
-            actual = precipitation.to_numpy()
-            actual = actual[-354:, 0]
-            print(actual)
-            actual_arr.append(actual)
-            preds = predicted_data[:, 0, lat, lon, 0]
-            print(preds)
-            preds_arr.append(preds)
+                    .format(lon, lat))
+                precipitation = read_csv('data/test/precip.csv')
+                actual = precipitation.to_numpy()
+                actual = actual[-354:, 0]
+                print(actual)
+                actual_arr.append(actual_precip)
+                temp_lat = int((23.95-lat)/0.1)
+                temp_lon = int((lon-100.05)/0.1)
+
+                preds = predicted_data[:, 0, temp_lat, temp_lon, 0]
+                print(preds)
+                preds_arr.append(preds)
 
         common_util.mae(actual_arr.flatten(), preds_arr.flatten())
 
