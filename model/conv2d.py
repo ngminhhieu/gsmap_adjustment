@@ -75,7 +75,7 @@ class Conv2DSupervisor():
             Conv3D(filters=3,
                    kernel_size=(3, 3, 3),
                    padding='same',
-                   activation='sigmoid'))
+                   activation=self.activation))
 
         print(model.summary())
 
@@ -123,17 +123,16 @@ class Conv2DSupervisor():
         actual_data = self.target_test
         predicted_data = np.zeros(shape=(len(actual_data), self.horizon, 160,
                                          120, 3))
-        # predicted_data = np.zeros(shape=(len(self.target_train), self.seq_len,
-        #                                  72, 72, 3))
         from tqdm import tqdm
         iterator = tqdm(
             range(0,
                   len(self.target_train) - self.seq_len - self.horizon,
                   self.horizon))
         for i in iterator:
-            input = np.zeros(shape=(1, self.horizon, 160, 120, 3))
+            input = np.zeros(shape=(1, self.seq_len, 72, 72, 3))
             input[0, :, :, :, :] = input_test[i].copy()
             predicted_data[i] = self.model.predict(input)
+            print(predicted_data[i])
 
         print(predicted_data[predicted_data[:, :, :, :, 2] > 0])
         print(predicted_data)
