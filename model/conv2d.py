@@ -46,7 +46,7 @@ class Conv2DSupervisor():
             ConvLSTM2D(filters=32,
                        kernel_size=(3, 3),
                        padding='same',
-                       activation=self.activation,
+                    #    activation=self.activation,
                        return_sequences=True,
                        input_shape=(self.seq_len, 72, 72, 3)))
 
@@ -84,8 +84,8 @@ class Conv2DSupervisor():
         model.add(
             Conv3D(filters=3,
                    kernel_size=(3, 3, 3),
-                   padding='same',
-                   activation=self.activation))
+                   padding='same'))
+                #    activation=self.activation))
 
         print(model.summary())
 
