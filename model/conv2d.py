@@ -72,7 +72,11 @@ class Conv2DSupervisor():
         # ((top_crop, bottom_crop), (left_crop, right_crop))
         model.add(Cropping3D(cropping=((4, 4), (10, 10), (12, 12))))
 
-        model.add(Conv3D(filters=3, kernel_size=(3, 3, 3), padding='same', activaiton = 'sigmoid'))
+        model.add(
+            Conv3D(filters=3,
+                   kernel_size=(3, 3, 3),
+                   padding='same',
+                   activaiton='sigmoid'))
 
         print(model.summary())
 
@@ -117,21 +121,19 @@ class Conv2DSupervisor():
         self.model.compile(optimizer=self.optimizer, loss=self.loss)
 
         input_test = self.input_test
-        input_train = self.input_train
         actual_data = self.target_test
-        # predicted_data = np.zeros(shape=(len(actual_data), self.horizon, 160,
-        #                                  120, 3))
-        predicted_data = np.zeros(shape=(len(self.target_train), self.seq_len,
-                                         72, 72, 3))
+        predicted_data = np.zeros(shape=(len(actual_data), self.horizon, 160,
+                                         120, 3))
+        # predicted_data = np.zeros(shape=(len(self.target_train), self.seq_len,
+        #                                  72, 72, 3))
         from tqdm import tqdm
         iterator = tqdm(
             range(0,
                   len(self.target_train) - self.seq_len - self.horizon,
                   self.horizon))
         for i in iterator:
-            input = np.zeros(shape=(1, self.seq_len, 72, 72, 3))
-            input[0, :, :, :, :] = input_train[i].copy()
-            # input = input[np.newaxis, :, :, :, :]
+            input = np.zeros(shape=(1, self.horizon, 160, 120, 3))
+            input[0, :, :, :, :] = input_test[i].copy()
             predicted_data[i] = self.model.predict(input)
 
         print(predicted_data[predicted_data[:, :, :, :, 2] > 0])
