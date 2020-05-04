@@ -184,6 +184,8 @@ class Conv2DSupervisor():
             input = np.zeros(shape=(1, self.seq_len, 72, 72, 1))
             input[0, :, :, :, 0] = input_test[i, :, :, :, 2].copy()
             predicted_data[i] = self.model.predict(input)
+            print(predicted_data[i])
+            print(input[i])
 
         # total_mae = 0
         actual_arr = []
