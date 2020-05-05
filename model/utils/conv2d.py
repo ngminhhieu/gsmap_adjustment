@@ -92,6 +92,12 @@ def load_dataset(**kwargs):
     test_size = kwargs['data'].get('test_size')
     valid_size = kwargs['data'].get('valid_size')
 
+    # normalization
+    scaler = MinMaxScaler(copy=True, feature_range=(0, 1))
+    scaler.fit(target_conv2d_gsmap)
+    input_conv2d_gsmap = scaler.transform(input_conv2d_gsmap)
+    target_conv2d_gsmap = scaler.transform(target_conv2d_gsmap)
+
     # split data to train_set, valid_set, test_size
     input_train, input_valid, input_test = common_util.prepare_train_valid_test(
         input_conv2d_gsmap, test_size=test_size, valid_size=valid_size)
