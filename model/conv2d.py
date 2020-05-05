@@ -82,7 +82,7 @@ class Conv2DSupervisor():
             Conv3D(filters=3,
                    kernel_size=(3, 3, 3),
                    padding='same',
-                   activation=self.activation))
+                   activation='sigmoid'))
 
         print(model.summary())
 
@@ -191,7 +191,7 @@ class Conv2DSupervisor():
             input = np.zeros(shape=(1, self.seq_len, 72, 72, 3))
             input[0] = input_test[i].copy()
             predicted_data[i] = self.model.predict(input)
-
+        print(predicted_data[0])
         # total_mae = 0
         actual_arr = []
         preds_arr = []
@@ -216,8 +216,8 @@ class Conv2DSupervisor():
                 print(actual_precip)
                 preds = predicted_data[:, 0, temp_lat, temp_lon, 2]
                 print(preds)
-                print(actual_precip.shape)
-                print(preds.shape)
+                import sys
+                sys.exit()
                 preds_arr.append(preds)
 
         common_util.mae(actual_arr, preds_arr)
