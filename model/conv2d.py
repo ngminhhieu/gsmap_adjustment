@@ -48,7 +48,7 @@ class Conv2DSupervisor():
                        padding='same',
                        return_sequences=True,
                     #    activation = self.activation,
-                       input_shape=(self.seq_len, 72, 72, 1)))
+                       input_shape=(self.seq_len, 72, 72, 3)))
 
         model.add(BatchNormalization())
 
@@ -81,10 +81,10 @@ class Conv2DSupervisor():
         model.add(BatchNormalization())
 
         model.add(
-            Conv3D(filters=1,
+            Conv3D(filters=3,
                    kernel_size=(3, 3, 3),
                    padding='same',
-                   activation='tanh'))
+                   activation='relu'))
 
         print(model.summary())
 
@@ -100,39 +100,39 @@ class Conv2DSupervisor():
                            loss=self.loss,
                            metrics=['mse', 'mae'])
 
-        input_train = np.zeros(shape=(len(self.input_train), self.seq_len, 72,
-                                      72, 1))
-        target_train = np.zeros(shape=(len(self.target_train), self.horizon,
-                                       160, 120, 1))
-        input_valid = np.zeros(shape=(len(self.input_valid), self.seq_len, 72,
-                                      72, 1))
-        target_valid = np.zeros(shape=(len(self.target_valid), self.horizon,
-                                       160, 120, 1))
+        # input_train = np.zeros(shape=(len(self.input_train), self.seq_len, 72,
+        #                               72, 1))
+        # target_train = np.zeros(shape=(len(self.target_train), self.horizon,
+        #                                160, 120, 1))
+        # input_valid = np.zeros(shape=(len(self.input_valid), self.seq_len, 72,
+        #                               72, 1))
+        # target_valid = np.zeros(shape=(len(self.target_valid), self.horizon,
+        #                                160, 120, 1))
 
-        input_train[:, :, :, :, 0] = self.input_train[:, :, :, :, 2].copy()
-        target_train[:, :, :, :, 0] = self.target_train[:, :, :, :, 2].copy()
-        input_valid[:, :, :, :, 0] = self.input_valid[:, :, :, :, 2].copy()
-        target_valid[:, :, :, :, 0] = self.target_valid[:, :, :, :, 2].copy()
+        # input_train[:, :, :, :, 0] = self.input_train[:, :, :, :, 2].copy()
+        # target_train[:, :, :, :, 0] = self.target_train[:, :, :, :, 2].copy()
+        # input_valid[:, :, :, :, 0] = self.input_valid[:, :, :, :, 2].copy()
+        # target_valid[:, :, :, :, 0] = self.target_valid[:, :, :, :, 2].copy()
 
-        # training_history = self.model.fit(self.input_train[:,:,:,:,2],
-        #                                   self.target_train[:,:,:,:,2],
-        #                                   batch_size=self.batch_size,
-        #                                   epochs=self.epochs,
-        #                                   callbacks=self.callbacks,
-        #                                   validation_data=(self.input_valid[:,:,:,:,2],
-        #                                                    self.target_valid[:,:,:,:,2]),
-        #                                   shuffle=True,
-        #                                   verbose=2)
-
-        training_history = self.model.fit(input_train,
-                                          target_train,
+        training_history = self.model.fit(self.input_train,
+                                          self.target_train,
                                           batch_size=self.batch_size,
                                           epochs=self.epochs,
                                           callbacks=self.callbacks,
-                                          validation_data=(input_valid,
-                                                           target_valid),
+                                          validation_data=(self.input_valid,
+                                                           self.target_valid),
                                           shuffle=True,
                                           verbose=2)
+
+        # training_history = self.model.fit(input_train,
+        #                                   target_train,
+        #                                   batch_size=self.batch_size,
+        #                                   epochs=self.epochs,
+        #                                   callbacks=self.callbacks,
+        #                                   validation_data=(input_valid,
+        #                                                    target_valid),
+        #                                   shuffle=True,
+        #                                   verbose=2)
 
         if training_history is not None:
             common_util._plot_training_history(training_history,
@@ -186,11 +186,11 @@ class Conv2DSupervisor():
         input_test = self.input_test
         actual_data = self.target_test
         predicted_data = np.zeros(shape=(len(actual_data), self.horizon, 160,
-                                         120, 1))
+                                         120, 3))
         from tqdm import tqdm
         iterator = tqdm(range(0,len(actual_data)))
         for i in iterator:
-            input = np.zeros(shape=(1, self.seq_len, 72, 72, 1))
+            input = np.zeros(shape=(1, self.seq_len, 72, 72, 3))
             input[0, :, :, :, 0] = input_test[i, :, :, :, 2].copy()
             predicted_data[i] = self.model.predict(input)
 
@@ -216,7 +216,7 @@ class Conv2DSupervisor():
                 # actual = actual[-354:1, 0]
                 actual_arr.append(actual_precip)
                 print(actual_precip)
-                preds = predicted_data[:, 0, temp_lat, temp_lon, 0]
+                preds = predicted_data[:, 0, temp_lat, temp_lon, 2]
                 print(preds)
                 print(actual_precip.shape)
                 print(preds.shape)
