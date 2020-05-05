@@ -47,7 +47,7 @@ class Conv2DSupervisor():
                        kernel_size=(3, 3),
                        padding='same',
                        return_sequences=True,
-                    #    activation = self.activation,
+                       activation = self.activation,
                        input_shape=(self.seq_len, 72, 72, 3)))
 
         model.add(BatchNormalization())
@@ -56,12 +56,12 @@ class Conv2DSupervisor():
             ConvLSTM2D(filters=32,
                        kernel_size=(3, 3),
                        padding='same',
-                    #    activation = self.activation,
+                       activation = self.activation,
                        return_sequences=True))
         model.add(BatchNormalization())
 
         model.add(Conv3D(filters=32, kernel_size=(3, 3, 3),
-        # activation = self.activation, 
+        activation = self.activation, 
         padding='same'))
         model.add(BatchNormalization())
         
@@ -71,7 +71,7 @@ class Conv2DSupervisor():
         model.add(
             Conv3DTranspose(filters=32,
                             kernel_size=(3, 3, 3),
-                            # activation = self.activation,
+                            activation = self.activation,
                             strides=(1, 5, 4)))
         model.add(BatchNormalization())
 
@@ -82,7 +82,7 @@ class Conv2DSupervisor():
             Conv3D(filters=3,
                    kernel_size=(3, 3, 3),
                    padding='same',
-                   activation='tanh'))
+                   activation=self.activation))
 
         print(model.summary())
 
