@@ -50,7 +50,7 @@ class Conv2DSupervisor():
                     #    activation = self.activation,
                        input_shape=(self.seq_len, 72, 72, 1)))
 
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
 
         model.add(
             ConvLSTM2D(filters=32,
@@ -58,12 +58,14 @@ class Conv2DSupervisor():
                        padding='same',
                     #    activation = self.activation,
                        return_sequences=True))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
 
         model.add(Conv3D(filters=32, kernel_size=(3, 3, 3),
+        model.add(BatchNormalization())
         # activation = self.activation, 
         padding='same'))
         model.add(MaxPooling3D(pool_size=(1, 2, 2)))
+        model.add(BatchNormalization())
 
         # scaling up
         model.add(
@@ -71,9 +73,11 @@ class Conv2DSupervisor():
                             kernel_size=(3, 3, 3),
                             # activation = self.activation,
                             strides=(1, 5, 4)))
+        model.add(BatchNormalization())
 
         # ((top_crop, bottom_crop), (left_crop, right_crop))
         model.add(Cropping3D(cropping=((4, 4), (10, 10), (12, 12))))
+        model.add(BatchNormalization())
 
         model.add(
             Conv3D(filters=1,
