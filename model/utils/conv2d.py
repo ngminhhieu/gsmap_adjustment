@@ -92,7 +92,7 @@ def load_dataset(**kwargs):
     test_size = kwargs['data'].get('test_size')
     valid_size = kwargs['data'].get('valid_size')
 
-    # # normalization
+    # normalization
     # scaler = MinMaxScaler(copy=True, feature_range=(0, 1))
     # scaler.fit(target_conv2d_gsmap)
     # input_conv2d_gsmap = scaler.transform(input_conv2d_gsmap)
