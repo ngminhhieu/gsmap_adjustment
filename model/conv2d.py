@@ -66,7 +66,6 @@ class Conv2DSupervisor():
         model.add(BatchNormalization())
         
         model.add(MaxPooling3D(pool_size=(1, 2, 2)))
-        model.add(BatchNormalization())
 
         # scaling up
         model.add(
@@ -78,13 +77,12 @@ class Conv2DSupervisor():
 
         # ((top_crop, bottom_crop), (left_crop, right_crop))
         model.add(Cropping3D(cropping=((4, 4), (10, 10), (12, 12))))
-        model.add(BatchNormalization())
 
         model.add(
             Conv3D(filters=3,
                    kernel_size=(3, 3, 3),
                    padding='same',
-                   activation='relu'))
+                   activation='tanh'))
 
         print(model.summary())
 
