@@ -1,7 +1,7 @@
 base_dir: log/conv2d/
 data:
   batch_size: 200
-  dataset: ../drive/My\ Drive/conv2d_gsmap.npz
+  dataset: ../drive/My Drive/conv2d_gsmap.npz
   # dataset: data/conv2d_gsmap/npz/conv2d_gsmap.npz
   test_batch_size: 1
   test_size: 0.2
