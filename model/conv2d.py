@@ -215,7 +215,7 @@ class Conv2DSupervisor():
                 print(preds.shape)
                 preds_arr.append(preds)
 
-        common_util.mae(actual_arr.flatten(), preds_arr.flatten())
+        common_util.mae(actual_arr, preds_arr)
 
     def plot_result(self):
         from matplotlib import pyplot as plt
