@@ -61,9 +61,10 @@ class Conv2DSupervisor():
         model.add(BatchNormalization())
 
         model.add(Conv3D(filters=32, kernel_size=(3, 3, 3),
-        model.add(BatchNormalization())
         # activation = self.activation, 
         padding='same'))
+        model.add(BatchNormalization())
+        
         model.add(MaxPooling3D(pool_size=(1, 2, 2)))
         model.add(BatchNormalization())
 
