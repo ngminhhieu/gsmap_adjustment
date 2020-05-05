@@ -84,7 +84,7 @@ class Conv2DSupervisor():
             Conv3D(filters=1,
                    kernel_size=(3, 3, 3),
                    padding='same',
-                   activation='relu'))
+                   activation='tanh'))
 
         print(model.summary())
 
