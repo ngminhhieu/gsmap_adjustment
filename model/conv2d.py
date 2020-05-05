@@ -195,20 +195,24 @@ class Conv2DSupervisor():
             
             for lon_index in range(72):
                 lon = input_test[-1, -1, 0, lon_index, 1]
-                actual_precip = actual_data[:, :, lat_index, lon_index, 2]
-                os.system(
-                    'cdo -outputtab,value -remapnn,lon={}_lat={} data/conv2d_gsmap/gsmap_2011_2018.nc > data/test/precip.csv'
-                    .format(lon, lat))
-                precipitation = read_csv('data/test/precip.csv')
-                actual = precipitation.to_numpy()
-                actual = actual[-354:, 0]
-                print(actual)
+                temp_lat = int(round((23.95-lat)/0.1))
+                temp_lon = int(round((lon-100.05)/0.1))
+                # print(lat, lon)
+                # print(temp_lat, temp_lon)
+                # print(actual_data[-1, -1, temp_lat, 0, 0], actual_data[-1, -1, 0, temp_lon, 1])
+                actual_precip = actual_data[:, 0, temp_lat, temp_lon, 2]
+                # os.system(
+                #     'cdo -outputtab,value -remapnn,lon={}_lat={} data/conv2d_gsmap/gsmap_2011_2018.nc > data/test/precip.csv'
+                #     .format(lon, lat))
+                # precipitation = read_csv('data/test/precip.csv')
+                # actual = precipitation.to_numpy()
+                # actual = actual[-354:1, 0]
                 actual_arr.append(actual_precip)
-                temp_lat = int((23.95-lat)/0.1)
-                temp_lon = int((lon-100.05)/0.1)
-
+                print(actual_precip)
                 preds = predicted_data[:, 0, temp_lat, temp_lon, 0]
                 print(preds)
+                print(actual_precip.shape)
+                print(preds.shape)
                 preds_arr.append(preds)
 
         common_util.mae(actual_arr.flatten(), preds_arr.flatten())
