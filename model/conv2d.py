@@ -84,7 +84,7 @@ class Conv2DSupervisor():
             Conv3D(filters=3,
                    kernel_size=(3, 3, 3),
                    padding='same',
-                   activation='relu'))
+                   activation='tanh'))
 
         print(model.summary())
 
@@ -191,7 +191,7 @@ class Conv2DSupervisor():
         iterator = tqdm(range(0,len(actual_data)))
         for i in iterator:
             input = np.zeros(shape=(1, self.seq_len, 72, 72, 3))
-            input[0, :, :, :, 0] = input_test[i, :, :, :, 2].copy()
+            input[0] = input_test[i].copy()
             predicted_data[i] = self.model.predict(input)
 
         # total_mae = 0
