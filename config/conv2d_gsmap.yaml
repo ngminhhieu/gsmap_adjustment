@@ -10,7 +10,7 @@ log_level: INFO
 model:
   rnn_units: 100
   activation: relu
-  seq_len: 7
+  seq_len: 14
   horizon: 1
 train:
   dropout: 0

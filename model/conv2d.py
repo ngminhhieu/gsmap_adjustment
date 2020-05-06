@@ -50,7 +50,7 @@ class Conv2DSupervisor():
                        activation = self.activation,
                        input_shape=(self.seq_len, 72, 72, 3)))
 
-        model.add(BatchNormalization())
+        # model.add(BatchNormalization())
 
         model.add(
             ConvLSTM2D(filters=32,
@@ -58,7 +58,20 @@ class Conv2DSupervisor():
                        padding='same',
                        activation = self.activation,
                        return_sequences=True))
-        model.add(BatchNormalization())
+        # model.add(BatchNormalization())
+        model.add(
+            ConvLSTM2D(filters=32,
+                       kernel_size=(3, 3),
+                       padding='same',
+                       activation = self.activation,
+                       return_sequences=True))
+        
+        model.add(
+            ConvLSTM2D(filters=32,
+                       kernel_size=(3, 3),
+                       padding='same',
+                       activation = self.activation,
+                       return_sequences=True))
 
         # model.add(Conv3D(filters=32, kernel_size=(3, 3, 3),
         # activation = self.activation, 
@@ -192,7 +205,6 @@ class Conv2DSupervisor():
             input = np.zeros(shape=(1, self.seq_len, 72, 72, 3))
             input[0] = input_test[i].copy()
             predicted_data[i] = self.model.predict(input)
-        print(predicted_data[0])
         # total_mae = 0
         actual_arr = []
         preds_arr = []
