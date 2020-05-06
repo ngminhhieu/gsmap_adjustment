@@ -60,10 +60,10 @@ class Conv2DSupervisor():
                        return_sequences=True))
         model.add(BatchNormalization())
 
-        model.add(Conv3D(filters=32, kernel_size=(3, 3, 3),
-        activation = self.activation, 
-        padding='same'))
-        model.add(BatchNormalization())
+        # model.add(Conv3D(filters=32, kernel_size=(3, 3, 3),
+        # activation = self.activation, 
+        # padding='same'))
+        # model.add(BatchNormalization())
         
         # model.add(MaxPooling3D(pool_size=(1, 2, 2)))
 
@@ -206,7 +206,7 @@ class Conv2DSupervisor():
                 # print(temp_lat, temp_lon)
                 # print(actual_data[-1, -1, temp_lat, 0, 0], actual_data[-1, -1, 0, temp_lon, 1])
                 # actual_precip = actual_data[:, 0, temp_lat, temp_lon, 2]
-                actual_precip = actual_data[:, 0, lat, lon, 2]
+                actual_precip = actual_data[:, -1, lat, lon, 2]
                 # os.system(
                 #     'cdo -outputtab,value -remapnn,lon={}_lat={} data/conv2d_gsmap/gsmap_2011_2018.nc > data/test/precip.csv'
                 #     .format(lon, lat))
@@ -215,7 +215,7 @@ class Conv2DSupervisor():
                 # actual = actual[-354:1, 0]
                 actual_arr.append(actual_precip)
                 print(actual_precip)
-                preds = predicted_data[:, 0, lat, lon, 2]
+                preds = predicted_data[:, -1, lat, lon, 2]
                 print(preds)
                 import sys
                 sys.exit()
