@@ -42,7 +42,7 @@ class Conv2DSupervisor():
 
         # extract useful information
         model.add(
-            ConvLSTM2D(filters=32,
+            ConvLSTM2D(filters=16,
                        kernel_size=(3, 3),
                        padding='same',
                        return_sequences=True,
