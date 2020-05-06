@@ -4,7 +4,6 @@ from keras.layers.convolutional import Conv3D, Conv3DTranspose
 from keras.layers.convolutional_recurrent import ConvLSTM2D
 from keras.layers.normalization import BatchNormalization
 import numpy as np
-import pylab as plt
 from model import common_util
 import model.utils.conv2d as utils_conv2d
 import os
@@ -52,23 +51,23 @@ class Conv2DSupervisor():
                        input_shape=(self.seq_len, 72, 72, 3)))
         model.add(BatchNormalization())
 
-        model.add(
-            ConvLSTM2D(filters=32,
-                       kernel_size=(3, 3),
-                       padding='same',
-                       activation = self.activation,
-                       name='hidden_layer_convlstm2d_1',
-                       return_sequences=True))
-        model.add(BatchNormalization())
+        # model.add(
+        #     ConvLSTM2D(filters=32,
+        #                kernel_size=(3, 3),
+        #                padding='same',
+        #                activation = self.activation,
+        #                name='hidden_layer_convlstm2d_1',
+        #                return_sequences=True))
+        # model.add(BatchNormalization())
         
-        model.add(
-            ConvLSTM2D(filters=32,
-                       kernel_size=(3, 3),
-                       padding='same',
-                       activation = self.activation,
-                       name='hidden_layer_convlstm2d_2',
-                       return_sequences=True))
-        model.add(BatchNormalization())
+        # model.add(
+        #     ConvLSTM2D(filters=32,
+        #                kernel_size=(3, 3),
+        #                padding='same',
+        #                activation = self.activation,
+        #                name='hidden_layer_convlstm2d_2',
+        #                return_sequences=True))
+        # model.add(BatchNormalization())
         
         # model.add(
         #     ConvLSTM2D(filters=32,
