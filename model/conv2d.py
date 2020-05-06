@@ -75,7 +75,7 @@ class Conv2DSupervisor():
         #                     strides=(1, 5, 4)))
         # model.add(BatchNormalization())
 
-        # # ((top_crop, bottom_crop), (left_crop, right_crop))
+        # # # ((top_crop, bottom_crop), (left_crop, right_crop))
         # model.add(Cropping3D(cropping=((4, 4), (10, 10), (12, 12))))
 
         model.add(
@@ -205,11 +205,12 @@ class Conv2DSupervisor():
                 # print(lat, lon)
                 # print(temp_lat, temp_lon)
                 # print(actual_data[-1, -1, temp_lat, 0, 0], actual_data[-1, -1, 0, temp_lon, 1])
-                actual_precip = actual_data[:, 0, temp_lat, temp_lon, 2]
-                # actual_precip = actual_data[:, -1, lat_index, lon_index, 2]
+                # actual_precip = actual_data[:, 0, temp_lat, temp_lon, 2]
+                actual_precip = actual_data[:, -1, lat_index, lon_index, 2]
                 actual_arr.append(actual_precip)
                 print(actual_precip)
-                preds = predicted_data[:, 0, temp_lat, temp_lon, 2]
+                preds = predicted_data[:, -1, lat_index, lon_index, 2]
+                # preds = predicted_data[:, 0, temp_lat, temp_lon, 2]
                 print(preds)
                 import sys
                 sys.exit()
