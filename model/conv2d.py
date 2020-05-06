@@ -42,7 +42,7 @@ class Conv2DSupervisor():
 
         # extract useful information
         model.add(
-            ConvLSTM2D(filters=16,
+            ConvLSTM2D(filters=32,
                        kernel_size=(3, 3),
                        padding='same',
                        return_sequences=True,
@@ -52,7 +52,7 @@ class Conv2DSupervisor():
         model.add(BatchNormalization())
 
         model.add(
-            ConvLSTM2D(filters=32,
+            ConvLSTM2D(filters=64,
                        kernel_size=(3, 3),
                        padding='same',
                        activation = self.activation,
@@ -60,14 +60,14 @@ class Conv2DSupervisor():
                        return_sequences=True))
         model.add(BatchNormalization())
         
-        model.add(
-            ConvLSTM2D(filters=32,
-                       kernel_size=(3, 3),
-                       padding='same',
-                       activation = self.activation,
-                       name='hidden_layer_convlstm2d_2',
-                       return_sequences=True))
-        model.add(BatchNormalization())
+        # model.add(
+        #     ConvLSTM2D(filters=32,
+        #                kernel_size=(3, 3),
+        #                padding='same',
+        #                activation = self.activation,
+        #                name='hidden_layer_convlstm2d_2',
+        #                return_sequences=True))
+        # model.add(BatchNormalization())
         
         # model.add(
         #     ConvLSTM2D(filters=32,
