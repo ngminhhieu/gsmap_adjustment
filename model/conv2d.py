@@ -206,16 +206,10 @@ class Conv2DSupervisor():
                 # print(temp_lat, temp_lon)
                 # print(actual_data[-1, -1, temp_lat, 0, 0], actual_data[-1, -1, 0, temp_lon, 1])
                 # actual_precip = actual_data[:, 0, temp_lat, temp_lon, 2]
-                actual_precip = actual_data[:, -1, lat, lon, 2]
-                # os.system(
-                #     'cdo -outputtab,value -remapnn,lon={}_lat={} data/conv2d_gsmap/gsmap_2011_2018.nc > data/test/precip.csv'
-                #     .format(lon, lat))
-                # precipitation = read_csv('data/test/precip.csv')
-                # actual = precipitation.to_numpy()
-                # actual = actual[-354:1, 0]
+                actual_precip = actual_data[:, -1, lat_index, lon_index, 2]
                 actual_arr.append(actual_precip)
                 print(actual_precip)
-                preds = predicted_data[:, -1, lat, lon, 2]
+                preds = predicted_data[:, -1, lat_index, lon_index, 2]
                 print(preds)
                 import sys
                 sys.exit()
