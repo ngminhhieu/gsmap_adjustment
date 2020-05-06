@@ -77,9 +77,10 @@ class Conv2DSupervisor():
 
         # # # ((top_crop, bottom_crop), (left_crop, right_crop))
         # model.add(Cropping3D(cropping=((4, 4), (10, 10), (12, 12))))
+        model.add(Cropping3D(cropping=((3, 3), (0, 0), (0, 0))))
 
         model.add(
-            Conv3D(filters=1,
+            Conv3D(filters=3,
                    kernel_size=(3, 3, 3),
                    padding='same',
                    activation='relu'))
