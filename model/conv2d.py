@@ -60,14 +60,15 @@ class Conv2DSupervisor():
                        name='hidden_layer_convlstm2d_1',
                        return_sequences=True))
         model.add(BatchNormalization())
-        # model.add(
-        #     ConvLSTM2D(filters=32,
-        #                kernel_size=(3, 3),
-        #                padding='same',
-        #                activation = self.activation,
-        #                name='hidden_layer_convlstm2d_2',
-        #                return_sequences=True))
-        # model.add(BatchNormalization())
+        
+        model.add(
+            ConvLSTM2D(filters=32,
+                       kernel_size=(3, 3),
+                       padding='same',
+                       activation = self.activation,
+                       name='hidden_layer_convlstm2d_2',
+                       return_sequences=True))
+        model.add(BatchNormalization())
         
         # model.add(
         #     ConvLSTM2D(filters=32,
