@@ -65,18 +65,18 @@ class Conv2DSupervisor():
         padding='same'))
         model.add(BatchNormalization())
         
-        model.add(MaxPooling3D(pool_size=(1, 2, 2)))
+        # model.add(MaxPooling3D(pool_size=(1, 2, 2)))
 
-        # scaling up
-        model.add(
-            Conv3DTranspose(filters=32,
-                            kernel_size=(3, 3, 3),
-                            activation = self.activation,
-                            strides=(1, 5, 4)))
-        model.add(BatchNormalization())
+        # # scaling up
+        # model.add(
+        #     Conv3DTranspose(filters=32,
+        #                     kernel_size=(3, 3, 3),
+        #                     activation = self.activation,
+        #                     strides=(1, 5, 4)))
+        # model.add(BatchNormalization())
 
-        # ((top_crop, bottom_crop), (left_crop, right_crop))
-        model.add(Cropping3D(cropping=((4, 4), (10, 10), (12, 12))))
+        # # ((top_crop, bottom_crop), (left_crop, right_crop))
+        # model.add(Cropping3D(cropping=((4, 4), (10, 10), (12, 12))))
 
         model.add(
             Conv3D(filters=3,
@@ -183,8 +183,8 @@ class Conv2DSupervisor():
 
         input_test = self.input_test
         actual_data = self.target_test
-        predicted_data = np.zeros(shape=(len(actual_data), self.horizon, 160,
-                                         120, 3))
+        predicted_data = np.zeros(shape=(len(actual_data), 7, 72,
+                                         72, 3))
         from tqdm import tqdm
         iterator = tqdm(range(0,len(actual_data)))
         for i in iterator:
