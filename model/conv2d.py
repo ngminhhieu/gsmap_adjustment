@@ -48,6 +48,7 @@ class Conv2DSupervisor():
                        padding='same',
                        return_sequences=True,
                        activation = self.activation,
+                       name = 'input_layer_convlstm2d',
                        input_shape=(self.seq_len, 72, 72, 3)))
 
         # model.add(BatchNormalization())
@@ -57,6 +58,7 @@ class Conv2DSupervisor():
                        kernel_size=(3, 3),
                        padding='same',
                        activation = self.activation,
+                       name='hidden_layer_convlstm2d_1',
                        return_sequences=True))
         # model.add(BatchNormalization())
         model.add(
@@ -64,6 +66,7 @@ class Conv2DSupervisor():
                        kernel_size=(3, 3),
                        padding='same',
                        activation = self.activation,
+                       name='hidden_layer_convlstm2d_2',
                        return_sequences=True))
         
         model.add(
@@ -71,6 +74,7 @@ class Conv2DSupervisor():
                        kernel_size=(3, 3),
                        padding='same',
                        activation = self.activation,
+                       name='hidden_layer_convlstm2d_3',
                        return_sequences=True))
 
         # model.add(Conv3D(filters=32, kernel_size=(3, 3, 3),
@@ -90,12 +94,13 @@ class Conv2DSupervisor():
 
         # # # ((top_crop, bottom_crop), (left_crop, right_crop))
         # model.add(Cropping3D(cropping=((4, 4), (10, 10), (12, 12))))
-        model.add(Cropping3D(cropping=((3, 3), (0, 0), (0, 0))))
+        model.add(Cropping3D(cropping=((3, 3), (0, 0), (0, 0)), name='cropping_layer'))
 
         model.add(
             Conv3D(filters=3,
                    kernel_size=(3, 3, 3),
                    padding='same',
+                   name='output_layer_conv3d'
                    activation='relu'))
 
         print(model.summary())
@@ -197,7 +202,7 @@ class Conv2DSupervisor():
 
         input_test = self.input_test
         actual_data = self.target_test
-        predicted_data = np.zeros(shape=(len(actual_data), 7, 72,
+        predicted_data = np.zeros(shape=(len(actual_data), self.horizon, 72,
                                          72, 3))
         from tqdm import tqdm
         iterator = tqdm(range(0,len(actual_data)))
