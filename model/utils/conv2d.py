@@ -27,7 +27,7 @@ def create_data(**kwargs):
     target_conv2d_gsmap = np.zeros(shape=(T, horizon,
                                           len(target_lat), len(target_lon),
                                           channels))
-    input_conv2d_gsmap2 = np.zeros(shape=(T, horizon,
+    input_conv2d_gsmap2 = np.zeros(shape=(T, seq_len,
                                           len(target_lat), len(target_lon),
                                           channels))
     """fill input_data"""
@@ -77,7 +77,8 @@ def create_data(**kwargs):
 
     # shape convlstm2d (batch_size, n_frames, height, width, channels)
     _x = np.empty(shape=(seq_len, len(lat), len(lon), channels))
-    _y = np.empty(shape=(horizon, len(lat), len(lon), channels))
+    _y = np.empty(shape=(horizon, 160, 120, channels))
+    _z = np.empty(shape=(seq_len, 160, 120, channels))
     for i in range(0, T):
         _x = precip[i:i + seq_len]
         # _y = target_precip[i + seq_len - horizon]
