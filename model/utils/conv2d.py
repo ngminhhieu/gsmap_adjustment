@@ -96,9 +96,35 @@ def create_data(**kwargs):
     return input_conv2d_gsmap2, target_conv2d_gsmap
 
 
+def create_data_prediction(**kwargs):
+    
+    data_npz = kwargs['data'].get('dataset')
+    seq_len = kwargs['model'].get('seq_len')
+    horizon = kwargs['model'].get('horizon')
+
+    time = np.load(data_npz)['time']
+    # horizon is in seq_len. the last
+    T = len(time) - seq_len - horizon
+
+    lon = np.load(data_npz)['output_lon']
+    lat = np.load(data_npz)['output_lat']
+    precip = np.load(data_npz)['output_precip']
+
+
+    input_conv2d_gsmap = np.zeros(shape=(T, seq_len,
+                                         len(lat), len(lon), 1))
+    target_conv2d_gsmap = np.zeros(shape=(T, seq_len,
+                                          len(lat), len(lon), 1))
+
+    for i in range(0, T):
+        input_conv2d_gsmap[i, :, :, :, :] = precip[i:i+seq_len]
+        target_conv2d_gsmap[i, :, :, :, :] = precip[i+1:i+seq_len+1]
+
+    return input_conv2d_gsmap, target_conv2d_gsmap
+
 def load_dataset(**kwargs):
     # get preprocessed input and target
-    input_conv2d_gsmap, target_conv2d_gsmap = create_data(**kwargs)
+    input_conv2d_gsmap, target_conv2d_gsmap = create_data_prediction(**kwargs)
 
     # get test_size, valid_size from config
     test_size = kwargs['data'].get('test_size')

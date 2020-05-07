@@ -77,7 +77,7 @@ class Conv2DSupervisor():
 
         # # # ((top_crop, bottom_crop), (left_crop, right_crop))
         # model.add(Cropping3D(cropping=((4, 4), (10, 10), (12, 12))))
-        model.add(Cropping3D(cropping=((7, 7), (0, 0), (0, 0)), name='cropping_layer'))
+        # model.add(Cropping3D(cropping=((7, 7), (0, 0), (0, 0)), name='cropping_layer'))
 
         model.add(
             Conv3D(filters=3,
@@ -100,20 +100,6 @@ class Conv2DSupervisor():
                            loss=self.loss,
                            metrics=['mse', 'mae'])
 
-        # input_train = np.zeros(shape=(len(self.input_train), self.seq_len, 72,
-        #                               72, 1))
-        # target_train = np.zeros(shape=(len(self.target_train), self.horizon,
-        #                                160, 120, 1))
-        # input_valid = np.zeros(shape=(len(self.input_valid), self.seq_len, 72,
-        #                               72, 1))
-        # target_valid = np.zeros(shape=(len(self.target_valid), self.horizon,
-        #                                160, 120, 1))
-
-        # input_train[:, :, :, :, 0] = self.input_train[:, :, :, :, 2].copy()
-        # target_train[:, :, :, :, 0] = self.target_train[:, :, :, :, 2].copy()
-        # input_valid[:, :, :, :, 0] = self.input_valid[:, :, :, :, 2].copy()
-        # target_valid[:, :, :, :, 0] = self.target_valid[:, :, :, :, 2].copy()
-
         training_history = self.model.fit(self.input_train,
                                           self.target_train,
                                           batch_size=self.batch_size,
@@ -123,16 +109,6 @@ class Conv2DSupervisor():
                                                            self.target_valid),
                                           shuffle=True,
                                           verbose=2)
-
-        # training_history = self.model.fit(input_train,
-        #                                   target_train,
-        #                                   batch_size=self.batch_size,
-        #                                   epochs=self.epochs,
-        #                                   callbacks=self.callbacks,
-        #                                   validation_data=(input_valid,
-        #                                                    target_valid),
-        #                                   shuffle=True,
-        #                                   verbose=2)
 
         if training_history is not None:
             common_util._plot_training_history(training_history,
@@ -165,7 +141,9 @@ class Conv2DSupervisor():
             # input = np.zeros(shape=(1, self.seq_len, 72, 72, 1))
             input = np.zeros(shape=(1, self.seq_len, 160, 120, 1))
             input[0, :, :, :, 0] = input_test[i, :, :, :, 2].copy()
-            predicted_data[i] = self.model.predict(input)
+            yhats = self.model.predict(input)
+            print(yhats.shape)
+            predicted_data[i] = yhats[-1]
             print(input[i, -1, :, :, 0])
             print(predicted_data[i, :, :, :, 0])
 
@@ -196,7 +174,9 @@ class Conv2DSupervisor():
             # input = np.zeros(shape=(1, self.seq_len, 72, 72, 3))
             input = np.zeros(shape=(1, self.seq_len, 160, 120, 3))
             input[0] = input_test[i].copy()
-            predicted_data[i] = self.model.predict(input)
+            yhats = self.model.predict(input)
+            print(yhats.shape)
+            predicted_data[i] = yhats[-1]
         # total_mae = 0
         actual_arr = []
         preds_arr = []
@@ -217,8 +197,6 @@ class Conv2DSupervisor():
                 # preds = predicted_data[:, 0, lat_index, lon_index, 2]
                 preds = predicted_data[:, 0, temp_lat, temp_lon, 2]
                 print(preds)
-                # import sys
-                # sys.exit()
                 preds_arr.append(preds)
 
         common_util.mae(actual_arr, preds_arr)
