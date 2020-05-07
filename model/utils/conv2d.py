@@ -26,10 +26,7 @@ def create_data(**kwargs):
                                          len(lat), len(lon), channels))
     target_conv2d_gsmap = np.zeros(shape=(T, horizon,
                                           len(target_lat), len(target_lon),
-                                          channels))
-    input_conv2d_gsmap2 = np.zeros(shape=(T, seq_len,
-                                          len(target_lat), len(target_lon),
-                                          channels))
+                                          channels)
     """fill input_data"""
     # preprocessing data
     lon_res = lon.reshape(1, lon.shape[0])
@@ -72,26 +69,19 @@ def create_data(**kwargs):
     target_conv2d_gsmap[:, :, :, :, 0] = target_lat_dup
     target_conv2d_gsmap[:, :, :, :, 1] = target_lon_dup
 
-    input_conv2d_gsmap2[:, :, :, :, 0] = target_lat_dup
-    input_conv2d_gsmap2[:, :, :, :, 1] = target_lon_dup
-
     # shape convlstm2d (batch_size, n_frames, height, width, channels)
     _x = np.empty(shape=(seq_len, len(lat), len(lon), channels))
     _y = np.empty(shape=(horizon, 160, 120, channels))
-    _z = np.empty(shape=(seq_len, 160, 120, channels))
     for i in range(0, T):
         _x = precip[i:i + seq_len]
-        # _y = target_precip[i + seq_len - horizon]
-        _y = target_precip[i + seq_len]
-        _z = target_precip[i:i+seq_len]
+        _y = target_precip[i + seq_len - horizon]
 
         input_conv2d_gsmap[i, :, :, :, 2] = _x
         target_conv2d_gsmap[i, :, :, :, 2] = _y
-        input_conv2d_gsmap2[i, :, :, :, 2] = _z
     
-    target_conv2d_gsmap_2 = np.zeros(shape=(T, horizon, 72, 72, 3))
-    target_conv2d_gsmap_2[:,:,:,:,2] = target_conv2d_gsmap[:, :, 0:72, 0:72, 2].copy()
-    target_conv2d_gsmap_2[:, :, :, :, 0:2] = target_conv2d_gsmap[:, :, 0:72, 0:72, 0:2].copy()
+    # target_conv2d_gsmap_2 = np.zeros(shape=(T, horizon, 72, 72, 3))
+    # target_conv2d_gsmap_2[:,:,:,:,2] = target_conv2d_gsmap[:, :, 0:72, 0:72, 2].copy()
+    # target_conv2d_gsmap_2[:, :, :, :, 0:2] = target_conv2d_gsmap[:, :, 0:72, 0:72, 0:2].copy()
 
     return input_conv2d_gsmap2, target_conv2d_gsmap
 
