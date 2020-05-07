@@ -81,7 +81,7 @@ def create_data(**kwargs):
     
     target_conv2d_gsmap_2 = np.zeros(shape=(T, horizon, 72, 72, 3))
     target_conv2d_gsmap_2[:,:,:,:,2] = target_conv2d_gsmap[:, :, 0:72, 0:72, 2].copy()
-    target_conv2d_gsmap_2[:, :, :, :, 0:2] = input_conv2d_gsmap[:, 0:1, :, :, 0:2].copy()
+    target_conv2d_gsmap_2[:, :, :, :, 0:2] = target_conv2d_gsmap[:, 0, 0:72, 0:72, 0:2].copy()
 
     return input_conv2d_gsmap, target_conv2d_gsmap_2
 
