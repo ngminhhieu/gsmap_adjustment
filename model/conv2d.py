@@ -48,11 +48,11 @@ class Conv2DSupervisor():
                        return_sequences=True,
                        activation = self.activation,
                        name = 'input_layer_convlstm2d',
-                       input_shape=(self.seq_len, 160, 120, 3)))
+                       input_shape=(self.seq_len, 160, 120, 1)))
         model.add(BatchNormalization())
 
         model.add(
-            ConvLSTM2D(filters=8,
+            ConvLSTM2D(filters=16,
                        kernel_size=(3, 3),
                        padding='same',
                        activation = self.activation,
@@ -80,7 +80,7 @@ class Conv2DSupervisor():
         # model.add(Cropping3D(cropping=((7, 7), (0, 0), (0, 0)), name='cropping_layer'))
 
         model.add(
-            Conv3D(filters=3,
+            Conv3D(filters=1,
                    kernel_size=(3, 3, 3),
                    padding='same',
                    name='output_layer_conv3d',
