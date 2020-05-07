@@ -52,7 +52,7 @@ class Conv2DSupervisor():
         model.add(BatchNormalization())
 
         model.add(
-            ConvLSTM2D(filters=16,
+            ConvLSTM2D(filters=8,
                        kernel_size=(3, 3),
                        padding='same',
                        activation = self.activation,
