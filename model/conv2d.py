@@ -194,9 +194,9 @@ class Conv2DSupervisor():
         lat = np.load(data_npz)['input_lat']
 
         gauge_dataset = self.config_model['data_kwargs'].get('gauge_dataset')
-        gauge_lon = np.load(data_npz)['gauge_lon']
-        gauge_lat = np.load(data_npz)['gauge_lat']
-        gauge_precipitation = np.load(data_npz)['gauge_precip']
+        gauge_lon = np.load(gauge_dataset)['gauge_lon']
+        gauge_lat = np.load(gauge_dataset)['gauge_lat']
+        gauge_precipitation = np.load(gauge_dataset)['gauge_precip']
 
         actual_arr = []
         preds_arr = []
