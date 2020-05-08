@@ -35,9 +35,9 @@ class Conv2DSupervisor():
         self.seq_len = self.config_model['seq_len']
         self.horizon = self.config_model['horizon']
 
-        self.model = self.build_model()
-
-    def build_model(self):
+        self.model = self.build_model_prediction()
+    
+    def build_model_generation(self):
         model = Sequential()
 
         # extract useful information
@@ -79,6 +79,43 @@ class Conv2DSupervisor():
         # # # ((top_crop, bottom_crop), (left_crop, right_crop))
         # model.add(Cropping3D(cropping=((4, 4), (10, 10), (12, 12))))
         # model.add(Cropping3D(cropping=((7, 7), (0, 0), (0, 0)), name='cropping_layer'))
+
+        model.add(
+            Conv3D(filters=1,
+                   kernel_size=(3, 3, 3),
+                   padding='same',
+                   name='output_layer_conv3d',
+                   activation=self.activation))
+
+        print(model.summary())
+
+        # plot model
+        from keras.utils import plot_model
+        plot_model(model=model,
+                   to_file=self.log_dir + '/conv2d_model.png',
+                   show_shapes=True)
+        return model
+
+    def build_model_prediction(self):
+        model = Sequential()
+        model.add(
+            ConvLSTM2D(filters=16,
+                       kernel_size=(3, 3),
+                       padding='same',
+                       return_sequences=True,
+                       activation = self.activation,
+                       name = 'input_layer_convlstm2d',
+                       input_shape=(None, 160, 120, 1)))
+        model.add(BatchNormalization())
+
+        model.add(
+            ConvLSTM2D(filters=16,
+                       kernel_size=(3, 3),
+                       padding='same',
+                       activation = self.activation,
+                       name='hidden_layer_convlstm2d_1',
+                       return_sequences=True))
+        model.add(BatchNormalization())
 
         model.add(
             Conv3D(filters=1,
@@ -139,20 +176,41 @@ class Conv2DSupervisor():
         for i in iterator:
             input = np.zeros(shape=(1, self.seq_len, 160, 120, 1))
             input[0] = input_test[i].copy()
-            # yhats = self.model.predict(input)
-            # print(yhats[0, -1])
-            # predicted_data[i] = yhats[0, -1]
             yhats = self.model.predict(input)   
-            print(yhats)
-            print(yhats.shape)
             predicted_data[i, 0] = yhats[0, -1]            
             print(predicted_data[i, 0])
             print("Prediction: ", np.count_nonzero(predicted_data[i, 0] > 0), "Actual: ", np.count_nonzero(actual_data[i, -1]>0))
             sys.exit()            
         
-        # # total_mae = 0
-        # actual_arr = []
-        # preds_arr = []
+        data_npz = self.config_model['data'].get('dataset')
+        lon = np.load(data_npz)['input_lon']
+        lat = np.load(data_npz)['input_lat']
+
+        actual_arr = []
+        preds_arr = []
+        for index, lat in np.ndenumerate(lat):
+            temp_lat = int(round((23.95-lat)/0.1))
+
+            for index, lon in np.ndenumerate(lon):
+                temp_lon = int(round((lon-100.05)/0.1))
+                print(temp_lat)
+                print(temp_lon)
+                print(lat)
+                print(lon)
+                sys.exit()
+
+                # actual data
+                actual_precip = actual_data[:, 0, temp_lat, temp_lon, 0]
+                actual_arr.append(actual_precip)
+                print(actual_precip)
+
+                # prediction data
+                preds = predicted_data[:, 0, temp_lat, temp_lon, 0]
+                print(preds)
+                preds_arr.append(preds)
+
+        common_util.mae(actual_arr, preds_arr)
+        
         # for lat_index in range(72):
         #     lat = input_test[-1, -1, lat_index, 0, 0]
             
