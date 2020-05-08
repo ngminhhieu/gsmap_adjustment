@@ -123,62 +123,25 @@ class Conv2DSupervisor():
             with open(os.path.join(self.log_dir, config_filename), 'w') as f:
                 yaml.dump(config, f, default_flow_style=False)
 
-    def test(self):
+    def test_prediction(self):
+        import sys
         print("Load model from: {}".format(self.log_dir))
         self.model.load_weights(self.log_dir + 'best_model.hdf5')
         self.model.compile(optimizer=self.optimizer, loss=self.loss)
 
         input_test = self.input_test
         actual_data = self.target_test
-        predicted_data = np.zeros(shape=(len(actual_data), self.horizon, 160,
-                                         120, 1))
-        from tqdm import tqdm
-        iterator = tqdm(
-            range(0,
-                  len(self.target_train) - self.seq_len - self.horizon,
-                  self.horizon))
-        for i in iterator:
-            # input = np.zeros(shape=(1, self.seq_len, 72, 72, 1))
-            input = np.zeros(shape=(1, self.seq_len, 160, 120, 1))
-            input[0, :, :, :, 0] = input_test[i, :, :, :, 2].copy()
-            yhats = self.model.predict(input)
-            print(yhats.shape)
-            predicted_data[i] = yhats[-1]
-            print(input[i, -1, :, :, 0])
-            print(predicted_data[i, :, :, :, 0])
-
-        print(predicted_data)
-        np.save(self.log_dir + 'pd', predicted_data)
-
-        actual_data = actual_data.flatten()
-        predicted_data = predicted_data.flatten()
-
-        common_util.mae(actual_data, predicted_data)
-        common_util.mse(actual_data, predicted_data)
-        common_util.rmse(actual_data, predicted_data)
-
-    def check(self):
-        print("Load model from: {}".format(self.log_dir))
-        self.model.load_weights(self.log_dir + 'best_model.hdf5')
-        self.model.compile(optimizer=self.optimizer, loss=self.loss)
-
-        input_test = self.input_test
-        actual_data = self.target_test
-        # predicted_data = np.zeros(shape=(len(actual_data), self.horizon, 72,
-        #                                  72, 3))
         predicted_data = np.zeros(shape=(len(actual_data), self.horizon, 160,
                                          120, 1))
         from tqdm import tqdm
         iterator = tqdm(range(0,len(actual_data)))
         for i in iterator:
-            # input = np.zeros(shape=(1, self.seq_len, 72, 72, 3))
             input = np.zeros(shape=(1, self.seq_len, 160, 120, 1))
             input[0] = input_test[i].copy()
             yhats = self.model.predict(input)
+            print(yhats[0, -1])
             predicted_data[i] = yhats[0, -1]
         
-        print(predicted_data[0])
-        print(actual_data[0, -1])
         # # total_mae = 0
         # actual_arr = []
         # preds_arr = []
@@ -201,7 +164,7 @@ class Conv2DSupervisor():
         #         print(preds)
         #         preds_arr.append(preds)
 
-        common_util.mae(actual_arr, preds_arr)
+        # common_util.mae(actual_arr, preds_arr)
 
     def plot_result(self):
         from matplotlib import pyplot as plt
