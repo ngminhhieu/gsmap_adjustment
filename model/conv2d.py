@@ -167,12 +167,12 @@ class Conv2DSupervisor():
         # predicted_data = np.zeros(shape=(len(actual_data), self.horizon, 72,
         #                                  72, 3))
         predicted_data = np.zeros(shape=(len(actual_data), self.horizon, 160,
-                                         120, 3))
+                                         120, 1))
         from tqdm import tqdm
         iterator = tqdm(range(0,len(actual_data)))
         for i in iterator:
             # input = np.zeros(shape=(1, self.seq_len, 72, 72, 3))
-            input = np.zeros(shape=(1, self.seq_len, 160, 120, 3))
+            input = np.zeros(shape=(1, self.seq_len, 160, 120, 1))
             input[0] = input_test[i].copy()
             yhats = self.model.predict(input)
             print(yhats.shape)
@@ -190,12 +190,12 @@ class Conv2DSupervisor():
                 # print(lat, lon)
                 # print(temp_lat, temp_lon)
                 # print(actual_data[-1, -1, temp_lat, 0, 0], actual_data[-1, -1, 0, temp_lon, 1])
-                actual_precip = actual_data[:, 0, temp_lat, temp_lon, 2]
+                actual_precip = actual_data[:, 0, temp_lat, temp_lon, 0]
                 # actual_precip = actual_data[:, 0, lat_index, lon_index, 2]
                 actual_arr.append(actual_precip)
                 print(actual_precip)
                 # preds = predicted_data[:, 0, lat_index, lon_index, 2]
-                preds = predicted_data[:, 0, temp_lat, temp_lon, 2]
+                preds = predicted_data[:, 0, temp_lat, temp_lon, 0]
                 print(preds)
                 preds_arr.append(preds)
 
