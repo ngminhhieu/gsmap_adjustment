@@ -235,7 +235,7 @@ class Conv2DSupervisor():
             preds = predicted_data[:, 0, temp_lat, temp_lon, 0]
             preds_arr.append(preds)
 
-        common_util.mae(gauge_arr, preds_arr)
+        common_util.cal_error(gauge_arr, preds_arr)
 
     def test_generation(self):
         for lat_index in range(72):

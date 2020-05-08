@@ -62,10 +62,11 @@ def find_lat_lon_remapnn():
 def set_gauge_data_to_gsmap():
     gauge_lat_arr = []
     gauge_lon_arr = []
-    gauge_precip_arr = np.empty(shape=(1766, 72))    
+    gauge_precip_arr = np.empty(shape=(1766, 72))
+    gsmap_precip_arr = np.empty(shape=(1766, 72))
     # get precipitation
     lat_arr, lon_arr, precipitation = get_lon_lat_gauge_data()
-    for i in range(0, len(lat_arr)):
+    for i in range(0, 1):
         os.system(
             'cdo -outputtab,value -remapnn,lon={}_lat={} data/conv2d_gsmap/gsmap_2011_2018.nc > data/conv2d_gsmap/remapnn.csv'
             .format(lon_arr[i], lat_arr[i]))
@@ -74,7 +75,13 @@ def set_gauge_data_to_gsmap():
         gauge_lon_arr.append(lon)
         precip = precipitation[i]
         gauge_precip_arr[:, i] = precip[:, 0]
-        
+
+        gsmap_precipitation = read_csv('data/conv2d_gsmap/remapnn.csv')
+        gsmap_precipitation = gsmap_precipitation.to_numpy()
+        gsmap_precip_arr[:, i] = gsmap_precipitation[:, 0]
+    
+        cal_error(gauge_precip_arr[-353:,:], gsmap_precip_arr[-353:,:])
+
     return gauge_lat_arr, gauge_lon_arr, gauge_precip_arr
 
 def save_to_npz():
@@ -85,4 +92,23 @@ def save_to_npz():
              gauge_lat=gauge_lat,
              gauge_precip=gauge_precip)
 
+def cal_error(test_arr, prediction_arr):
+    from sklearn.metrics import mean_squared_error, mean_absolute_error
+    with np.errstate(divide='ignore', invalid='ignore'):
+        # cal mse
+        error_mae = mean_absolute_error(test_arr, prediction_arr)
+
+        # cal rmse
+        error_mse = mean_squared_error(test_arr, prediction_arr)
+        error_rmse = np.sqrt(error_mse)
+
+        # cal mape
+        y_true, y_pred = np.array(test_arr), np.array(prediction_arr)
+        error_mape = np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+        error_list = [error_mae, error_rmse, error_mape]
+        print("MAE: %.4f" % (error_mae))
+        print("RMSE: %.4f" % (error_rmse))
+        print("MAPE: %.4f" % (error_mape))
+        return error_list
+        
 save_to_npz()

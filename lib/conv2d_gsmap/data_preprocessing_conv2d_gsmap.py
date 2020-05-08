@@ -8,7 +8,7 @@ import glob
 
 def get_lon_lat_gauge_data():
 
-    preprocessed_data_dir = './data/preprocessed_txt_data/'
+    preprocessed_data_dir = './data/conv2d_gsmap/preprocessed_txt_data/'
     start_index = len(preprocessed_data_dir)
     type_file = '.csv'
     end_index = -len(type_file)
@@ -33,10 +33,10 @@ def get_lon_lat_gauge_data():
 
 def find_lat_lon_remapnn():
     # find nearest lon_lat
-    precip_list = read_csv('./data/remapnn.csv')
+    precip_list = read_csv('./data/conv2d_gsmap/remapnn.csv')
     precip_list = precip_list.to_numpy()
 
-    original_nc = Dataset('data/gsmap_2011_2018.nc', 'r')
+    original_nc = Dataset('data/conv2d_gsmap/gsmap_2011_2018.nc', 'r')
 
     # check dataset
     gsmap_time = np.array(original_nc['time'][:])
@@ -67,7 +67,7 @@ def set_gauge_data_to_gsmap():
     lat_arr, lon_arr = get_lon_lat_gauge_data()
     for i in range(0, len(lat_arr)):
         os.system(
-            'cdo -outputtab,value -remapnn,lon={}_lat={} data/gsmap_2011_2018.nc > data/remapnn.csv'
+            'cdo -outputtab,value -remapnn,lon={}_lat={} data/conv2d_gsmap/gsmap_2011_2018.nc > data/conv2d_gsmap/remapnn.csv'
             .format(lon_arr[i], lat_arr[i]))
         lat, lon = find_lat_lon_remapnn()
         input_lat_arr.append(lat)
@@ -81,9 +81,9 @@ def set_gauge_data_to_gsmap():
                                        len(input_lat_arr), len(input_lon_arr)))
     for i in range(0, len(input_lat_arr)):
         os.system(
-            'cdo -outputtab,value -remapnn,lon={}_lat={} data/conv2d_gsmap/gsmap_2011_2018.nc > data/precip.csv'
+            'cdo -outputtab,value -remapnn,lon={}_lat={} data/conv2d_gsmap/gsmap_2011_2018.nc > data/conv2d_gsmap/precip.csv'
             .format(input_lon_arr[i], input_lat_arr[i]))
-        precipitation = read_csv('data/precip.csv')
+        precipitation = read_csv('data/conv2d_gsmap/precip.csv')
         precipitation = precipitation.to_numpy()
         input_precip_arr[:, i, i] = precipitation[:,0]
 
@@ -92,7 +92,7 @@ def set_gauge_data_to_gsmap():
 
 def save_to_npz():
     input_lat, input_lon, input_precip = set_gauge_data_to_gsmap()
-    output_nc = Dataset('data/gsmap_2011_2018.nc', 'r')
+    output_nc = Dataset('data/conv2d_gsmap/gsmap_2011_2018.nc', 'r')
 
     time = np.array(output_nc['time'][:])
     output_lon = np.array(output_nc['lon'][:])
