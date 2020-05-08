@@ -26,7 +26,7 @@ def create_data(**kwargs):
                                          len(lat), len(lon), channels))
     target_conv2d_gsmap = np.zeros(shape=(T, horizon,
                                           len(target_lat), len(target_lon),
-                                          channels)
+                                          channels))
     """fill input_data"""
     # preprocessing data
     lon_res = lon.reshape(1, lon.shape[0])
