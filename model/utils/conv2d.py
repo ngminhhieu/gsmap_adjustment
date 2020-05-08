@@ -103,15 +103,15 @@ def create_data_prediction(**kwargs):
 
     input_conv2d_gsmap = np.zeros(shape=(T, seq_len,
                                          len(lat), len(lon), 1))
-    # target_conv2d_gsmap = np.zeros(shape=(T, seq_len,
-    #                                       len(lat), len(lon), 1))
-    target_conv2d_gsmap = np.zeros(shape=(T, horizon,
+    target_conv2d_gsmap = np.zeros(shape=(T, seq_len,
                                           len(lat), len(lon), 1))
+    # target_conv2d_gsmap = np.zeros(shape=(T, horizon,
+    #                                       len(lat), len(lon), 1))
 
     for i in range(0, T):
         input_conv2d_gsmap[i, :, :, :, 0] = precip[i:i+seq_len]
-        # target_conv2d_gsmap[i, :, :, :, 0] = precip[i+horizon:i+seq_len+horizon]
-        target_conv2d_gsmap[i, :, :, :, 0] = precip[i+seq_len:i+seq_len+horizon]
+        target_conv2d_gsmap[i, :, :, :, 0] = precip[i+horizon:i+seq_len+horizon]
+        # target_conv2d_gsmap[i, :, :, :, 0] = precip[i+seq_len:i+seq_len+horizon]
     return input_conv2d_gsmap, target_conv2d_gsmap
 
 def load_dataset(**kwargs):
@@ -121,12 +121,6 @@ def load_dataset(**kwargs):
     # get test_size, valid_size from config
     test_size = kwargs['data'].get('test_size')
     valid_size = kwargs['data'].get('valid_size')
-
-    # normalization
-    # scaler = MinMaxScaler(copy=True, feature_range=(0, 1))
-    # scaler.fit(target_conv2d_gsmap)
-    # input_conv2d_gsmap = scaler.transform(input_conv2d_gsmap)
-    # target_conv2d_gsmap = scaler.transform(target_conv2d_gsmap)
 
     # split data to train_set, valid_set, test_size
     input_train, input_valid, input_test = common_util.prepare_train_valid_test(
