@@ -181,7 +181,7 @@ class Conv2DSupervisor():
             print(predicted_data[i, 0])
             print("Prediction: ", np.count_nonzero(predicted_data[i, 0] > 0), "Actual: ", np.count_nonzero(actual_data[i, -1]>0))
         
-        data_npz = self.config_model['data'].get('dataset')
+        data_npz = self.config_model['data_kwargs'].get('dataset')
         lon = np.load(data_npz)['input_lon']
         lat = np.load(data_npz)['input_lat']
 
