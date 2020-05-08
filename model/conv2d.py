@@ -48,6 +48,7 @@ class Conv2DSupervisor():
                        return_sequences=True,
                        activation = self.activation,
                        name = 'input_layer_convlstm2d',
+                       # set seq_len is None to make the output flexible
                        input_shape=(None, 160, 120, 1)))
         model.add(BatchNormalization())
 
@@ -138,9 +139,11 @@ class Conv2DSupervisor():
         for i in iterator:
             input = np.zeros(shape=(1, self.seq_len, 160, 120, 1))
             input[0] = input_test[i].copy()
-            yhats = self.model.predict(input)
-            print(yhats[0, -1])
-            predicted_data[i] = yhats[0, -1]
+            # yhats = self.model.predict(input)
+            # print(yhats[0, -1])
+            # predicted_data[i] = yhats[0, -1]
+            predicted_data[i] = self.model.predict(input)
+            print("Prediction: ", np.count_nonzero(predicted_data[i, 0] > 0), "Actual: ", actual_data[i, 0])
         
         # # total_mae = 0
         # actual_arr = []
