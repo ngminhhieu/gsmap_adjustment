@@ -142,7 +142,11 @@ class Conv2DSupervisor():
             # yhats = self.model.predict(input)
             # print(yhats[0, -1])
             # predicted_data[i] = yhats[0, -1]
-            predicted_data[i] = self.model.predict(input)
+            yhats = self.model.predict(input)
+            print(yhats)
+            print(yhats.shape)
+            sys.exit()
+            predicted_data[i] = yhats[0, -1]
             print("Prediction: ", np.count_nonzero(predicted_data[i, 0] > 0), "Actual: ", actual_data[i, 0])
         
         # # total_mae = 0
