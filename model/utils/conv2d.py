@@ -111,7 +111,7 @@ def create_data_prediction(**kwargs):
     for i in range(0, T):
         input_conv2d_gsmap[i, :, :, :, 0] = precip[i:i+seq_len]
         # target_conv2d_gsmap[i, :, :, :, 0] = precip[i+horizon:i+seq_len+horizon]
-        target_conv2d_gsmap[i, :, :, :, 0] = precip[i+seq_len]
+        target_conv2d_gsmap[i, :, :, :, 0] = precip[i+seq_len:i+seq_len+horizon]
     return input_conv2d_gsmap, target_conv2d_gsmap
 
 def load_dataset(**kwargs):
