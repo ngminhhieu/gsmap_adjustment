@@ -3,6 +3,7 @@ data:
   batch_size: 200
   dataset: ../drive/My Drive/conv2d_gsmap.npz
   # dataset: data/conv2d_gsmap/npz/conv2d_gsmap.npz
+  gauge_dataset: data/conv2d_gsmap/npz/gauge_data.npz
   test_batch_size: 1
   test_size: 0.2
   valid_size: 0.2

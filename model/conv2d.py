@@ -193,8 +193,16 @@ class Conv2DSupervisor():
         lon = np.load(data_npz)['input_lon']
         lat = np.load(data_npz)['input_lat']
 
+        gauge_dataset = self.config_model['data_kwargs'].get('gauge_dataset')
+        gauge_lon = np.load(data_npz)['gauge_lon']
+        gauge_lat = np.load(data_npz)['gauge_lat']
+        gauge_precipitation = np.load(data_npz)['gauge_precip']
+
         actual_arr = []
         preds_arr = []
+        gauge_arr = []
+
+        # MAE for 72x72 matrix including gauge data
         for index, lat in np.ndenumerate(lat):
             temp_lat = int(round((23.95-lat)/0.1))
 
@@ -204,15 +212,30 @@ class Conv2DSupervisor():
                 # actual data
                 actual_precip = actual_data[:, 0, temp_lat, temp_lon, 0]
                 actual_arr.append(actual_precip)
-                print(actual_precip)
 
                 # prediction data
                 preds = predicted_data[:, 0, temp_lat, temp_lon, 0]
-                print(preds)
                 preds_arr.append(preds)
-
+        
         common_util.mae(actual_arr, preds_arr)
         
+        # MAE for only gauge data
+        for i in range(len(gauge_lat)):
+            lat = gauge_lat[i]
+            lon = gauge_lon[i]
+            temp_lat = int(round((23.95-lat)/0.1))
+            temp_lon = int(round((lon-100.05)/0.1))
+
+            # gauge data
+            gauge_precip = gauge_precipitation[:, i]
+            gauge_arr.append(gauge_precip)
+
+            # prediction data
+            preds = predicted_data[:, 0, temp_lat, temp_lon, 0]
+            preds_arr.append(preds)
+
+        common_util.mae(gauge_arr, preds_arr)
+
     def test_generation(self):
         for lat_index in range(72):
             lat = input_test[-1, -1, lat_index, 0, 0]
