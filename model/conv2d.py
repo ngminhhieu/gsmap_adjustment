@@ -178,7 +178,6 @@ class Conv2DSupervisor():
             input[0] = input_test[i].copy()
             yhats = self.model.predict(input)   
             predicted_data[i, 0] = yhats[0, -1]            
-            print(predicted_data[i, 0])
             print("Prediction: ", np.count_nonzero(predicted_data[i, 0] > 0), "Actual: ", np.count_nonzero(actual_data[i, -1]>0))
         
         data_npz = self.config_model['data_kwargs'].get('dataset')
