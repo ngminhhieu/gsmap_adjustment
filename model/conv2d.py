@@ -191,11 +191,6 @@ class Conv2DSupervisor():
 
             for index, lon in np.ndenumerate(lon):
                 temp_lon = int(round((lon-100.05)/0.1))
-                print(temp_lat)
-                print(temp_lon)
-                print(lat)
-                print(lon)
-                sys.exit()
 
                 # actual data
                 actual_precip = actual_data[:, 0, temp_lat, temp_lon, 0]
