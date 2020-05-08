@@ -219,6 +219,7 @@ class Conv2DSupervisor():
         
         common_util.mae(actual_arr, preds_arr)
         
+        preds_arr = []
         # MAE for only gauge data
         for i in range(len(gauge_lat)):
             lat = gauge_lat[i]
@@ -227,7 +228,7 @@ class Conv2DSupervisor():
             temp_lon = int(round((lon-100.05)/0.1))
 
             # gauge data
-            gauge_precip = gauge_precipitation[:, i]
+            gauge_precip = gauge_precipitation[-353:, i]
             gauge_arr.append(gauge_precip)
 
             # prediction data
