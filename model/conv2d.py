@@ -180,7 +180,6 @@ class Conv2DSupervisor():
             predicted_data[i, 0] = yhats[0, -1]            
             print(predicted_data[i, 0])
             print("Prediction: ", np.count_nonzero(predicted_data[i, 0] > 0), "Actual: ", np.count_nonzero(actual_data[i, -1]>0))
-            sys.exit()            
         
         data_npz = self.config_model['data'].get('dataset')
         lon = np.load(data_npz)['input_lon']
@@ -211,26 +210,27 @@ class Conv2DSupervisor():
 
         common_util.mae(actual_arr, preds_arr)
         
-        # for lat_index in range(72):
-        #     lat = input_test[-1, -1, lat_index, 0, 0]
+    def test_generation(self):
+        for lat_index in range(72):
+            lat = input_test[-1, -1, lat_index, 0, 0]
             
-        #     for lon_index in range(72):
-        #         lon = input_test[-1, -1, 0, lon_index, 1]
-        #         temp_lat = int(round((23.95-lat)/0.1))
-        #         temp_lon = int(round((lon-100.05)/0.1))
-        #         # print(lat, lon)
-        #         # print(temp_lat, temp_lon)
-        #         # print(actual_data[-1, -1, temp_lat, 0, 0], actual_data[-1, -1, 0, temp_lon, 1])
-        #         actual_precip = actual_data[:, 0, temp_lat, temp_lon, 0]
-        #         # actual_precip = actual_data[:, 0, lat_index, lon_index, 2]
-        #         actual_arr.append(actual_precip)
-        #         print(actual_precip)
-        #         # preds = predicted_data[:, 0, lat_index, lon_index, 2]
-        #         preds = predicted_data[:, 0, temp_lat, temp_lon, 0]
-        #         print(preds)
-        #         preds_arr.append(preds)
+            for lon_index in range(72):
+                lon = input_test[-1, -1, 0, lon_index, 1]
+                temp_lat = int(round((23.95-lat)/0.1))
+                temp_lon = int(round((lon-100.05)/0.1))
+                # print(lat, lon)
+                # print(temp_lat, temp_lon)
+                # print(actual_data[-1, -1, temp_lat, 0, 0], actual_data[-1, -1, 0, temp_lon, 1])
+                actual_precip = actual_data[:, 0, temp_lat, temp_lon, 0]
+                # actual_precip = actual_data[:, 0, lat_index, lon_index, 2]
+                actual_arr.append(actual_precip)
+                print(actual_precip)
+                # preds = predicted_data[:, 0, lat_index, lon_index, 2]
+                preds = predicted_data[:, 0, temp_lat, temp_lon, 0]
+                print(preds)
+                preds_arr.append(preds)
 
-        # common_util.mae(actual_arr, preds_arr)
+        common_util.mae(actual_arr, preds_arr)
 
     def plot_result(self):
         from matplotlib import pyplot as plt
