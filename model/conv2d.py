@@ -135,6 +135,24 @@ class Conv2DSupervisor():
                        return_sequences=True))
         model.add(BatchNormalization())
 
+         model.add(
+            ConvLSTM2D(filters=16,
+                       kernel_size=(3, 3),
+                       padding='same',
+                       activation = self.activation,
+                       name='hidden_layer_convlstm2d_2',
+                       return_sequences=True))
+        model.add(BatchNormalization())
+
+         model.add(
+            ConvLSTM2D(filters=16,
+                       kernel_size=(3, 3),
+                       padding='same',
+                       activation = self.activation,
+                       name='hidden_layer_convlstm2d_3',
+                       return_sequences=True))
+        model.add(BatchNormalization())
+
         model.add(
             Conv3D(filters=1,
                    kernel_size=(3, 3, 3),
