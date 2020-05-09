@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Flatten, Dense, MaxPooling2D, Conv2D, Conv2DTranspose, UpSampling2D, Cropping2D, Cropping3D, MaxPooling3D
+from keras.layers import Flatten, Dense, MaxPooling2D, Conv2D, Conv2DTranspose, UpSampling2D, Cropping2D, Cropping3D, MaxPooling3D, UpSampling3D
 from keras.layers.convolutional import Conv3D, Conv3DTranspose
 from keras.layers.convolutional_recurrent import ConvLSTM2D
 from keras.layers.normalization import BatchNormalization
@@ -126,14 +126,18 @@ class Conv2DSupervisor():
                        input_shape=(None, 160, 120, 1)))
         model.add(BatchNormalization())
 
+        model.add(MaxPooling3D(pool_size=(2, 2, 2)))
+
         model.add(
-            ConvLSTM2D(filters=16,
+            ConvLSTM2D(filters=32,
                        kernel_size=(3, 3),
                        padding='same',
                        activation = self.activation,
                        name='hidden_layer_convlstm2d_1',
                        return_sequences=True))
         model.add(BatchNormalization())
+
+        model.add(UpSampling3D(size=(2, 2, 2)))
 
         model.add(
             ConvLSTM2D(filters=8,
