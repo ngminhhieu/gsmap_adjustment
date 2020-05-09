@@ -66,7 +66,7 @@ class Conv2DSupervisor():
                        kernel_size=(3, 3),
                        padding='same',
                        activation = self.activation,
-                       name='hidden_layer_convlstm2d_1',
+                       name='hidden_layer_convlstm2d_2',
                        return_sequences=True))
         model.add(BatchNormalization())
 
@@ -75,7 +75,7 @@ class Conv2DSupervisor():
                        kernel_size=(3, 3),
                        padding='same',
                        activation = self.activation,
-                       name='hidden_layer_convlstm2d_1',
+                       name='hidden_layer_convlstm2d_3',
                        return_sequences=True))
         model.add(BatchNormalization())
 
