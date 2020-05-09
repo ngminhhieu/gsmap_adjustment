@@ -66,7 +66,7 @@ def set_gauge_data_to_gsmap():
     gsmap_precip_arr = np.empty(shape=(1766, 72))
     # get precipitation
     lat_arr, lon_arr, precipitation = get_lon_lat_gauge_data()
-    for i in range(0, 1):
+    for i in range(0, len(lat_arr)):
         os.system(
             'cdo -outputtab,value -remapnn,lon={}_lat={} data/conv2d_gsmap/gsmap_2011_2018.nc > data/conv2d_gsmap/remapnn.csv'
             .format(lon_arr[i], lat_arr[i]))
@@ -79,8 +79,8 @@ def set_gauge_data_to_gsmap():
         gsmap_precipitation = read_csv('data/conv2d_gsmap/remapnn.csv')
         gsmap_precipitation = gsmap_precipitation.to_numpy()
         gsmap_precip_arr[:, i] = gsmap_precipitation[:, 0]
-    
-        cal_error(gauge_precip_arr[-353:,:], gsmap_precip_arr[-353:,:])
+
+    cal_error(gauge_precip_arr[-353:,:], gsmap_precip_arr[-353:,:])
 
     return gauge_lat_arr, gauge_lon_arr, gauge_precip_arr
 
@@ -110,5 +110,5 @@ def cal_error(test_arr, prediction_arr):
         print("RMSE: %.4f" % (error_rmse))
         print("MAPE: %.4f" % (error_mape))
         return error_list
-        
+
 save_to_npz()
