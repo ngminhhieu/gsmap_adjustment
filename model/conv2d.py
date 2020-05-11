@@ -35,86 +35,9 @@ class Conv2DSupervisor():
         self.seq_len = self.config_model['seq_len']
         self.horizon = self.config_model['horizon']
 
-        self.model = self.build_model_prediction_2()
-    
-    def build_model_generation(self):
-        model = Sequential()
+        self.model = self.build_model_prediction()
 
-        # extract useful information
-        model.add(
-            ConvLSTM2D(filters=16,
-                       kernel_size=(3, 3),
-                       padding='same',
-                       return_sequences=True,
-                       activation = self.activation,
-                       name = 'input_layer_convlstm2d',
-                       # set seq_len is None to make the output flexible
-                       input_shape=(None, 160, 120, 1)))
-        model.add(BatchNormalization())
-
-        model.add(
-            ConvLSTM2D(filters=16,
-                       kernel_size=(3, 3),
-                       padding='same',
-                       activation = self.activation,
-                    #    name='hidden_layer_convlstm2d_1',
-                       return_sequences=True))
-        model.add(BatchNormalization())
-
-        model.add(
-            ConvLSTM2D(filters=16,
-                       kernel_size=(3, 3),
-                       padding='same',
-                       activation = self.activation,
-                    #    name='hidden_layer_convlstm2d_2',
-                       return_sequences=True))
-        model.add(BatchNormalization())
-
-        model.add(
-            ConvLSTM2D(filters=16,
-                       kernel_size=(3, 3),
-                       padding='same',
-                       activation = self.activation,
-                    #    name='hidden_layer_convlstm2d_3',
-                       return_sequences=True))
-        model.add(BatchNormalization())
-
-        # model.add(Conv3D(filters=32, kernel_size=(3, 3, 3),
-        # activation = self.activation, 
-        # padding='same'))
-        # model.add(BatchNormalization())
-        
-        # model.add(MaxPooling3D(pool_size=(1, 2, 2)))
-
-        # # scaling up
-        # model.add(
-        #     Conv3DTranspose(filters=32,
-        #                     kernel_size=(3, 3, 3),
-        #                     activation = self.activation,
-        #                     strides=(1, 5, 4)))
-        # model.add(BatchNormalization())
-
-        # # # ((top_crop, bottom_crop), (left_crop, right_crop))
-        # model.add(Cropping3D(cropping=((4, 4), (10, 10), (12, 12))))
-        # model.add(Cropping3D(cropping=((7, 7), (0, 0), (0, 0)), name='cropping_layer'))
-
-        model.add(
-            Conv3D(filters=1,
-                   kernel_size=(3, 3, 3),
-                   padding='same',
-                   name='output_layer_conv3d',
-                   activation=self.activation))
-
-        print(model.summary())
-
-        # plot model
-        from keras.utils import plot_model
-        plot_model(model=model,
-                   to_file=self.log_dir + '/conv2d_model.png',
-                   show_shapes=True)
-        return model
-
-    def build_model_prediction_2(self):
+    def build_model_prediction(self):
         model = Sequential()
         model.add(
             ConvLSTM2D(filters=8,
@@ -172,7 +95,7 @@ class Conv2DSupervisor():
 
         model.add(
             Conv3D(filters=1,
-                   kernel_size=(3, 3, 3),
+                   kernel_size=(3, 3, 1),
                    padding='same',
                    name='output_layer_conv3d',
                    activation=self.activation))
