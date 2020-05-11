@@ -40,7 +40,7 @@ class Conv2DSupervisor():
     def build_model_prediction(self):
         model = Sequential()
         model.add(
-            ConvLSTM2D(filters=8,
+            ConvLSTM2D(filters=16,
                        kernel_size=(3, 3),
                        padding='same',
                        return_sequences=True,
