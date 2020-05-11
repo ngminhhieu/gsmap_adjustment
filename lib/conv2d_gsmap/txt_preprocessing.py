@@ -4,7 +4,7 @@ from datetime import datetime
 import re
 import numpy as np
 
-data_dir = 'data/raw_data_daily/'
+data_dir = 'data/conv2d_gsmap/raw_data_daily/'
 data_paths = glob.glob(data_dir + '*.txt')
 
 
@@ -53,6 +53,8 @@ def process(file_pth):
                     day_arr.append(day)
                     month_arr.append(month)
                     year_arr.append(year)
+                    if data[month] < 0:
+                        data[month] = 0.0
                     precipitation.append(data[month])
         year += 1
 
@@ -64,7 +66,7 @@ def process(file_pth):
     df['precipitation'] = precipitation
     df = df.sort_values('time', ascending=True)
 
-    df.to_csv(f'./data/preprocessed_txt_data/{name}_{lon}_{lat}_{height}.csv',
+    df.to_csv(f'./data/conv2d_gsmap/preprocessed_txt_data/{name}_{lon}_{lat}_{height}.csv',
               index=False)
 
 
