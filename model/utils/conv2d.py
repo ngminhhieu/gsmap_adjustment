@@ -105,13 +105,10 @@ def create_data_prediction(**kwargs):
                                          len(lat), len(lon), 1))
     target_conv2d_gsmap = np.zeros(shape=(T, seq_len,
                                           len(lat), len(lon), 1))
-    # target_conv2d_gsmap = np.zeros(shape=(T, horizon,
-    #                                       len(lat), len(lon), 1))
 
     for i in range(0, T):
         input_conv2d_gsmap[i, :, :, :, 0] = precip[i:i+seq_len]
         target_conv2d_gsmap[i, :, :, :, 0] = precip[i+horizon:i+seq_len+horizon]
-        # target_conv2d_gsmap[i, :, :, :, 0] = precip[i+seq_len:i+seq_len+horizon]
     return input_conv2d_gsmap, target_conv2d_gsmap
 
 def load_dataset(**kwargs):
