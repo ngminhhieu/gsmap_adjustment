@@ -86,6 +86,7 @@ def set_gauge_data_to_gsmap():
         precipitation = read_csv('data/conv2d_gsmap/precip.csv')
         precipitation = precipitation.to_numpy()
         input_precip_arr[:, i, i] = precipitation[:,0]
+    input_precip_arr = np.round(gsmap_precip_arr, 1)
 
     return input_lat_arr, input_lon_arr, input_precip_arr
 
@@ -98,6 +99,7 @@ def save_to_npz():
     output_lon = np.array(output_nc['lon'][:])
     output_lat = np.array(output_nc['lat'][:])
     output_precip = np.array(output_nc['precip'][:])
+    output_precip = np.round(output_precip, 1)
 
     np.savez('data/npz/conv2d_gsmap.npz',
              time=time,

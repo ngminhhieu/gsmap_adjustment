@@ -79,7 +79,8 @@ def set_gauge_data_to_gsmap():
         gsmap_precipitation = read_csv('data/conv2d_gsmap/remapnn.csv')
         gsmap_precipitation = gsmap_precipitation.to_numpy()
         gsmap_precip_arr[:, i] = gsmap_precipitation[:, 0]
-
+    
+    gsmap_precip_arr = np.round(gsmap_precip_arr, 1)
     cal_error(gauge_precip_arr[-353:,:], gsmap_precip_arr[-353:,:])
 
     return gauge_lat_arr, gauge_lon_arr, gauge_precip_arr
