@@ -154,7 +154,7 @@ class Conv2DSupervisor():
         from tqdm import tqdm
         iterator = tqdm(range(0,len(actual_data)))
         for i in iterator:
-            input = np.zeros(shape=(1, self.seq_len, 160, 120, 1))
+            input = np.zeros(shape=(1, self.seq_len, 160, 120, 2))
             input[0] = input_test[i].copy()
             yhats = self.model.predict(input)   
             predicted_data[i, 0] = yhats[0, -1]            
