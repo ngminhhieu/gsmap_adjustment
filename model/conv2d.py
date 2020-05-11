@@ -48,11 +48,11 @@ class Conv2DSupervisor():
                        return_sequences=True,
                        activation = self.activation,
                        name = 'input_layer_convlstm2d',
-                       input_shape=(self.seq_len, 160, 120, 1)))
+                       input_shape=(self.seq_len, 160, 120, 2)))
         model.add(BatchNormalization())
 
         # Max Pooling - Go deeper
-        model.add(MaxPooling3D(pool_size=(2, 2, 1)))
+        model.add(MaxPooling3D(pool_size=(2, 2, 2)))
 
         model.add(
             ConvLSTM2D(filters=16,
@@ -63,7 +63,7 @@ class Conv2DSupervisor():
                        return_sequences=True))
         model.add(BatchNormalization())
 
-        model.add(MaxPooling3D(pool_size=(2, 2, 1)))
+        model.add(MaxPooling3D(pool_size=(2, 2, 2)))
 
         model.add(
             ConvLSTM2D(filters=32,
@@ -75,7 +75,7 @@ class Conv2DSupervisor():
         model.add(BatchNormalization())
 
         # Up Sampling
-        model.add(UpSampling3D(size=(2, 2, 1)))
+        model.add(UpSampling3D(size=(2, 2, 2)))
 
         model.add(
             ConvLSTM2D(filters=16,
@@ -86,7 +86,7 @@ class Conv2DSupervisor():
                        return_sequences=True))
         model.add(BatchNormalization())
 
-        model.add(UpSampling3D(size=(2, 2, 1)))
+        model.add(UpSampling3D(size=(2, 2, 2)))
 
         model.add(
             ConvLSTM2D(filters=16,
@@ -99,7 +99,7 @@ class Conv2DSupervisor():
 
         model.add(
             Conv3D(filters=1,
-                   kernel_size=(3, 3, 1),
+                   kernel_size=(3, 3, 3),
                    padding='same',
                    name='output_layer_conv3d',
                    activation=self.activation))
@@ -207,28 +207,6 @@ class Conv2DSupervisor():
             preds_arr.append(preds)
 
         common_util.cal_error(gauge_arr, preds_arr)
-
-    def test_generation(self):
-        for lat_index in range(72):
-            lat = input_test[-1, -1, lat_index, 0, 0]
-            
-            for lon_index in range(72):
-                lon = input_test[-1, -1, 0, lon_index, 1]
-                temp_lat = int(round((23.95-lat)/0.1))
-                temp_lon = int(round((lon-100.05)/0.1))
-                # print(lat, lon)
-                # print(temp_lat, temp_lon)
-                # print(actual_data[-1, -1, temp_lat, 0, 0], actual_data[-1, -1, 0, temp_lon, 1])
-                actual_precip = actual_data[:, 0, temp_lat, temp_lon, 0]
-                # actual_precip = actual_data[:, 0, lat_index, lon_index, 2]
-                actual_arr.append(actual_precip)
-                print(actual_precip)
-                # preds = predicted_data[:, 0, lat_index, lon_index, 2]
-                preds = predicted_data[:, 0, temp_lat, temp_lon, 0]
-                print(preds)
-                preds_arr.append(preds)
-
-        common_util.mae(actual_arr, preds_arr)
 
     def plot_result(self):
         from matplotlib import pyplot as plt
