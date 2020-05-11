@@ -99,7 +99,7 @@ def create_data_prediction(**kwargs):
     lon = np.load(data_npz)['output_lon']
     lat = np.load(data_npz)['output_lat']
     precip = np.load(data_npz)['output_precip']
-
+    print(precip)
 
     input_conv2d_gsmap = np.zeros(shape=(T, seq_len,
                                          len(lat), len(lon), 2))
