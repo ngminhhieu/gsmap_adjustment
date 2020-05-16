@@ -97,6 +97,8 @@ class Conv2DSupervisor():
                        return_sequences=True))
         model.add(BatchNormalization())
 
+        model.add(Cropping3D(cropping=((3,0), (0,0), (0,0))))        
+
         model.add(
             Conv3D(filters=1,
                    kernel_size=(3, 3, 3),
