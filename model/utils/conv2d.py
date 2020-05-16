@@ -3,7 +3,7 @@ from model import common_util
 from sklearn.preprocessing import MinMaxScaler
 
 def create_data(**kwargs):
-
+    
     data_npz = kwargs['data'].get('dataset')
     seq_len = kwargs['model'].get('seq_len')
     horizon = kwargs['model'].get('horizon')
@@ -125,7 +125,7 @@ def create_data_prediction(**kwargs):
         for j in range(T):
             input_conv2d_gsmap[j, :, temp_lat, temp_lon, 1] = gauge_precip[j:j+seq_len]
             # remap the target gsmap by gauge data
-            target_conv2d_gsmap[j, :, temp_lat, temp_lon, 0] = gauge_precip[j:j+seq_len]
+            target_conv2d_gsmap[j, :, temp_lat, temp_lon, 0] = gauge_precip[j+horizon:j+seq_len+horizon]
 
     return input_conv2d_gsmap, target_conv2d_gsmap
 
