@@ -2,10 +2,6 @@ import numpy as np
 from model import common_util
 from sklearn.preprocessing import MinMaxScaler
 
-<<<<<<< HEAD
-=======
-
->>>>>>> c3a9660539646149ec74ac691add7ae5acb73831
 def create_data_prediction(**kwargs):
 
     data_npz = kwargs['data'].get('dataset')
