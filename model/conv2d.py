@@ -46,8 +46,8 @@ class Conv2DSupervisor():
                        kernel_size=(3, 3),
                        padding='same',
                        return_sequences=True,
-                       activation = self.activation,
-                       name = 'input_layer_convlstm2d',
+                       activation=self.activation,
+                       name='input_layer_convlstm2d',
                        input_shape=(self.seq_len, 160, 120, 2)))
         # model.add(BatchNormalization())
 
@@ -55,10 +55,10 @@ class Conv2DSupervisor():
         model.add(MaxPooling3D(pool_size=(2, 2, 2)))
 
         model.add(
-            ConvLSTM2D(filters=16,
+            ConvLSTM2D(filters=32,
                        kernel_size=(3, 3),
                        padding='same',
-                       activation = self.activation,
+                       activation=self.activation,
                        name='hidden_layer_convlstm2d_1',
                        return_sequences=True))
         # model.add(BatchNormalization())
@@ -66,10 +66,10 @@ class Conv2DSupervisor():
         model.add(MaxPooling3D(pool_size=(2, 2, 2)))
 
         model.add(
-            ConvLSTM2D(filters=32,
+            ConvLSTM2D(filters=64,
                        kernel_size=(3, 3),
                        padding='same',
-                       activation = self.activation,
+                       activation=self.activation,
                        name='hidden_layer_convlstm2d_2',
                        return_sequences=True))
         # model.add(BatchNormalization())
@@ -78,10 +78,10 @@ class Conv2DSupervisor():
         model.add(UpSampling3D(size=(2, 2, 2)))
 
         model.add(
-            ConvLSTM2D(filters=16,
+            ConvLSTM2D(filters=32,
                        kernel_size=(3, 3),
                        padding='same',
-                       activation = self.activation,
+                       activation=self.activation,
                        name='hidden_layer_convlstm2d_3',
                        return_sequences=True))
         # model.add(BatchNormalization())
@@ -92,7 +92,7 @@ class Conv2DSupervisor():
             ConvLSTM2D(filters=16,
                        kernel_size=(3, 3),
                        padding='same',
-                       activation = self.activation,
+                       activation=self.activation,
                        name='hidden_layer_convlstm2d_4',
                        return_sequences=True))
         # model.add(BatchNormalization())
@@ -154,14 +154,15 @@ class Conv2DSupervisor():
         predicted_data = np.zeros(shape=(len(actual_data), self.horizon, 160,
                                          120, 1))
         from tqdm import tqdm
-        iterator = tqdm(range(0,len(actual_data)))
+        iterator = tqdm(range(0, len(actual_data)))
         for i in iterator:
             input = np.zeros(shape=(1, self.seq_len, 160, 120, 2))
             input[0] = input_test[i].copy()
-            yhats = self.model.predict(input)   
-            predicted_data[i, 0] = yhats[0, -1]            
-            print("Prediction: ", np.count_nonzero(predicted_data[i, 0] > 0), "Actual: ", np.count_nonzero(actual_data[i, -1]>0))
-        
+            yhats = self.model.predict(input)
+            predicted_data[i, 0] = yhats[0, -1]
+            print("Prediction: ", np.count_nonzero(predicted_data[i, 0] > 0),
+                  "Actual: ", np.count_nonzero(actual_data[i, -1] > 0))
+
         data_npz = self.config_model['data_kwargs'].get('dataset')
         lon = np.load(data_npz)['input_lon']
         lat = np.load(data_npz)['input_lat']
@@ -171,34 +172,14 @@ class Conv2DSupervisor():
         gauge_lat = np.load(gauge_dataset)['gauge_lat']
         gauge_precipitation = np.load(gauge_dataset)['gauge_precip']
 
-        actual_arr = []
-        preds_arr = []
         gauge_arr = []
-
-        # MAE for 72x72 matrix including gauge data
-        for index, lat in np.ndenumerate(lat):
-            temp_lat = int(round((23.95-lat)/0.1))
-
-            for index, lon in np.ndenumerate(lon):
-                temp_lon = int(round((lon-100.05)/0.1))
-
-                # actual data
-                actual_precip = actual_data[:, 0, temp_lat, temp_lon, 0]
-                actual_arr.append(actual_precip)
-
-                # prediction data
-                preds = predicted_data[:, 0, temp_lat, temp_lon, 0]
-                preds_arr.append(preds)
-        
-        common_util.mae(actual_arr, preds_arr)
-        
         preds_arr = []
         # MAE for only gauge data
         for i in range(len(gauge_lat)):
             lat = gauge_lat[i]
             lon = gauge_lon[i]
-            temp_lat = int(round((23.95-lat)/0.1))
-            temp_lon = int(round((lon-100.05)/0.1))
+            temp_lat = int(round((23.95 - lat) / 0.1))
+            temp_lon = int(round((lon - 100.05) / 0.1))
 
             # gauge data
             gauge_precip = gauge_precipitation[-353:, i]
@@ -207,6 +188,8 @@ class Conv2DSupervisor():
             # prediction data
             preds = predicted_data[:, 0, temp_lat, temp_lon, 0]
             preds_arr.append(preds)
+            print("Prediction: ", np.count_nonzero(preds > 0), "Gauge: ",
+                  np.count_nonzero(gauge_precip > 0))
 
         common_util.cal_error(gauge_arr, preds_arr)
 
