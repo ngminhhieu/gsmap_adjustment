@@ -55,7 +55,7 @@ class Conv2DSupervisor():
         model.add(MaxPooling3D(pool_size=(2, 2, 2)))
 
         model.add(
-            ConvLSTM2D(filters=16,
+            ConvLSTM2D(filters=32,
                        kernel_size=(3, 3),
                        padding='same',
                        activation=self.activation,
@@ -66,7 +66,7 @@ class Conv2DSupervisor():
         model.add(MaxPooling3D(pool_size=(2, 2, 2)))
 
         model.add(
-            ConvLSTM2D(filters=32,
+            ConvLSTM2D(filters=64,
                        kernel_size=(3, 3),
                        padding='same',
                        activation=self.activation,
