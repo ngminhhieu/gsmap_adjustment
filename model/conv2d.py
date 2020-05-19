@@ -188,7 +188,6 @@ class Conv2DSupervisor():
             # prediction data
             preds = predicted_data[:, 0, temp_lat, temp_lon, 0]
             preds_arr.append(preds)
-            print(len(preds))            
             print("Prediction: ", np.count_nonzero(preds > 0), "Gauge: ",
                   np.count_nonzero(gauge_precip > 0))
 
