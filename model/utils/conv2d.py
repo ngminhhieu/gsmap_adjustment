@@ -32,7 +32,7 @@ def create_data_prediction(**kwargs):
         gauge_precip = gauge_precipitation[:, i]
         for j in range(T):
             input_conv2d_gsmap[j, :, temp_lat, temp_lon,
-                               1] = gauge_precip[j:j + seq_len]
+                               0] = precip[j:j + seq_len]
             # remap the target gsmap by gauge data
             target_conv2d_gsmap[j, :, temp_lat, temp_lon,
                                 0] = gauge_precip[j + horizon:j + seq_len +
