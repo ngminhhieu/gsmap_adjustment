@@ -48,19 +48,23 @@ class Conv2DSupervisor():
                        activation=self.activation,
                        name='input_layer_conv2d',
                        input_shape=(160, 120, 1)))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
         
         # Max Pooling - Go deeper
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_1'))
+        model.add(BatchNormalization())
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='hidden_conv2d_2'))
+        model.add(BatchNormalization())
 
         # Up Sampling
         model.add(UpSampling2D(size=(2, 2)))
         model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='hidden_conv2d_3'))
+        model.add(BatchNormalization())
         model.add(UpSampling2D(size=(2, 2)))
         model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_4'))
+        model.add(BatchNormalization())
 
         model.add(
             Conv2D(filters=1,
@@ -121,8 +125,6 @@ class Conv2DSupervisor():
             input[0] = input_test[i].copy()
             yhats = self.model.predict(input)
             predicted_data[i] = yhats[0]
-            print("Prediction: ", np.count_nonzero(predicted_data[i] > 0),
-                  "Actual: ", np.count_nonzero(actual_data[i] > 0))
 
         data_npz = self.config_model['data_kwargs'].get('dataset')
         lon = np.load(data_npz)['input_lon']
@@ -143,15 +145,13 @@ class Conv2DSupervisor():
             temp_lon = int(round((lon - 100.05) / 0.1))
 
             # gauge data
-            gauge_precip = gauge_precipitation[-353:, i]
+            gauge_precip = gauge_precipitation[-354:, i]
             gauge_arr.append(gauge_precip)
 
             # prediction data
             preds = predicted_data[:, temp_lat, temp_lon, 0]
             preds_arr.append(preds)
-            print(len(preds))
-            print("Prediction: ", np.count_nonzero(preds > 0), "Gauge: ",
-                  np.count_nonzero(gauge_precip > 0))
+            print("Prediction: ", np.count_nonzero(preds > 0), "Gauge: ", np.count_nonzero(gauge_precip > 0))
 
         common_util.cal_error(gauge_arr, preds_arr)
 
