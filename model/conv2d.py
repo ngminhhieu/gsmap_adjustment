@@ -160,8 +160,6 @@ class Conv2DSupervisor():
             input[0] = input_test[i].copy()
             yhats = self.model.predict(input)
             predicted_data[i, 0] = yhats[0, -1]
-            print("Prediction: ", np.count_nonzero(predicted_data[i, 0] > 0),
-                  "Actual: ", np.count_nonzero(actual_data[i, -1] > 0))
 
         data_npz = self.config_model['data_kwargs'].get('dataset')
         lon = np.load(data_npz)['input_lon']
@@ -174,6 +172,8 @@ class Conv2DSupervisor():
 
         gauge_arr = []
         preds_arr = []
+        num_gauge = 0
+        num_preds = 0
         # MAE for only gauge data
         for i in range(len(gauge_lat)):
             lat = gauge_lat[i]
@@ -188,9 +188,13 @@ class Conv2DSupervisor():
             # prediction data
             preds = predicted_data[:, 0, temp_lat, temp_lon, 0]
             preds_arr.append(preds)
-            print("Prediction: ", np.count_nonzero(preds > 0), "Gauge: ",
-                  np.count_nonzero(gauge_precip > 0))
+            x = np.count_nonzero(preds > 0)
+            y = np.count_nonzero(gauge_precip > 0)
+            print("Prediction: ", x, "Gauge: ", y)
+            num_preds = num_preds + x
+            num_gauge = num_gauge + y
 
+        print(num_preds, num_gauge)
         common_util.cal_error(gauge_arr, preds_arr)
 
     def plot_result(self):
