@@ -2,6 +2,7 @@ import numpy as np
 from model import common_util
 from sklearn.preprocessing import MinMaxScaler
 
+
 def create_data_prediction(**kwargs):
 
     data_npz = kwargs['data'].get('dataset')
@@ -16,16 +17,9 @@ def create_data_prediction(**kwargs):
     lat = np.load(data_npz)['output_lat']
     precip = np.load(data_npz)['output_precip']
 
-    input_conv2d_gsmap = np.zeros(shape=(T, seq_len,
-                                         len(lat), len(lon), 2))
-    target_conv2d_gsmap = np.zeros(shape=(T, horizon,
-                                          len(lat), len(lon), 1))
+    input_conv2d_gsmap = np.zeros(shape=(T, seq_len, len(lat), len(lon), 1))
+    target_conv2d_gsmap = np.zeros(shape=(T, horizon, len(lat), len(lon), 1))
 
-    for i in range(T):
-        input_conv2d_gsmap[i, :, :, :, 0] = precip[i:i+seq_len]
-        target_conv2d_gsmap[i, :, :, :, 0] = precip[i+seq_len:i+seq_len+horizon]
-    
-    # channel 2 - gauge data
     gauge_dataset = kwargs['data'].get('gauge_dataset')
     gauge_lon = np.load(gauge_dataset)['gauge_lon']
     gauge_lat = np.load(gauge_dataset)['gauge_lat']
@@ -40,7 +34,9 @@ def create_data_prediction(**kwargs):
             input_conv2d_gsmap[j, :, temp_lat, temp_lon,
                                1] = gauge_precip[j:j + seq_len]
             # remap the target gsmap by gauge data
-            target_conv2d_gsmap[j, :, temp_lat, temp_lon, 0] = gauge_precip[j+seq_len:j+seq_len+horizon]
+            target_conv2d_gsmap[j, :, temp_lat, temp_lon,
+                                0] = gauge_precip[j + seq_len:j + seq_len +
+                                                  horizon]
     return input_conv2d_gsmap, target_conv2d_gsmap
 
 
