@@ -48,29 +48,29 @@ class Conv2DSupervisor():
                        activation=self.activation,
                        name='input_layer_conv2d',
                        input_shape=(160, 120, 1)))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
         
         # Max Pooling - Go deeper
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_1'))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_2'))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='hidden_conv2d_3'))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
 
         # Up Sampling
         model.add(UpSampling2D(size=(2, 2)))
         model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='hidden_conv2d_4'))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
         model.add(UpSampling2D(size=(2, 2)))
         model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_5'))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
         model.add(UpSampling2D(size=(2, 2)))
         model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_6'))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
 
         model.add(
             Conv2D(filters=1,
@@ -161,11 +161,11 @@ class Conv2DSupervisor():
             preds_arr.append(preds)
             x = np.count_nonzero(preds > 0)
             y = np.count_nonzero(gauge_precip > 0)
+            num_preds = num_preds + x            
             num_gauge = num_gauge + y
-            num_preds = num_preds + x
             print("Prediction: ", x, "Gauge: ", y)
-            print(num_preds, num_gauge)
 
+        print(num_preds, num_gauge)        
         common_util.cal_error(gauge_arr, preds_arr)
 
     def plot_result(self):
