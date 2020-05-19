@@ -48,11 +48,11 @@ class Conv2DSupervisor():
                        return_sequences=True,
                        activation=self.activation,
                        name='input_layer_convlstm2d',
-                       input_shape=(self.seq_len, 160, 120, 2)))
+                       input_shape=(self.seq_len, 160, 120, 1)))
         # model.add(BatchNormalization())
 
         # Max Pooling - Go deeper
-        model.add(MaxPooling3D(pool_size=(2, 2, 2)))
+        model.add(MaxPooling3D(pool_size=(2, 2, 1)))
 
         model.add(
             ConvLSTM2D(filters=32,
@@ -63,7 +63,7 @@ class Conv2DSupervisor():
                        return_sequences=True))
         # model.add(BatchNormalization())
 
-        model.add(MaxPooling3D(pool_size=(2, 2, 2)))
+        model.add(MaxPooling3D(pool_size=(2, 2, 1)))
 
         model.add(
             ConvLSTM2D(filters=64,
@@ -75,7 +75,7 @@ class Conv2DSupervisor():
         # model.add(BatchNormalization())
 
         # Up Sampling
-        model.add(UpSampling3D(size=(2, 2, 2)))
+        model.add(UpSampling3D(size=(2, 2, 1)))
 
         model.add(
             ConvLSTM2D(filters=32,
@@ -86,7 +86,7 @@ class Conv2DSupervisor():
                        return_sequences=True))
         # model.add(BatchNormalization())
 
-        model.add(UpSampling3D(size=(2, 2, 2)))
+        model.add(UpSampling3D(size=(2, 2, 1)))
 
         model.add(
             ConvLSTM2D(filters=16,
@@ -97,11 +97,11 @@ class Conv2DSupervisor():
                        return_sequences=True))
         # model.add(BatchNormalization())
 
-        model.add(Cropping3D(cropping=((3,0), (0,0), (0,0))))        
+        # model.add(Cropping3D(cropping=((3,0), (0,0), (0,0))))
 
         model.add(
             Conv3D(filters=1,
-                   kernel_size=(3, 3, 3),
+                   kernel_size=(3, 3, 1),
                    padding='same',
                    name='output_layer_conv3d',
                    activation=self.activation))
