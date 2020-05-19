@@ -49,7 +49,7 @@ class Conv2DSupervisor():
                        activation=self.activation,
                        name='input_layer_convlstm2d',
                        input_shape=(self.seq_len, 160, 120, 1)))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
 
         # Max Pooling - Go deeper
         model.add(MaxPooling3D(pool_size=(2, 2, 1)))
@@ -61,7 +61,7 @@ class Conv2DSupervisor():
                        activation=self.activation,
                        name='hidden_layer_convlstm2d_1',
                        return_sequences=True))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
 
         model.add(MaxPooling3D(pool_size=(2, 2, 1)))
 
@@ -72,7 +72,7 @@ class Conv2DSupervisor():
                        activation=self.activation,
                        name='hidden_layer_convlstm2d_2',
                        return_sequences=True))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
 
         # Up Sampling
         model.add(UpSampling3D(size=(2, 2, 1)))
@@ -84,7 +84,7 @@ class Conv2DSupervisor():
                        activation=self.activation,
                        name='hidden_layer_convlstm2d_3',
                        return_sequences=True))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
 
         model.add(UpSampling3D(size=(2, 2, 1)))
 
@@ -95,7 +95,7 @@ class Conv2DSupervisor():
                        activation=self.activation,
                        name='hidden_layer_convlstm2d_4',
                        return_sequences=True))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
 
         # model.add(Cropping3D(cropping=((3,0), (0,0), (0,0))))
 
