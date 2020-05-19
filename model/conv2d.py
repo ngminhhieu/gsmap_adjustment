@@ -57,9 +57,9 @@ class Conv2DSupervisor():
         model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='hidden_conv2d_2'))
 
         # Up Sampling
-        model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(UpSampling2D(size=(2, 2)))
         model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='hidden_conv2d_3'))
-        model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(UpSampling2D(size=(2, 2)))
         model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_4'))
 
         model.add(
