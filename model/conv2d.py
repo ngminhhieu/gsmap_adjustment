@@ -55,7 +55,7 @@ class Conv2DSupervisor():
         model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_1'))
         # model.add(BatchNormalization())
         model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='hidden_conv2d_2'))
+        model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_2'))
         # model.add(BatchNormalization())
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='hidden_conv2d_3'))
@@ -69,7 +69,7 @@ class Conv2DSupervisor():
         model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_5'))
         # model.add(BatchNormalization())
         model.add(UpSampling2D(size=(2, 2)))
-        model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='hidden_conv2d_6'))
+        model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_6'))
         # model.add(BatchNormalization())
 
         model.add(
@@ -143,6 +143,8 @@ class Conv2DSupervisor():
 
         gauge_arr = []
         preds_arr = []
+        num_preds = 0
+        num_gauge = 0
         # MAE for only gauge data
         for i in range(len(gauge_lat)):
             lat = gauge_lat[i]
@@ -157,7 +159,11 @@ class Conv2DSupervisor():
             # prediction data
             preds = predicted_data[:, temp_lat, temp_lon, 0]
             preds_arr.append(preds)
-            print("Prediction: ", np.count_nonzero(preds > 0), "Gauge: ", np.count_nonzero(gauge_precip > 0))
+            x = np.count_nonzero(preds > 0)
+            y = np.count_nonzero(gauge_precip > 0)
+            num_gauge = num_gauge + y
+            num_preds = num_preds + x
+            print("Prediction: ", x, "Gauge: ", y)
 
         common_util.cal_error(gauge_arr, preds_arr)
 
