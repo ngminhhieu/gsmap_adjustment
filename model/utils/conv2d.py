@@ -30,6 +30,7 @@ def create_data_prediction(**kwargs):
         temp_lat = int(round((23.95 - lat) / 0.1))
         temp_lon = int(round((lon - 100.05) / 0.1))
         gauge_precip = gauge_precipitation[:, i]
+        gsmap_precip = precip[:, temp_lat, temp_lon]
         for j in range(T):
             input_conv2d_gsmap[j, :, temp_lat, temp_lon,
                                0] = precip[j:j + seq_len]
