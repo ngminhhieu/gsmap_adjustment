@@ -18,7 +18,7 @@ def create_data_prediction(**kwargs):
     precip = np.load(data_npz)['output_precip']
 
     input_conv2d_gsmap = np.zeros(shape=(T, seq_len, len(lat), len(lon), 1))
-    target_conv2d_gsmap = np.zeros(shape=(T, horizon, len(lat), len(lon), 1))
+    target_conv2d_gsmap = np.zeros(shape=(T, seq_len, len(lat), len(lon), 1))
 
     gauge_dataset = kwargs['data'].get('gauge_dataset')
     gauge_lon = np.load(gauge_dataset)['gauge_lon']
