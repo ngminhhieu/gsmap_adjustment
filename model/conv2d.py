@@ -164,6 +164,7 @@ class Conv2DSupervisor():
             num_gauge = num_gauge + y
             num_preds = num_preds + x
             print("Prediction: ", x, "Gauge: ", y)
+            print(num_preds, num_gauge)
 
         common_util.cal_error(gauge_arr, preds_arr)
 
