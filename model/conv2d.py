@@ -8,7 +8,7 @@ import model.utils.conv2d as utils_conv2d
 import os
 import yaml
 from pandas import read_csv
-from keras.utils import plot_model
+from keras.utils import plot_model, 
 from keras import backend as K
 
 
@@ -135,7 +135,6 @@ class Conv2DSupervisor():
         print("Load model from: {}".format(self.log_dir))
         self.model.load_weights(self.log_dir + 'best_model.hdf5')
         self.model.compile(optimizer=self.optimizer, loss=self.loss)
-        plot_results(self.model_enc_dec, (self.input_test, self.target_test), batch_size=self.batch_size, model_name="vae_cnn")
         
         input_test = self.input_test
         actual_data = self.target_test
