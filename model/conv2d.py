@@ -109,12 +109,12 @@ class Conv2DSupervisor():
                            metrics=['mse', 'mae'])
 
         training_history = self.model.fit(self.input_train,
-                                          self.target_train,
+                                        #   self.target_train,
                                           batch_size=self.batch_size,
                                           epochs=self.epochs,
                                           callbacks=self.callbacks,
                                           validation_data=(self.input_valid,
-                                                           self.target_valid),
+                                                           None),
                                           shuffle=True,
                                           verbose=2)
 
