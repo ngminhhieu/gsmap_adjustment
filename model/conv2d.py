@@ -51,26 +51,26 @@ class Conv2DSupervisor():
         model.add(BatchNormalization())
         
         # Max Pooling - Go deeper
-        model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(Conv2D(32, (5, 5), activation='relu', padding='same', name='hidden_conv2d_1'))
+        # model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_1'))
         model.add(BatchNormalization())
-        model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(Conv2D(32, (5, 5), activation='relu', padding='same', name='hidden_conv2d_2'))
+        # model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_2'))
         model.add(BatchNormalization())
-        model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(Conv2D(64, (5, 5), activation='relu', padding='same', name='hidden_conv2d_3'))
+        # model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='hidden_conv2d_3'))
         model.add(BatchNormalization())
 
-        # Up Sampling
-        model.add(UpSampling2D(size=(2, 2)))
-        model.add(Conv2D(64, (5, 5), activation='relu', padding='same', name='hidden_conv2d_4'))
-        model.add(BatchNormalization())
-        model.add(UpSampling2D(size=(2, 2)))
-        model.add(Conv2D(32, (5, 5), activation='relu', padding='same', name='hidden_conv2d_5'))
-        model.add(BatchNormalization())
-        model.add(UpSampling2D(size=(2, 2)))
-        model.add(Conv2D(32, (5, 5), activation='relu', padding='same', name='hidden_conv2d_6'))
-        model.add(BatchNormalization())
+        # # Up Sampling
+        # model.add(UpSampling2D(size=(2, 2)))
+        # model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='hidden_conv2d_4'))
+        # model.add(BatchNormalization())
+        # model.add(UpSampling2D(size=(2, 2)))
+        # model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_5'))
+        # model.add(BatchNormalization())
+        # model.add(UpSampling2D(size=(2, 2)))
+        # model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_6'))
+        # model.add(BatchNormalization())
 
         model.add(
             Conv2D(filters=1,
