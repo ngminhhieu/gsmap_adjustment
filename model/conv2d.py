@@ -87,7 +87,7 @@ class Conv2DSupervisor():
 
         outputs = Conv2DTranspose(filters=1,
                                 kernel_size=kernel_size,
-                                activation='sigmoid',
+                                activation=self.activation,
                                 padding='same',
                                 name='decoder_output')(x)
 
