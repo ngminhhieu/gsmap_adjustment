@@ -10,6 +10,7 @@ import yaml
 from pandas import read_csv
 from keras.utils import plot_model
 from keras import backend as K
+from keras.losses import mse
 
 
 class Conv2DSupervisor():
@@ -36,7 +37,7 @@ class Conv2DSupervisor():
         self.seq_len = self.config_model['seq_len']
         self.horizon = self.config_model['horizon']
 
-        self.model, self.model_enc_dec = self.build_model_prediction()
+        self.vae, self.vae_enc_dec = self.build_model_prediction()
 
     def build_model_prediction(self):
         input_shape=(160, 120, 1)
@@ -100,23 +101,31 @@ class Conv2DSupervisor():
         outputs = decoder(encoder(inputs)[2])
         vae = Model(inputs, outputs, name='vae')
         model = (encoder, decoder)
-
+        reconstruction_loss = mse(K.flatten(inputs), K.flatten(outputs))
+        reconstruction_loss *= 160 * 120
+        kl_loss = 1 + z_log_var - K.square(z_mean) - K.exp(z_log_var)
+        kl_loss = K.sum(kl_loss, axis=-1)
+        kl_loss *= -0.5
+        vae_loss = K.mean(reconstruction_loss + kl_loss)
+        vae.add_loss(vae_loss)
+        
         return vae, model
 
     def train(self):
-        self.model.compile(optimizer=self.optimizer,
-                           loss=self.loss,
-                           metrics=['mse', 'mae'])
+        # self.vae.compile(optimizer=self.optimizer,
+        #                    loss=self.loss,
+        #                    metrics=['mse', 'mae'])
+        
+        self.vae.compile(optimizer='rmsprop')
 
-        training_history = self.model.fit(self.input_train,
+        training_history = self.vae.fit(self.input_train,
                                         #   self.target_train,
                                           batch_size=self.batch_size,
                                           epochs=self.epochs,
                                           callbacks=self.callbacks,
-                                          validation_data=(self.input_valid,
-                                                           None),
-                                          shuffle=True,
-                                          verbose=2)
+                                          validation_data=(self.input_valid,None))
+                                        #   shuffle=True,
+                                        #   verbose=2)
 
         if training_history is not None:
             common_util._plot_training_history(training_history,
@@ -133,8 +142,9 @@ class Conv2DSupervisor():
 
     def test_prediction(self):
         print("Load model from: {}".format(self.log_dir))
-        self.model.load_weights(self.log_dir + 'best_model.hdf5')
-        self.model.compile(optimizer=self.optimizer, loss=self.loss)
+        self.vae.load_weights(self.log_dir + 'best_model.hdf5')
+        self.vae.compile(optimizer='rmsprop')
+        # self.vae.compile(optimizer=self.optimizer, loss=self.loss)
         
         input_test = self.input_test
         actual_data = self.target_test
@@ -144,7 +154,7 @@ class Conv2DSupervisor():
         for i in iterator:
             input = np.zeros(shape=(1, 160, 120, 1))
             input[0] = input_test[i].copy()
-            yhats = self.model.predict(input)
+            yhats = self.vae.predict(input)
             predicted_data[i] = yhats[0]
 
         data_npz = self.config_model['data_kwargs'].get('dataset')

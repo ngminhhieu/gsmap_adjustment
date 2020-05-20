@@ -1,7 +1,7 @@
 import numpy as np
+from keras.datasets import mnist
 
-x1 = np.array([1])
-x2 = np.array([2])
-data = (x1, x2)
-print(data)
-print(type(data))
+# MNIST dataset
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+print(x_train.shape)
