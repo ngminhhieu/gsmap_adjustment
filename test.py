@@ -1,7 +1,7 @@
 import numpy as np
-from keras.datasets import mnist
+from matplotlib import pyplot as plt
+from numpy.random import rand
 
-# MNIST dataset
-(x_train, y_train), (x_test, y_test) = mnist.load_data()
-
-print(x_train.shape)
+a = np.array([[1,2,4], [4,5,6], [10,20,30]])
+b = a[0:2, :]*3
+print(b)

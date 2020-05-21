@@ -79,19 +79,21 @@ def set_gauge_data_to_gsmap():
         gsmap_precipitation = read_csv('data/conv2d_gsmap/remapnn.csv')
         gsmap_precipitation = gsmap_precipitation.to_numpy()
         gsmap_precip_arr[:, i] = gsmap_precipitation[:, 0]
+        print(i,i,i)
     
     gsmap_precip_arr = np.round(gsmap_precip_arr, 1)
     cal_error(gauge_precip_arr[-353:,:], gsmap_precip_arr[-353:,:])
 
-    return gauge_lat_arr, gauge_lon_arr, gauge_precip_arr
+    return gauge_lat_arr, gauge_lon_arr, gauge_precip_arr, gsmap_precip_arr
 
 def save_to_npz():
-    gauge_lat, gauge_lon, gauge_precip = set_gauge_data_to_gsmap()
+    gauge_lat, gauge_lon, gauge_precip, gsmap_precip_arr = set_gauge_data_to_gsmap()
 
     np.savez('data/conv2d_gsmap/npz/gauge_data.npz',
              gauge_lon=gauge_lon,
              gauge_lat=gauge_lat,
-             gauge_precip=gauge_precip)
+             gauge_precip=gauge_precip,
+             nearest_precip=gsmap_precip_arr)
 
 def cal_error(test_arr, prediction_arr):
     from sklearn.metrics import mean_squared_error, mean_absolute_error
