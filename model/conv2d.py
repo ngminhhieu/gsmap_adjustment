@@ -99,8 +99,6 @@ class Conv2DSupervisor():
                        return_sequences=True))
         model.add(BatchNormalization())
 
-        # model.add(Cropping3D(cropping=((3,0), (0,0), (0,0))))
-
         model.add(
             Conv3D(filters=1,
                    kernel_size=(3, 3, 1),
@@ -118,20 +116,18 @@ class Conv2DSupervisor():
         return model
 
     def train(self):
-        # self.vae.compile(optimizer=self.optimizer,
-        #                    loss=self.loss,
-        #                    metrics=['mse', 'mae'])
+        self.vae.compile(optimizer=self.optimizer,
+                           loss=self.loss,
+                           metrics=['mse', 'mae'])
         
-        self.vae.compile(optimizer='rmsprop')
-
         training_history = self.vae.fit(self.input_train,
-                                        #   self.target_train,
+                                          self.target_train,
                                           batch_size=self.batch_size,
                                           epochs=self.epochs,
                                           callbacks=self.callbacks,
                                           validation_data=(self.input_valid,None))
-                                        #   shuffle=True,
-                                        #   verbose=2)
+                                          shuffle=True,
+                                          verbose=2)
 
         if training_history is not None:
             common_util._plot_training_history(training_history,
@@ -149,8 +145,7 @@ class Conv2DSupervisor():
     def test_prediction(self):
         print("Load model from: {}".format(self.log_dir))
         self.vae.load_weights(self.log_dir + 'best_model.hdf5')
-        self.vae.compile(optimizer='rmsprop')
-        # self.vae.compile(optimizer=self.optimizer, loss=self.loss)
+        self.vae.compile(optimizer=self.optimizer, loss=self.loss)
         
         input_test = self.input_test
         actual_data = self.target_test
