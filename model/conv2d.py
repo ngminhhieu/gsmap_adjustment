@@ -179,10 +179,10 @@ class Conv2DSupervisor():
             temp_lon = int(round((lon - 100.05) / 0.1))
 
             # gauge data
-            groundtruth.append(actual_data[:, temp_lat, temp_lon, 0].copy())
+            groundtruth.append(actual_data[:, -1, temp_lat, temp_lon, 0].copy())
 
             # prediction data
-            preds.append(predicted_data[:, temp_lat, temp_lon, 0].copy())
+            preds.append(predicted_data[:, 0, temp_lat, temp_lon, 0].copy())
 
             x = np.count_nonzero(preds > 0)
             y = np.count_nonzero(groundtruth > 0)
