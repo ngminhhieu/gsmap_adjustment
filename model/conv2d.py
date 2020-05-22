@@ -44,68 +44,42 @@ class Conv2DSupervisor():
 
         # Input
         model.add(
-            ConvLSTM2D(filters=16,
-                       kernel_size=(3, 3),
+            Conv2D(filters=64,
+                       kernel_size=(5, 5),
                        padding='same',
-                       return_sequences=True,
                        activation=self.activation,
-                       name='input_layer_convlstm2d',
-                       input_shape=(self.seq_len, 160, 120, 1)))
+                       name='input_layer_conv2d',
+                       input_shape=(160, 120, 1)))
         model.add(BatchNormalization())
-
+        
         # Max Pooling - Go deeper
-        model.add(MaxPooling3D(pool_size=(2, 2, 1)))
-
-        model.add(
-            ConvLSTM2D(filters=32,
-                       kernel_size=(3, 3),
-                       padding='same',
-                       activation=self.activation,
-                       name='hidden_layer_convlstm2d_1',
-                       return_sequences=True))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(Conv2D(64, (5, 5), activation='relu', padding='same', name='hidden_conv2d_1'))
         model.add(BatchNormalization())
-
-        model.add(MaxPooling3D(pool_size=(2, 2, 1)))
-
-        model.add(
-            ConvLSTM2D(filters=64,
-                       kernel_size=(3, 3),
-                       padding='same',
-                       activation=self.activation,
-                       name='hidden_layer_convlstm2d_2',
-                       return_sequences=True))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(Conv2D(64, (5, 5), activation='relu', padding='same', name='hidden_conv2d_2'))
+        model.add(BatchNormalization())
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(Conv2D(64, (5, 5), activation='relu', padding='same', name='hidden_conv2d_3'))
         model.add(BatchNormalization())
 
         # Up Sampling
-        model.add(UpSampling3D(size=(2, 2, 1)))
-
-        model.add(
-            ConvLSTM2D(filters=32,
-                       kernel_size=(3, 3),
-                       padding='same',
-                       activation=self.activation,
-                       name='hidden_layer_convlstm2d_3',
-                       return_sequences=True))
+        model.add(UpSampling2D(size=(2, 2)))
+        model.add(Conv2D(64, (5, 5), activation='relu', padding='same', name='hidden_conv2d_4'))
         model.add(BatchNormalization())
-
-        model.add(UpSampling3D(size=(2, 2, 1)))
-
-        model.add(
-            ConvLSTM2D(filters=16,
-                       kernel_size=(3, 3),
-                       padding='same',
-                       activation=self.activation,
-                       name='hidden_layer_convlstm2d_4',
-                       return_sequences=True))
+        model.add(UpSampling2D(size=(2, 2)))
+        model.add(Conv2D(64, (5, 5), activation='relu', padding='same', name='hidden_conv2d_5'))
+        model.add(BatchNormalization())
+        model.add(UpSampling2D(size=(2, 2)))
+        model.add(Conv2D(64, (5, 5), activation='relu', padding='same', name='hidden_conv2d_6'))
         model.add(BatchNormalization())
 
         model.add(
-            Conv3D(filters=1,
-                   kernel_size=(3, 3, 1),
+            Conv2D(filters=1,
+                   kernel_size=(5, 5),
                    padding='same',
-                   name='output_layer_conv3d',
+                   name='output_layer_conv2d',
                    activation=self.activation))
-
         print(model.summary())
 
         # plot model
