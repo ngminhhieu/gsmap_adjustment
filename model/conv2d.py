@@ -40,7 +40,6 @@ class Conv2DSupervisor():
         self.vae, self.vae_enc_dec = self.build_model_prediction()
 
     def build_model_prediction(self):
-<<<<<<< HEAD
         model = Sequential()
 
         # Input
@@ -117,78 +116,6 @@ class Conv2DSupervisor():
                    to_file=self.log_dir + '/conv2d_model.png',
                    show_shapes=True)
         return model
-=======
-        input_shape=(160, 120, 1)
-        kernel_size = 3
-        latent_dim = 2
-        filters = 16
-
-        inputs = Input(shape=input_shape, name='encoder_input')
-        x = inputs
-        for i in range(2):
-            filters *= 2
-            x = Conv2D(filters=filters,
-                    kernel_size=kernel_size,
-                    activation=self.activation,
-                    strides=2,
-                    padding='same')(x)
-
-        # shape info needed to build decoder model
-        shape = K.int_shape(x)
-
-        # generate latent vector Q(z|X)
-        x = Flatten()(x)
-        x = Dense(16, activation='relu')(x)
-        z_mean = Dense(latent_dim, name='z_mean')(x)
-        z_log_var = Dense(latent_dim, name='z_log_var')(x)
-
-        # use reparameterization trick to push the sampling out as input
-        # note that "output_shape" isn't necessary with the TensorFlow backend
-        z = Lambda(utils_conv2d.sampling, output_shape=(latent_dim,), name='z')([z_mean, z_log_var])
-
-        # instantiate encoder model
-        encoder = Model(inputs, [z_mean, z_log_var, z], name='encoder')
-        encoder.summary()
-        plot_model(encoder, to_file=self.log_dir + 'vae_cnn_encoder.png', show_shapes=True)
-
-        # build decoder model
-        latent_inputs = Input(shape=(latent_dim,), name='z_sampling')
-        x = Dense(shape[1] * shape[2] * shape[3], activation=self.activation)(latent_inputs)
-        x = Reshape((shape[1], shape[2], shape[3]))(x)
-
-        for i in range(2):
-            x = Conv2DTranspose(filters=filters,
-                                kernel_size=kernel_size,
-                                activation=self.activation,
-                                strides=2,
-                                padding='same')(x)
-            filters //= 2
-
-        outputs = Conv2DTranspose(filters=1,
-                                kernel_size=kernel_size,
-                                activation=self.activation,
-                                padding='same',
-                                name='decoder_output')(x)
-
-        # instantiate decoder model
-        decoder = Model(latent_inputs, outputs, name='decoder')
-        decoder.summary()
-        plot_model(decoder, to_file=self.log_dir + 'vae_cnn_decoder.png', show_shapes=True)
-
-        # instantiate VAE model
-        outputs = decoder(encoder(inputs)[2])
-        vae = Model(inputs, outputs, name='vae')
-        model = (encoder, decoder)
-        reconstruction_loss = mse(K.flatten(inputs), K.flatten(outputs))
-        reconstruction_loss *= 160 * 120
-        kl_loss = 1 + z_log_var - K.square(z_mean) - K.exp(z_log_var)
-        kl_loss = K.sum(kl_loss, axis=-1)
-        kl_loss *= -0.5
-        vae_loss = K.mean(reconstruction_loss + kl_loss)
-        vae.add_loss(vae_loss)
-        
-        return vae, model
->>>>>>> ac5749f2064cbcefe9a1fb3d671274d69cf2fbe0
 
     def train(self):
         # self.vae.compile(optimizer=self.optimizer,
@@ -227,7 +154,6 @@ class Conv2DSupervisor():
         
         input_test = self.input_test
         actual_data = self.target_test
-<<<<<<< HEAD
         predicted_data = np.zeros(shape=(len(actual_data), 1, 160,
                                          120, 1))
         from tqdm import tqdm
@@ -237,35 +163,19 @@ class Conv2DSupervisor():
             input[0] = input_test[i].copy()
             yhats = self.model.predict(input)
             predicted_data[i, 0] = yhats[0, -1]
-=======
-        predicted_data = np.zeros(shape=(len(actual_data), 160, 120, 1))
-        from tqdm import tqdm
-        iterator = tqdm(range(0, len(actual_data)))
-        for i in iterator:
-            input = np.zeros(shape=(1, 160, 120, 1))
-            input[0] = input_test[i].copy()
-            yhats = self.vae.predict(input)
-            predicted_data[i] = yhats[0]
->>>>>>> ac5749f2064cbcefe9a1fb3d671274d69cf2fbe0
 
         data_npz = self.config_model['data_kwargs'].get('dataset')
         lon = np.load(data_npz)['input_lon']
         lat = np.load(data_npz)['input_lat']
 
-        gauge_dataset = self.config_model['data_kwargs'].get('gauge_dataset')
-        gauge_lon = np.load(gauge_dataset)['gauge_lon']
-        gauge_lat = np.load(gauge_dataset)['gauge_lat']
-        gauge_precipitation = np.load(gauge_dataset)['gauge_precip']
+        dataset = self.config_model['data_kwargs'].get('dataset')
+        gauge_lon = np.load(dataset)['gauge_lon']
+        gauge_lat = np.load(dataset)['gauge_lat']
 
-        gauge_arr = []
-        preds_arr = []
-<<<<<<< HEAD
+        groundtruth = []
+        preds = []
         num_gauge = 0
         num_preds = 0
-=======
-        num_preds = 0
-        num_gauge = 0
->>>>>>> ac5749f2064cbcefe9a1fb3d671274d69cf2fbe0
         # MAE for only gauge data
         for i in range(len(gauge_lat)):
             lat = gauge_lat[i]
@@ -274,28 +184,19 @@ class Conv2DSupervisor():
             temp_lon = int(round((lon - 100.05) / 0.1))
 
             # gauge data
-            gauge_precip = gauge_precipitation[-354:, i]
-            gauge_arr.append(gauge_precip)
+            groundtruth.append(actual_data[:, temp_lat, temp_lon, 0].copy())
 
             # prediction data
-            preds = predicted_data[:, temp_lat, temp_lon, 0]
-            preds_arr.append(preds)
+            preds.append(predicted_data[:, temp_lat, temp_lon, 0].copy())
+
             x = np.count_nonzero(preds > 0)
-            y = np.count_nonzero(gauge_precip > 0)
-<<<<<<< HEAD
-            print("Prediction: ", x, "Gauge: ", y)
+            y = np.count_nonzero(groundtruth > 0)
+            print("Prediction: ", x, "Groundtruth: ", y)
             num_preds = num_preds + x
-            num_gauge = num_gauge + y
+            num_gt = num_gt + y
 
         print(num_preds, num_gauge)
-=======
-            num_preds = num_preds + x            
-            num_gauge = num_gauge + y
-            print("Prediction: ", x, "Gauge: ", y)
-
-        print(num_preds, num_gauge)        
->>>>>>> ac5749f2064cbcefe9a1fb3d671274d69cf2fbe0
-        common_util.cal_error(gauge_arr, preds_arr)
+        common_util.cal_error(groundtruth, preds)
 
     def plot_result(self):
         from matplotlib import pyplot as plt
