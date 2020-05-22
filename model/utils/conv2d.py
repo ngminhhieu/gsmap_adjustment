@@ -13,26 +13,28 @@ def create_data_prediction(**kwargs):
     # horizon is in seq_len. the last
     T = len(time)
 
-    lon = np.load(data_npz)['output_lon']
-    lat = np.load(data_npz)['output_lat']
-    precip = np.load(data_npz)['output_precip']
+    map_lon = np.load(data_npz)['map_lon']
+    map_lat = np.load(data_npz)['map_lat']
+    map_precip = np.load(data_npz)['map_precip']
 
-    input_conv2d_gsmap = np.zeros(shape=(T, len(lat), len(lon), 1))
-    target_conv2d_gsmap = np.zeros(shape=(T, len(lat), len(lon), 1))
+    gauge_lon = np.load(data_npz)['gauge_lon']
+    gauge_lat = np.load(data_npz)['gauge_lat']
+    gauge_precip = np.load(data_npz)['gauge_precip']
 
-    dataset = '../../data/conv2d_gsmap/npz/gauge_data.npz'
-    gauge_lon = np.load(gauge_dataset)['gauge_lon']
-    gauge_lat = np.load(gauge_dataset)['gauge_lat']
-    gauge_precipitation = np.load(gauge_dataset)['gauge_precip']
+    # input is gsmap
+    input_model = np.zeros(shape=(T, len(map_lat), len(map_lon), 1))
+    # output is gauge
+    output_model = np.zeros(shape=(T, len(map_lat), len(map_lon), 1))
+
     for i in range(len(gauge_lat)):
-        lat = gauge_lat[i]
-        lon = gauge_lon[i]
-        temp_lat = int(round((23.95 - lat) / 0.1))
-        temp_lon = int(round((lon - 100.05) / 0.1))
-        gauge_precip = gauge_precipitation[:, i]
-        gsmap_precip = precip[:, temp_lat, temp_lon]
-        input_conv2d_gsmap[:, temp_lat, temp_lon, 0] = gsmap_precip
-        target_conv2d_gsmap[:, temp_lat, temp_lon, 0] = gauge_precip
+        # lat = gauge_lat[i]
+        # lon = gauge_lon[i]
+        # temp_lat = int(round((23.95 - lat) / 0.1))
+        # temp_lon = int(round((lon - 100.05) / 0.1))
+        # gauge_precip = gauge_precipitation[:, i]
+        # gsmap_precip = map_precip[:, temp_lat, temp_lon]
+        input_conv2d_gsmap[:, i, i, 0] = map_precip[:, i]
+        target_conv2d_gsmap[:, i, i, 0] = gauge_precip[:, i]
     return input_conv2d_gsmap, target_conv2d_gsmap
 
 

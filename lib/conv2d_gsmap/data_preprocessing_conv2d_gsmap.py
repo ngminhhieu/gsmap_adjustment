@@ -17,6 +17,7 @@ def get_lon_lat_gauge_data():
 
     lon_arr = np.empty(shape=(len(data_paths_preprocessed_data)))
     lat_arr = np.empty(shape=(len(data_paths_preprocessed_data)))
+    precipitation = np.zeros(shape=(1766,72))
     for index, file in enumerate(data_paths_preprocessed_data):
         file_name = file[start_index:end_index]
         file_name_list = file_name.split('_')
@@ -24,11 +25,13 @@ def get_lon_lat_gauge_data():
         lat = float(file_name_list[2])
         lon_arr[index] = lon
         lat_arr[index] = lat
-
+        precip = read_csv(file, usecols=['precipitation'])
+        precip = precip.to_numpy()
+        precipitation[:, index] = precip[-1766:, 0]
     lon_arr = np.round(lon_arr, 3)
     lat_arr = np.round(lat_arr, 3)
 
-    return lat_arr, lon_arr
+    return lat_arr, lon_arr, precipitation
 
 
 def find_lat_lon_remapnn():
@@ -61,58 +64,72 @@ def find_lat_lon_remapnn():
 
 
 def set_gauge_data_to_gsmap():
-    input_lat_arr = []
-    input_lon_arr = []
+    map_lat = []
+    map_lon = []
+    map_precip = np.zeros(shape=(1766, 72))
 
-    lat_arr, lon_arr = get_lon_lat_gauge_data()
-    for i in range(0, len(lat_arr)):
+    gauge_lat, gauge_lon, gauge_precip = get_lon_lat_gauge_data()
+    for i in range(0, len(gauge_lat)):
         os.system(
             'cdo -outputtab,value -remapnn,lon={}_lat={} data/conv2d_gsmap/gsmap_2011_2018.nc > data/conv2d_gsmap/remapnn.csv'
-            .format(lon_arr[i], lat_arr[i]))
-        lat, lon = find_lat_lon_remapnn()
-        input_lat_arr.append(lat)
-        input_lon_arr.append(lon)
+            .format(gauge_lon[i], gauge_lat[i]))
+        lat_nearest_gauge, lon_nearest_gauge = find_lat_lon_remapnn()
+        map_lat.append(lat_nearest_gauge)
+        map_lon.append(lon_nearest_gauge)
 
-    input_lat_arr.sort()
-    input_lon_arr.sort()
+        gsmap_precipitation = read_csv('data/conv2d_gsmap/remapnn.csv')
+        gsmap_precipitation = gsmap_precipitation.to_numpy()
+        # *24 because gsmap is measured by average mm/hour
+        gsmap_precipitation = gsmap_precipitation * 24
+        map_precip[:, i] = gsmap_precipitation[:, 0]
+        print(i)
 
-    # get precipitation
-    input_precip_arr = np.empty(shape=(1766,
-                                       len(input_lat_arr), len(input_lon_arr)))
-    for i in range(0, len(input_lat_arr)):
-        os.system(
-            'cdo -outputtab,value -remapnn,lon={}_lat={} data/conv2d_gsmap/gsmap_2011_2018.nc > data/conv2d_gsmap/precip.csv'
-            .format(input_lon_arr[i], input_lat_arr[i]))
-        precipitation = read_csv('data/conv2d_gsmap/precip.csv')
-        precipitation = precipitation.to_numpy()
-        input_precip_arr[:, i, i] = precipitation[:,0]
-    input_precip_arr = np.round(gsmap_precip_arr, 1)
+    map_precip = np.round(map_precip, 1)  # round 1 because of gauge_data
 
-    return input_lat_arr, input_lon_arr, input_precip_arr
+    return map_lat, map_lon, map_precip, gauge_lat, gauge_lon, gauge_precip
 
 
 def save_to_npz():
-    input_lat, input_lon, input_precip = set_gauge_data_to_gsmap()
-    output_nc = Dataset('data/conv2d_gsmap/gsmap_2011_2018.nc', 'r')
+    map_lat, map_lon, map_precip, gauge_lat, gauge_lon, gauge_precip = set_gauge_data_to_gsmap()
+    raw_gsmap = Dataset('data/conv2d_gsmap/gsmap_2011_2018.nc', 'r')
+    time = np.array(raw_gsmap['time'][:])
 
-    time = np.array(output_nc['time'][:])
-    output_lon = np.array(output_nc['lon'][:])
-    output_lat = np.array(output_nc['lat'][:])
-    output_precip = np.array(output_nc['precip'][:])
-    output_precip = np.round(output_precip, 1)
-
-    np.savez('data/npz/conv2d_gsmap.npz',
+    np.savez('data/conv2d_gsmap/npz/map_gauge_72_stations.npz',
              time=time,
-             input_lon=input_lon,
-             input_lat=input_lat,
-             input_precip=input_precip,
-             output_lon=output_lon,
-             output_lat=output_lat,
-             output_precip=output_precip)
+             map_lat=map_lat,
+             map_lon=map_lon,
+             map_precip=map_precip,
+             gauge_lat=gauge_lat,
+             gauge_lon=gauge_lon,
+             gauge_precip=gauge_precip)
 
-def test():
-    input_precip = np.load('data/npz/conv2d_gsmap.npz')['input_precip']
-    print(input_precip[4,70,70])
 
-# test()
+def cal_error_gauge_gsmap():
+    dataset = 'data/conv2d_gsmap/npz/map_gauge_72_stations.npz'
+    map_precip = np.load(dataset)['map_precip']
+    gauge_precip = np.load(dataset)['gauge_precip']
+    cal_error(gauge_precip[-354:, :], map_precip[-354:, :])
+
+
+def cal_error(test_arr, prediction_arr):
+    from sklearn.metrics import mean_squared_error, mean_absolute_error
+    with np.errstate(divide='ignore', invalid='ignore'):
+        # cal mse
+        error_mae = mean_absolute_error(test_arr, prediction_arr)
+
+        # cal rmse
+        error_mse = mean_squared_error(test_arr, prediction_arr)
+        error_rmse = np.sqrt(error_mse)
+
+        # cal mape
+        y_true, y_pred = np.array(test_arr), np.array(prediction_arr)
+        error_mape = np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+        error_list = [error_mae, error_rmse, error_mape]
+        print("MAE: %.4f" % (error_mae))
+        print("RMSE: %.4f" % (error_rmse))
+        print("MAPE: %.4f" % (error_mape))
+        return error_list
+
+
 save_to_npz()
+cal_error_gauge_gsmap()
