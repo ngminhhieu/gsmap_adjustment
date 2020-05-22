@@ -1,7 +1,7 @@
 import numpy as np
 from model import common_util
 from sklearn.preprocessing import MinMaxScaler
-
+from keras import backend as K
 
 def create_data_prediction(**kwargs):
 
@@ -11,33 +11,30 @@ def create_data_prediction(**kwargs):
 
     time = np.load(data_npz)['time']
     # horizon is in seq_len. the last
-    T = len(time) - seq_len - horizon
+    T = len(time)
 
-    lon = np.load(data_npz)['output_lon']
-    lat = np.load(data_npz)['output_lat']
-    precip = np.load(data_npz)['output_precip']
+    map_lon = np.load(data_npz)['map_lon']
+    map_lat = np.load(data_npz)['map_lat']
+    map_precip = np.load(data_npz)['map_precip']
 
-    input_conv2d_gsmap = np.zeros(shape=(T, seq_len, len(lat), len(lon), 1))
-    target_conv2d_gsmap = np.zeros(shape=(T, seq_len, len(lat), len(lon), 1))
+    gauge_lon = np.load(data_npz)['gauge_lon']
+    gauge_lat = np.load(data_npz)['gauge_lat']
+    gauge_precip = np.load(data_npz)['gauge_precip']
 
-    gauge_dataset = kwargs['data'].get('gauge_dataset')
-    gauge_lon = np.load(gauge_dataset)['gauge_lon']
-    gauge_lat = np.load(gauge_dataset)['gauge_lat']
-    gauge_precipitation = np.load(gauge_dataset)['gauge_precip']
+    # input is gsmap
+    input_model = np.zeros(shape=(T, len(map_lat), len(map_lon), 1))
+    # output is gauge
+    output_model = np.zeros(shape=(T, len(map_lat), len(map_lon), 1))
+
     for i in range(len(gauge_lat)):
-        lat = gauge_lat[i]
-        lon = gauge_lon[i]
-        temp_lat = int(round((23.95 - lat) / 0.1))
-        temp_lon = int(round((lon - 100.05) / 0.1))
-        gauge_precip = gauge_precipitation[:, i]
-        gsmap_precip = precip[:, temp_lat, temp_lon]
-        for j in range(T):
-            input_conv2d_gsmap[j, :, temp_lat, temp_lon,
-                               0] = gsmap_precip[j:j + seq_len]
-            # remap the target gsmap by gauge data
-            target_conv2d_gsmap[j, :, temp_lat, temp_lon,
-                                0] = gauge_precip[j + horizon:j + seq_len +
-                                                  horizon]
+        # lat = gauge_lat[i]
+        # lon = gauge_lon[i]
+        # temp_lat = int(round((23.95 - lat) / 0.1))
+        # temp_lon = int(round((lon - 100.05) / 0.1))
+        # gauge_precip = gauge_precipitation[:, i]
+        # gsmap_precip = map_precip[:, temp_lat, temp_lon]
+        input_conv2d_gsmap[:, i, i, 0] = map_precip[:, i]
+        target_conv2d_gsmap[:, i, i, 0] = gauge_precip[:, i]
     return input_conv2d_gsmap, target_conv2d_gsmap
 
 
@@ -61,3 +58,23 @@ def load_dataset(**kwargs):
         data["target_" + cat] = y
 
     return data
+
+# reparameterization trick
+# instead of sampling from Q(z|X), sample eps = N(0,I)
+# then z = z_mean + sqrt(var)*eps
+def sampling(args):
+    """Reparameterization trick by sampling fr an isotropic unit Gaussian.
+
+    # Arguments
+        args (tensor): mean and log of variance of Q(z|X)
+
+    # Returns
+        z (tensor): sampled latent vector
+    """
+
+    z_mean, z_log_var = args
+    batch = K.shape(z_mean)[0]
+    dim = K.int_shape(z_mean)[1]
+    # by default, random_normal has mean=0 and std=1.0
+    epsilon = K.random_normal(shape=(batch, dim))
+    return z_mean + K.exp(0.5 * z_log_var) * epsilon

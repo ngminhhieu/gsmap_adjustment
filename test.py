@@ -1,10 +1,12 @@
 import numpy as np
-from scipy.spatial import cKDTree
-x, y = np.mgrid[0:5, 2:8]
-tree = cKDTree(np.c_[x.ravel(), y.ravel()])
-dd = tree.query([1.1, 3.1], k=3)[1]
-print(dd)
+from matplotlib import pyplot as plt
+from numpy.random import rand
 
-ix = np.logical_or([True,False,True], [False,False,False])
+a = np.array([[1,2,4], [4,5,6], [10,20,30]])
+b = a[0:2, :]*3
+print(b)
 
-print(np.where(np.logical_not(ix))[0])
+z = np.array([[[1,3,4,50]]], [[[0.1,0,0.2,0.3]]])
+print(z.shape)
+z = np.reshape(z, (4,2))
+print(z)
