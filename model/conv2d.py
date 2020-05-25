@@ -173,18 +173,24 @@ class Conv2DSupervisor():
             temp_lon = int(round((lon - 100.05) / 0.1))
 
             # gauge data
-            groundtruth.append(actual_data[:, -1, temp_lat, temp_lon, 0].copy())
+            gt = actual_data[:, -1, temp_lat, temp_lon, 0].copy()
+            groundtruth.append(gt)
 
             # prediction data
-            preds.append(predicted_data[:, 0, temp_lat, temp_lon, 0].copy())
+            yhat = predicted_data[:, 0, temp_lat, temp_lon, 0].copy()
+            preds.append(yhat)
 
-            x = np.count_nonzero(preds > 0)
-            y = np.count_nonzero(groundtruth > 0)
+            x = np.count_nonzero(yhat > 0)
+            y = np.count_nonzero(gt > 0)
             print("Prediction: ", x, "Groundtruth: ", y)
             num_preds = num_preds + x
             num_gt = num_gt + y
 
         print(num_preds, num_gauge)
+        groundtruth = np.array(groundtruth)
+        preds = np.array(preds)
+        np.savetxt(self.log_dir + 'groundtruth.csv', groundtruth, delimiter=",")
+        np.savetxt(self.log_dir + 'preds.csv', preds, delimiter=",")
         common_util.cal_error(groundtruth, preds)
 
     def plot_result(self):
