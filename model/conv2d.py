@@ -97,7 +97,7 @@ class Conv2DSupervisor():
                                           batch_size=self.batch_size,
                                           epochs=self.epochs,
                                           callbacks=self.callbacks,
-                                          validation_data=(self.input_valid,None),
+                                          validation_data=(self.input_valid,self.target_valid),
                                           shuffle=True,
                                           verbose=2)
 
