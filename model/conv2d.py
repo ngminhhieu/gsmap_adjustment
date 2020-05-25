@@ -1,4 +1,4 @@
-from keras.layers import Dense, Input
+from keras.layers import Dense, Input, Sequential
 from keras.layers import Conv2D, Flatten, Lambda
 from keras.layers import Reshape, Conv2DTranspose
 from keras.models import Model
