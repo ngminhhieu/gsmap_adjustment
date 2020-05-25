@@ -1,7 +1,5 @@
-from keras.layers import Dense, Input
-from keras.layers import Conv2D, Flatten, Lambda
-from keras.layers import Reshape, Conv2DTranspose
-from keras.models import Model, Sequential
+from keras.layers import ConvLSTM2D, BatchNormalization, MaxPooling3D, UpSampling3D
+from keras.models import Sequential
 import numpy as np
 from model import common_util
 import model.utils.conv2d as utils_conv2d
@@ -37,7 +35,7 @@ class Conv2DSupervisor():
         self.seq_len = self.config_model['seq_len']
         self.horizon = self.config_model['horizon']
 
-        self.vae, self.vae_enc_dec = self.build_model_prediction()
+        self.model = self.build_model_prediction()
 
     def build_model_prediction(self):
         model = Sequential()
@@ -116,11 +114,11 @@ class Conv2DSupervisor():
         return model
 
     def train(self):
-        self.vae.compile(optimizer=self.optimizer,
+        self.model.compile(optimizer=self.optimizer,
                            loss=self.loss,
                            metrics=['mse', 'mae'])
         
-        training_history = self.vae.fit(self.input_train,
+        training_history = self.model.fit(self.input_train,
                                           self.target_train,
                                           batch_size=self.batch_size,
                                           epochs=self.epochs,
@@ -144,8 +142,8 @@ class Conv2DSupervisor():
 
     def test_prediction(self):
         print("Load model from: {}".format(self.log_dir))
-        self.vae.load_weights(self.log_dir + 'best_model.hdf5')
-        self.vae.compile(optimizer=self.optimizer, loss=self.loss)
+        self.model.load_weights(self.log_dir + 'best_model.hdf5')
+        self.model.compile(optimizer=self.optimizer, loss=self.loss)
         
         input_test = self.input_test
         actual_data = self.target_test
