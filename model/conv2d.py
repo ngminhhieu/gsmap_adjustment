@@ -1,7 +1,7 @@
-from keras.layers import Dense, Input, Sequential
+from keras.layers import Dense, Input
 from keras.layers import Conv2D, Flatten, Lambda
 from keras.layers import Reshape, Conv2DTranspose
-from keras.models import Model
+from keras.models import Model, Sequential
 import numpy as np
 from model import common_util
 import model.utils.conv2d as utils_conv2d
