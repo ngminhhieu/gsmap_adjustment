@@ -157,10 +157,6 @@ class Conv2DSupervisor():
             yhats = self.model.predict(input)
             predicted_data[i, 0] = yhats[0, -1]
 
-        data_npz = self.config_model['data_kwargs'].get('dataset')
-        lon = np.load(data_npz)['input_lon']
-        lat = np.load(data_npz)['input_lat']
-
         dataset = self.config_model['data_kwargs'].get('dataset')
         gauge_lon = np.load(dataset)['gauge_lon']
         gauge_lat = np.load(dataset)['gauge_lat']
