@@ -163,7 +163,7 @@ class Conv2DSupervisor():
 
         groundtruth = []
         preds = []
-        num_gauge = 0
+        num_gt = 0
         num_preds = 0
         # MAE for only gauge data
         for i in range(len(gauge_lat)):
@@ -186,7 +186,7 @@ class Conv2DSupervisor():
             num_preds = num_preds + x
             num_gt = num_gt + y
 
-        print(num_preds, num_gauge)
+        print(num_preds, num_gt)
         groundtruth = np.array(groundtruth)
         preds = np.array(preds)
         np.savetxt(self.log_dir + 'groundtruth.csv', groundtruth, delimiter=",")
