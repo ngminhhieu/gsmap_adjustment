@@ -1,7 +1,5 @@
-from keras.layers import Dense, Input
-from keras.layers import Conv2D, Flatten, Lambda
-from keras.layers import Reshape, Conv2DTranspose
-from keras.models import Model
+from keras.layers import Conv2D, BatchNormalization, MaxPooling2D, UpSampling2D
+from keras.models import Sequential
 import numpy as np
 from model import common_util
 import model.utils.conv2d as utils_conv2d
@@ -37,15 +35,15 @@ class Conv2DSupervisor():
         self.seq_len = self.config_model['seq_len']
         self.horizon = self.config_model['horizon']
 
-        self.vae, self.vae_enc_dec = self.build_model_prediction()
+        self.model = self.build_model_prediction()
 
     def build_model_prediction(self):
         model = Sequential()
 
         # Input
         model.add(
-            Conv2D(filters=64,
-                       kernel_size=(5, 5),
+            Conv2D(filters=32,
+                       kernel_size=(3, 3),
                        padding='same',
                        activation=self.activation,
                        name='input_layer_conv2d',
@@ -54,29 +52,29 @@ class Conv2DSupervisor():
         
         # Max Pooling - Go deeper
         model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(Conv2D(64, (5, 5), activation='relu', padding='same', name='hidden_conv2d_1'))
+        model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_1'))
         model.add(BatchNormalization())
         model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(Conv2D(64, (5, 5), activation='relu', padding='same', name='hidden_conv2d_2'))
+        model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_2'))
         model.add(BatchNormalization())
         model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(Conv2D(64, (5, 5), activation='relu', padding='same', name='hidden_conv2d_3'))
+        model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='hidden_conv2d_3'))
         model.add(BatchNormalization())
 
         # Up Sampling
         model.add(UpSampling2D(size=(2, 2)))
-        model.add(Conv2D(64, (5, 5), activation='relu', padding='same', name='hidden_conv2d_4'))
+        model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='hidden_conv2d_4'))
         model.add(BatchNormalization())
         model.add(UpSampling2D(size=(2, 2)))
-        model.add(Conv2D(64, (5, 5), activation='relu', padding='same', name='hidden_conv2d_5'))
+        model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_5'))
         model.add(BatchNormalization())
         model.add(UpSampling2D(size=(2, 2)))
-        model.add(Conv2D(64, (5, 5), activation='relu', padding='same', name='hidden_conv2d_6'))
+        model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_6'))
         model.add(BatchNormalization())
 
         model.add(
             Conv2D(filters=1,
-                   kernel_size=(5, 5),
+                   kernel_size=(3, 3),
                    padding='same',
                    name='output_layer_conv2d',
                    activation=self.activation))
@@ -90,11 +88,11 @@ class Conv2DSupervisor():
         return model
 
     def train(self):
-        self.vae.compile(optimizer=self.optimizer,
+        self.model.compile(optimizer=self.optimizer,
                            loss=self.loss,
                            metrics=['mse', 'mae'])
         
-        training_history = self.vae.fit(self.input_train,
+        training_history = self.model.fit(self.input_train,
                                           self.target_train,
                                           batch_size=self.batch_size,
                                           epochs=self.epochs,
@@ -118,8 +116,8 @@ class Conv2DSupervisor():
 
     def test_prediction(self):
         print("Load model from: {}".format(self.log_dir))
-        self.vae.load_weights(self.log_dir + 'best_model.hdf5')
-        self.vae.compile(optimizer=self.optimizer, loss=self.loss)
+        self.model.load_weights(self.log_dir + 'best_model.hdf5')
+        self.model.compile(optimizer=self.optimizer, loss=self.loss)
         
         input_test = self.input_test
         actual_data = self.target_test
