@@ -103,33 +103,4 @@ def save_to_npz():
              gauge_lon=gauge_lon,
              gauge_precip=gauge_precip)
 
-
-def cal_error_gauge_gsmap():
-    dataset = 'data/conv2d_gsmap/npz/map_gauge_72_stations.npz'
-    map_precip = np.load(dataset)['map_precip']
-    gauge_precip = np.load(dataset)['gauge_precip']
-    cal_error(gauge_precip[-354:, :], map_precip[-354:, :])
-
-
-def cal_error(test_arr, prediction_arr):
-    from sklearn.metrics import mean_squared_error, mean_absolute_error
-    with np.errstate(divide='ignore', invalid='ignore'):
-        # cal mse
-        error_mae = mean_absolute_error(test_arr, prediction_arr)
-
-        # cal rmse
-        error_mse = mean_squared_error(test_arr, prediction_arr)
-        error_rmse = np.sqrt(error_mse)
-
-        # cal mape
-        y_true, y_pred = np.array(test_arr), np.array(prediction_arr)
-        error_mape = np.mean(np.abs((y_true - y_pred) / y_true)) * 100
-        error_list = [error_mae, error_rmse, error_mape]
-        print("MAE: %.4f" % (error_mae))
-        print("RMSE: %.4f" % (error_rmse))
-        print("MAPE: %.4f" % (error_mape))
-        return error_list
-
-
 save_to_npz()
-cal_error_gauge_gsmap()
