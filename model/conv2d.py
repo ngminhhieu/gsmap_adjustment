@@ -139,6 +139,7 @@ class Conv2DSupervisor():
         preds = []
         num_gt = 0
         num_preds = 0
+        list_metrics = np.zeros(shape = (len(gauge_lat), 3))
         # MAE for only gauge data
         for i in range(len(gauge_lat)):
             lat = gauge_lat[i]
@@ -156,15 +157,21 @@ class Conv2DSupervisor():
 
             x = np.count_nonzero(yhat > 0)
             y = np.count_nonzero(gt > 0)
-            print("Prediction: ", x, "Groundtruth: ", y)
+            # print("Prediction: ", x, "Groundtruth: ", y)
+            
+            list_metrics[i, 0] = common_util.mae(gt, yhat)
+            list_metrics[i, 0] = common_util.rmse(gt, yhat)
+            list_metrics[i, 2] = y - x
+
             num_preds = num_preds + x
             num_gt = num_gt + y
 
-        print(num_preds, num_gt)
+        # print(num_preds, num_gt)
         groundtruth = np.array(groundtruth)
         preds = np.array(preds)
         np.savetxt(self.log_dir + 'groundtruth.csv', groundtruth, delimiter=",")
         np.savetxt(self.log_dir + 'preds.csv', preds, delimiter=",")
+        np.savetxt(self.log_dir + 'preds.csv', list_metrics, delimiter=",")
         common_util.cal_error(groundtruth, preds)
 
     def plot_result(self):
