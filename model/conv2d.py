@@ -171,7 +171,7 @@ class Conv2DSupervisor():
         preds = np.array(preds)
         np.savetxt(self.log_dir + 'groundtruth.csv', groundtruth, delimiter=",")
         np.savetxt(self.log_dir + 'preds.csv', preds, delimiter=",")
-        np.savetxt(self.log_dir + 'preds.csv', list_metrics, delimiter=",")
+        np.savetxt(self.log_dir + 'error.csv', list_metrics, delimiter=",")
         common_util.cal_error(groundtruth, preds)
 
     def plot_result(self):
