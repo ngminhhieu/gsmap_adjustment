@@ -33,6 +33,8 @@ def create_data_prediction(**kwargs):
         temp_lon = int(round((lon - 100.05) / 0.1))
         input_model[:, temp_lat, temp_lon, 0] = map_precip[:, i]
         output_model[:, temp_lat, temp_lon, 0] = gauge_precip[:, i]
+    print(np.count_nonzero(input_model[0] >0))
+    print(np.count_nonzero(output_model[0] >0))
     return input_model, output_model
 
 
