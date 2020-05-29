@@ -125,7 +125,7 @@ class Conv2DSupervisor():
                                           callbacks=self.callbacks,
                                           validation_data=(self.input_valid, self.target_valid),
                                           shuffle=True,
-                                          verbose=2)
+                                          verbose=1)
 
         if training_history is not None:
             common_util._plot_training_history(training_history,
@@ -155,7 +155,7 @@ class Conv2DSupervisor():
             input = np.zeros(shape=(1, self.seq_len, 160, 120, 1))
             input[0] = input_test[i].copy()
             yhats = self.model.predict(input)
-            predicted_data[i, 0] = yhats[0, -1]
+            predicted_data[i] = yhats[0]
 
         dataset = self.config_model['data_kwargs'].get('dataset')
         gauge_lon = np.load(dataset)['gauge_lon']
