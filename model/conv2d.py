@@ -160,7 +160,7 @@ class Conv2DSupervisor():
         dataset = self.config_model['data_kwargs'].get('dataset')
         gauge_lon = np.load(dataset)['gauge_lon']
         gauge_lat = np.load(dataset)['gauge_lat']
-
+        list_metrics = np.zeros(shape = (len(gauge_lat), 3))
         groundtruth = []
         preds = []
         num_gt = 0
@@ -183,6 +183,10 @@ class Conv2DSupervisor():
             x = np.count_nonzero(yhat > 0)
             y = np.count_nonzero(gt > 0)
             print("Prediction: ", x, "Groundtruth: ", y)
+            
+            list_metrics[i, 0] = common_util.mae(gt, yhat)
+            list_metrics[i, 0] = common_util.rmse(gt, yhat)
+            list_metrics[i, 2] = y - x
             num_preds = num_preds + x
             num_gt = num_gt + y
 
