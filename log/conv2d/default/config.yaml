@@ -1,0 +1,20 @@
+base_dir: log/conv2d/
+data:
+  batch_size: 200
+  dataset: data/conv2d_gsmap/npz/map_gauge_72_stations.npz
+  test_batch_size: 1
+  test_size: 0.2
+  valid_size: 0.2
+log_level: INFO
+model:
+  activation: relu
+  horizon: 0
+  rnn_units: 100
+  seq_len: 4
+train:
+  dropout: 0
+  epochs: 300
+  log_dir: log/conv2d/default/
+  loss: mse
+  optimizer: adadelta
+  patience: 15

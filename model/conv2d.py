@@ -99,7 +99,7 @@ class Conv2DSupervisor():
                                           callbacks=self.callbacks,
                                           validation_data=(self.input_valid,self.target_valid),
                                           shuffle=True,
-                                          verbose=2)
+                                          verbose=1)
 
         if training_history is not None:
             common_util._plot_training_history(training_history,
