@@ -42,7 +42,7 @@ class Conv2DSupervisor():
 
         # Input
         model.add(
-            ConvLSTM2D(filters=16,
+            ConvLSTM2D(filters=32,
                        kernel_size=(3, 3),
                        padding='same',
                        return_sequences=True,
@@ -52,7 +52,7 @@ class Conv2DSupervisor():
         model.add(BatchNormalization())
 
         # Max Pooling - Go deeper
-        model.add(MaxPooling3D(pool_size=(2, 2, 1)))
+        # model.add(MaxPooling3D(pool_size=(2, 2, 1)))
 
         model.add(
             ConvLSTM2D(filters=32,
@@ -63,10 +63,10 @@ class Conv2DSupervisor():
                        return_sequences=True))
         model.add(BatchNormalization())
 
-        model.add(MaxPooling3D(pool_size=(2, 2, 1)))
+        # model.add(MaxPooling3D(pool_size=(2, 2, 1)))
 
         model.add(
-            ConvLSTM2D(filters=64,
+            ConvLSTM2D(filters=32,
                        kernel_size=(3, 3),
                        padding='same',
                        activation=self.activation,
@@ -74,28 +74,28 @@ class Conv2DSupervisor():
                        return_sequences=True))
         # model.add(BatchNormalization())
 
-        # Up Sampling
-        model.add(UpSampling3D(size=(2, 2, 1)))
+        # # Up Sampling
+        # model.add(UpSampling3D(size=(2, 2, 1)))
 
-        model.add(
-            ConvLSTM2D(filters=32,
-                       kernel_size=(3, 3),
-                       padding='same',
-                       activation=self.activation,
-                       name='hidden_layer_convlstm2d_3',
-                       return_sequences=True))
-        model.add(BatchNormalization())
+        # model.add(
+        #     ConvLSTM2D(filters=32,
+        #                kernel_size=(3, 3),
+        #                padding='same',
+        #                activation=self.activation,
+        #                name='hidden_layer_convlstm2d_3',
+        #                return_sequences=True))
+        # model.add(BatchNormalization())
 
-        model.add(UpSampling3D(size=(2, 2, 1)))
+        # model.add(UpSampling3D(size=(2, 2, 1)))
 
-        model.add(
-            ConvLSTM2D(filters=16,
-                       kernel_size=(3, 3),
-                       padding='same',
-                       activation=self.activation,
-                       name='hidden_layer_convlstm2d_4',
-                       return_sequences=True))
-        model.add(BatchNormalization())
+        # model.add(
+        #     ConvLSTM2D(filters=16,
+        #                kernel_size=(3, 3),
+        #                padding='same',
+        #                activation=self.activation,
+        #                name='hidden_layer_convlstm2d_4',
+        #                return_sequences=True))
+        # model.add(BatchNormalization())
 
         model.add(
             Conv3D(filters=1,
