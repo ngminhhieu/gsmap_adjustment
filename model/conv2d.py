@@ -161,8 +161,7 @@ class Conv2DSupervisor():
 
         groundtruth = []
         preds = []
-        num_gt = 0
-        num_preds = 0
+        total_margin = 0
         list_metrics = np.zeros(shape=(len(gauge_lat) + 1, 3))
         # MAE for only gauge data
         for i in range(len(gauge_lat)):
