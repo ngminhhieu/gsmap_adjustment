@@ -160,12 +160,20 @@ class Conv2DSupervisor():
             # print("Prediction: ", x, "Groundtruth: ", y)
             
             list_metrics[i, 0] = common_util.mae(gt, yhat)
-            list_metrics[i, 0] = common_util.rmse(gt, yhat)
-            list_metrics[i, 2] = y - x
+            list_metrics[i, 1] = common_util.rmse(gt, yhat)
+            list_metrics[i, 2] = abs(y - x)
 
             num_preds = num_preds + x
             num_gt = num_gt + y
-
+        
+        metric_sum = np.sum(list_metrics, axis=0)
+        total_mae = metric_sum[0]
+        total_rmse = metric_sum[1]
+        total_margin = metric_sum[2]
+        
+        print("Total MAE: ", total_mae)
+        print("Total RMSE: ", total_rmse)
+        print("Total Margin: ", total_margin)
         # print(num_preds, num_gt)
         groundtruth = np.array(groundtruth)
         preds = np.array(preds)
