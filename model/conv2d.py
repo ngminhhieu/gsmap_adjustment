@@ -9,6 +9,7 @@ from pandas import read_csv
 from keras.utils import plot_model
 from keras import backend as K
 from keras.losses import mse
+import math
 
 
 class Conv2DSupervisor():
@@ -160,13 +161,12 @@ class Conv2DSupervisor():
         dataset = self.config_model['data_kwargs'].get('dataset')
         gauge_lon = np.load(dataset)['gauge_lon']
         gauge_lat = np.load(dataset)['gauge_lat']
-        list_metrics = np.zeros(shape = (len(gauge_lat), 3))
+        list_metrics = np.zeros(shape = (len(gauge_lat)+1, 3))
         groundtruth = []
         preds = []
-        num_gt = 0
-        num_preds = 0
+        total_margin = 0
         # MAE for only gauge data
-        for i in range(len(gauge_lat)):
+        for i in range(1, len(gauge_lat)+1):
             lat = gauge_lat[i]
             lon = gauge_lon[i]
             temp_lat = int(round((23.95 - lat) / 0.1))
@@ -182,20 +182,21 @@ class Conv2DSupervisor():
 
             x = np.count_nonzero(yhat > 0)
             y = np.count_nonzero(gt > 0)
-            print("Prediction: ", x, "Groundtruth: ", y)
             
             list_metrics[i, 0] = common_util.mae(gt, yhat)
-            list_metrics[i, 0] = common_util.rmse(gt, yhat)
-            list_metrics[i, 2] = y - x
-            num_preds = num_preds + x
-            num_gt = num_gt + y
+            list_metrics[i, 1] = common_util.rmse(gt, yhat)
+            margin = y - x
+            total_margin = total_margin + math.abs(margin)
+            list_metrics[i, 2] = margin
 
-        print(num_preds, num_gt)
+        list_metrics[0, 0] = common_util.mae(groundtruth, preds)
+        list_metrics[0, 1] = common_util.rmse(groundtruth, preds)
+        list_metrics[0, 2] = total
+
         groundtruth = np.array(groundtruth)
         preds = np.array(preds)
         np.savetxt(self.log_dir + 'groundtruth.csv', groundtruth, delimiter=",")
         np.savetxt(self.log_dir + 'preds.csv', preds, delimiter=",")
-        common_util.cal_error(groundtruth, preds)
 
     def plot_result(self):
         from matplotlib import pyplot as plt
