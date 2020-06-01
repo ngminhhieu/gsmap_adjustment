@@ -48,7 +48,7 @@ class Conv2DSupervisor():
                        return_sequences=True,
                        activation=self.activation,
                        name='input_layer_convlstm2d',
-                       input_shape=(self.seq_len, 160, 120, 1)))
+                       input_shape=(self.seq_len, 72, 72, 1)))
         model.add(BatchNormalization())
 
         # Max Pooling - Go deeper
