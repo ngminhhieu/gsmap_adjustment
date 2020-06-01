@@ -36,8 +36,8 @@ def create_data_prediction(**kwargs):
         temp_lat = int(round((23.95 - lat) / 0.1))
         temp_lon = int(round((lon - 100.05) / 0.1))
         for batch in range(T):
-            input_model[i, :, batch, batch, 0] = map_precip[batch:batch+seq_len, i].copy()
-            output_model[i, :, batch, batch, 0] = gauge_precip[batch+horizon:batch+seq_len+horizon, i].copy()
+            input_model[i, :, i, i, 0] = map_precip[batch:batch+seq_len, i].copy()
+            output_model[i, :, i, i, 0] = gauge_precip[batch+horizon:batch+seq_len+horizon, i].copy()
     return input_model, output_model
 
 
