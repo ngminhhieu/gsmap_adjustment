@@ -43,33 +43,57 @@ class Conv2DSupervisor():
         # Input
         model.add(
             Conv2D(filters=32,
-                       kernel_size=(3, 3),
-                       padding='same',
-                       activation=self.activation,
-                       name='input_layer_conv2d',
-                       input_shape=(160, 120, 1)))
+                   kernel_size=(3, 3),
+                   padding='same',
+                   activation=self.activation,
+                   name='input_layer_conv2d',
+                   input_shape=(160, 120, 1)))
         model.add(BatchNormalization())
-        
+
         # Max Pooling - Go deeper
         model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_1'))
+        model.add(
+            Conv2D(32, (3, 3),
+                   activation='relu',
+                   padding='same',
+                   name='hidden_conv2d_1'))
         model.add(BatchNormalization())
         model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_2'))
+        model.add(
+            Conv2D(32, (3, 3),
+                   activation='relu',
+                   padding='same',
+                   name='hidden_conv2d_2'))
         model.add(BatchNormalization())
         model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='hidden_conv2d_3'))
+        model.add(
+            Conv2D(64, (3, 3),
+                   activation='relu',
+                   padding='same',
+                   name='hidden_conv2d_3'))
         model.add(BatchNormalization())
 
         # Up Sampling
         model.add(UpSampling2D(size=(2, 2)))
-        model.add(Conv2D(64, (3, 3), activation='relu', padding='same', name='hidden_conv2d_4'))
+        model.add(
+            Conv2D(64, (3, 3),
+                   activation='relu',
+                   padding='same',
+                   name='hidden_conv2d_4'))
         model.add(BatchNormalization())
         model.add(UpSampling2D(size=(2, 2)))
-        model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_5'))
+        model.add(
+            Conv2D(32, (3, 3),
+                   activation='relu',
+                   padding='same',
+                   name='hidden_conv2d_5'))
         model.add(BatchNormalization())
         model.add(UpSampling2D(size=(2, 2)))
-        model.add(Conv2D(32, (3, 3), activation='relu', padding='same', name='hidden_conv2d_6'))
+        model.add(
+            Conv2D(32, (3, 3),
+                   activation='relu',
+                   padding='same',
+                   name='hidden_conv2d_6'))
         model.add(BatchNormalization())
 
         model.add(
@@ -91,13 +115,14 @@ class Conv2DSupervisor():
         self.model.compile(optimizer=self.optimizer,
                            loss=self.loss,
                            metrics=['mse', 'mae'])
-        
+
         training_history = self.model.fit(self.input_train,
                                           self.target_train,
                                           batch_size=self.batch_size,
                                           epochs=self.epochs,
                                           callbacks=self.callbacks,
-                                          validation_data=(self.input_valid,self.target_valid),
+                                          validation_data=(self.input_valid,
+                                                           self.target_valid),
                                           shuffle=True,
                                           verbose=1)
 
@@ -118,11 +143,10 @@ class Conv2DSupervisor():
         print("Load model from: {}".format(self.log_dir))
         self.model.load_weights(self.log_dir + 'best_model.hdf5')
         self.model.compile(optimizer=self.optimizer, loss=self.loss)
-        
+
         input_test = self.input_test
         actual_data = self.target_test
-        predicted_data = np.zeros(shape=(len(actual_data), 160,
-                                         120, 1))
+        predicted_data = np.zeros(shape=(len(actual_data), 160, 120, 1))
         from tqdm import tqdm
         iterator = tqdm(range(0, len(actual_data)))
         for i in iterator:
@@ -139,7 +163,7 @@ class Conv2DSupervisor():
         preds = []
         num_gt = 0
         num_preds = 0
-        list_metrics = np.zeros(shape = (len(gauge_lat), 3))
+        list_metrics = np.zeros(shape=(len(gauge_lat) + 1, 3))
         # MAE for only gauge data
         for i in range(len(gauge_lat)):
             lat = gauge_lat[i]
@@ -157,22 +181,22 @@ class Conv2DSupervisor():
 
             x = np.count_nonzero(yhat > 0)
             y = np.count_nonzero(gt > 0)
-            # print("Prediction: ", x, "Groundtruth: ", y)
-            
+
             list_metrics[i, 0] = common_util.mae(gt, yhat)
-            list_metrics[i, 0] = common_util.rmse(gt, yhat)
-            list_metrics[i, 2] = y - x
+            list_metrics[i, 1] = common_util.rmse(gt, yhat)
+            margin = y - x
+            total_margin = total_margin + math.abs(margin)
+            list_metrics[i, 2] = margin
 
-            num_preds = num_preds + x
-            num_gt = num_gt + y
+        # total of 72 gauges
+        list_metrics[0, 0] = common_util.mae(groundtruth, preds)
+        list_metrics[0, 1] = common_util.rmse(groundtruth, preds)
+        list_metrics[0, 2] = total
 
-        # print(num_preds, num_gt)
         groundtruth = np.array(groundtruth)
         preds = np.array(preds)
         np.savetxt(self.log_dir + 'groundtruth.csv', groundtruth, delimiter=",")
         np.savetxt(self.log_dir + 'preds.csv', preds, delimiter=",")
-        np.savetxt(self.log_dir + 'error.csv', list_metrics, delimiter=",")
-        common_util.cal_error(groundtruth, preds)
 
     def plot_result(self):
         from matplotlib import pyplot as plt
