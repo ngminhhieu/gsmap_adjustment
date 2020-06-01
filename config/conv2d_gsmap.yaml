@@ -11,7 +11,7 @@ model:
   rnn_units: 100
   activation: relu
   seq_len: 4
-  horizon: 0
+  horizon: 1
 train:
   dropout: 0
   epochs: 300
