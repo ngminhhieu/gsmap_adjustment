@@ -15,7 +15,7 @@ model:
 train:
   dropout: 0
   epochs: 300
-  optimizer: adadelta
+  optimizer: adam
   patience: 15
   loss: mse
 
