@@ -9,6 +9,7 @@ from pandas import read_csv
 from keras.utils import plot_model
 from keras import backend as K
 from keras.losses import mse
+import math
 
 
 class Conv2DSupervisor():
