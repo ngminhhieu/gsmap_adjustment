@@ -165,7 +165,7 @@ class Conv2DSupervisor():
         preds = []
         total_margin = 0
         # MAE for only gauge data
-        for i in range(1, len(gauge_lat)+1):
+        for i in range(0, len(gauge_lat)):
             lat = gauge_lat[i]
             lon = gauge_lon[i]
             temp_lat = int(round((23.95 - lat) / 0.1))
@@ -182,11 +182,11 @@ class Conv2DSupervisor():
             x = np.count_nonzero(yhat > 0)
             y = np.count_nonzero(gt > 0)
             
-            list_metrics[i, 0] = common_util.mae(gt, yhat)
-            list_metrics[i, 1] = common_util.rmse(gt, yhat)
+            list_metrics[i+1, 0] = common_util.mae(gt, yhat)
+            list_metrics[i+1, 1] = common_util.rmse(gt, yhat)
             margin = y - x
             total_margin = total_margin + abs(margin)
-            list_metrics[i, 2] = margin
+            list_metrics[i+1, 2] = margin
 
         list_metrics[0, 0] = common_util.mae(groundtruth, preds)
         list_metrics[0, 1] = common_util.rmse(groundtruth, preds)
