@@ -9,7 +9,6 @@ from pandas import read_csv
 from keras.utils import plot_model
 from keras import backend as K
 from keras.losses import mse
-import math
 
 
 class Conv2DSupervisor():
@@ -186,12 +185,12 @@ class Conv2DSupervisor():
             list_metrics[i, 0] = common_util.mae(gt, yhat)
             list_metrics[i, 1] = common_util.rmse(gt, yhat)
             margin = y - x
-            total_margin = total_margin + math.abs(margin)
+            total_margin = total_margin + abs(margin)
             list_metrics[i, 2] = margin
 
         list_metrics[0, 0] = common_util.mae(groundtruth, preds)
         list_metrics[0, 1] = common_util.rmse(groundtruth, preds)
-        list_metrics[0, 2] = total
+        list_metrics[0, 2] = total_margin
 
         groundtruth = np.array(groundtruth)
         preds = np.array(preds)
