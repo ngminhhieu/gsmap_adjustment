@@ -43,7 +43,7 @@ class Conv2DSupervisor():
         # Input
         model.add(
             ConvLSTM2D(filters=16,
-                       kernel_size=(3, 3),
+                       kernel_size=(5, 5),
                        padding='same',
                        return_sequences=True,
                        activation=self.activation,
@@ -56,7 +56,7 @@ class Conv2DSupervisor():
 
         model.add(
             ConvLSTM2D(filters=32,
-                       kernel_size=(3, 3),
+                       kernel_size=(5, 5),
                        padding='same',
                        activation=self.activation,
                        name='hidden_layer_convlstm2d_1',
@@ -67,7 +67,7 @@ class Conv2DSupervisor():
 
         model.add(
             ConvLSTM2D(filters=32,
-                       kernel_size=(3, 3),
+                       kernel_size=(5, 5),
                        padding='same',
                        activation=self.activation,
                        name='hidden_layer_convlstm2d_2',
@@ -99,7 +99,7 @@ class Conv2DSupervisor():
 
         model.add(
             Conv3D(filters=1,
-                   kernel_size=(3, 3, 1),
+                   kernel_size=(5, 5, 1),
                    padding='same',
                    name='output_layer_conv3d',
                    activation=self.activation))
