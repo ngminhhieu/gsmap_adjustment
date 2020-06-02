@@ -18,5 +18,5 @@ train:
   optimizer: adam
   patience: 15
   loss: mse
-  batch_size: 16
+
 
