@@ -42,7 +42,7 @@ class Conv2DSupervisor():
 
         # Input
         model.add(
-            ConvLSTM2D(filters=20,
+            ConvLSTM2D(filters=16,
                        kernel_size=(3, 3),
                        padding='same',
                        return_sequences=True,
@@ -118,18 +118,18 @@ class Conv2DSupervisor():
                           loss=self.loss,
                           metrics=['mse', 'mae'])
         
-        # training_history = self.model.fit(self.input_train,
-        #                                   self.target_train,
-        #                                   batch_size=self.batch_size,
-        #                                   epochs=self.epochs,
-        #                                   callbacks=self.callbacks,
-        #                                   validation_data=(self.input_valid, self.target_valid),
-        #                                   shuffle=True,
-        #                                   verbose=1)
+        training_history = self.model.fit(self.input_train,
+                                          self.target_train,
+                                          batch_size=self.batch_size,
+                                          epochs=self.epochs,
+                                          callbacks=self.callbacks,
+                                          validation_data=(self.input_valid, self.target_valid),
+                                          shuffle=True,
+                                          verbose=1)
         training_history = self.model.fit_generator(self.gauge_generator(self.input_train, self.target_train),
                                                     steps_per_epoch = len(self.input_train)//self.batch_size,
-                                                    validation_data = self.gauge_generator(self.input_test, self.target_test),
-                                                    validation_steps = len(self.input_test)//self.batch_size,
+                                                    validation_data = self.gauge_generator(self.input_valid, self.target_valid),
+                                                    validation_steps = len(self.input_valid)//self.batch_size,
                                                     epochs = self.epochs,
                                                     callbacks=self.callbacks,
                                                     verbose = 1,
@@ -211,7 +211,7 @@ class Conv2DSupervisor():
             list_metrics[i, 1] = common_util.rmse(gt, yhat)
             margin = y - x
             total_margin = total_margin + abs(margin)
-            list_metrics[i, 2] = margin
+            list_metrics[i+1, 2] = margin
 
         list_metrics[0, 0] = common_util.mae(groundtruth, preds)
         list_metrics[0, 1] = common_util.rmse(groundtruth, preds)
@@ -221,7 +221,6 @@ class Conv2DSupervisor():
         preds = np.array(preds)
         np.savetxt(self.log_dir + 'groundtruth.csv', groundtruth, delimiter=",")
         np.savetxt(self.log_dir + 'preds.csv', preds, delimiter=",")
-        self.plot_result()
 
     def plot_result(self):
         from matplotlib import pyplot as plt
