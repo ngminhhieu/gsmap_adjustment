@@ -12,9 +12,10 @@ model:
   rnn_units: 100
   seq_len: 4
 train:
+  batch_size: 16
   dropout: 0
   epochs: 300
   log_dir: log/conv2d/default/
-  loss: mae
-  optimizer: adadelta
+  loss: mse
+  optimizer: adam
   patience: 15

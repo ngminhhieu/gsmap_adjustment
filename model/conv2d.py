@@ -42,7 +42,7 @@ class Conv2DSupervisor():
 
         # Input
         model.add(
-            ConvLSTM2D(filters=16,
+            ConvLSTM2D(filters=20,
                        kernel_size=(3, 3),
                        padding='same',
                        return_sequences=True,
@@ -115,21 +115,30 @@ class Conv2DSupervisor():
 
     def train(self):
         self.model.compile(optimizer=self.optimizer,
-                           loss=self.loss,
-                           metrics=['mse', 'mae'])
+                          loss=self.loss,
+                          metrics=['mse', 'mae'])
         
-        training_history = self.model.fit(self.input_train,
-                                          self.target_train,
-                                          batch_size=self.batch_size,
-                                          epochs=self.epochs,
-                                          callbacks=self.callbacks,
-                                          validation_data=(self.input_valid, self.target_valid),
-                                          shuffle=True,
-                                          verbose=2)
-
+        # training_history = self.model.fit(self.input_train,
+        #                                   self.target_train,
+        #                                   batch_size=self.batch_size,
+        #                                   epochs=self.epochs,
+        #                                   callbacks=self.callbacks,
+        #                                   validation_data=(self.input_valid, self.target_valid),
+        #                                   shuffle=True,
+        #                                   verbose=1)
+        training_history = self.model.fit_generator(self.gauge_generator(self.input_train, self.target_train),
+                                                    steps_per_epoch = len(self.input_train)//self.batch_size,
+                                                    validation_data = self.gauge_generator(self.input_test, self.target_test),
+                                                    validation_steps = len(self.input_test)//self.batch_size,
+                                                    epochs = self.epochs,
+                                                    callbacks=self.callbacks,
+                                                    verbose = 1,
+                                                    shuffle = False
+                                                    )
+        
         if training_history is not None:
             common_util._plot_training_history(training_history,
-                                               self.config_model)
+                                              self.config_model)
             common_util._save_model_history(training_history,
                                             self.config_model)
             config = dict(self.config_model['kwargs'])
@@ -139,7 +148,23 @@ class Conv2DSupervisor():
             config['train']['log_dir'] = self.log_dir
             with open(os.path.join(self.log_dir, config_filename), 'w') as f:
                 yaml.dump(config, f, default_flow_style=False)
-
+        
+    def gauge_generator(self, samples, labels):
+        import random
+        while True:
+            input_list = []
+            target_list = []
+            i = random.choice(range(len(samples)))
+            while(len(input_list) < self.batch_size):
+                if i == len(samples):
+                    i = 0
+                sample = samples[i]
+                label = labels[i]
+                input_list.append(sample)
+                target_list.append(label)
+                i += 1
+            yield((np.array(input_list), np.array(target_list)))
+            
     def test_prediction(self):
         print("Load model from: {}".format(self.log_dir))
         self.model.load_weights(self.log_dir + 'best_model.hdf5')
@@ -165,7 +190,7 @@ class Conv2DSupervisor():
         preds = []
         total_margin = 0
         # MAE for only gauge data
-        for i in range(1, len(gauge_lat)+1):
+        for i in range(0, len(gauge_lat)):
             lat = gauge_lat[i]
             lon = gauge_lon[i]
             temp_lat = int(round((23.95 - lat) / 0.1))
@@ -196,6 +221,7 @@ class Conv2DSupervisor():
         preds = np.array(preds)
         np.savetxt(self.log_dir + 'groundtruth.csv', groundtruth, delimiter=",")
         np.savetxt(self.log_dir + 'preds.csv', preds, delimiter=",")
+        self.plot_result()
 
     def plot_result(self):
         from matplotlib import pyplot as plt
