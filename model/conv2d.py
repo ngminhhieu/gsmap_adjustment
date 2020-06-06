@@ -194,6 +194,7 @@ class Conv2DSupervisor():
 
         groundtruth = np.array(groundtruth)
         preds = np.array(preds)
+        np.savetxt(self.log_dir + 'list_metrics.csv', list_metrics, delimiter=",")
         np.savetxt(self.log_dir + 'groundtruth.csv', groundtruth, delimiter=",")
         np.savetxt(self.log_dir + 'preds.csv', preds, delimiter=",")
 
