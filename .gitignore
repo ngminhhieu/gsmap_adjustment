@@ -104,5 +104,4 @@ venv.bak/
 .mypy_cache/
 
 *.nc
-*.npz
 !data/conv2d_gsmap/npz/gauge_data.npz
