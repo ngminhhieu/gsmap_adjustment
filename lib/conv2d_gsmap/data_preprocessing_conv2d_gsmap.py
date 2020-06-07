@@ -93,7 +93,7 @@ def save_to_npz():
     map_lat, map_lon, map_precip, gauge_lat, gauge_lon, gauge_precip = set_gauge_data_to_gsmap()
     raw_gsmap = Dataset('data/conv2d_gsmap/gsmap_2011_2018.nc', 'r')
     time = np.array(raw_gsmap['time'][:])
-
+  
     np.savez('data/conv2d_gsmap/npz/map_gauge_72_stations.npz',
              time=time,
              map_lat=map_lat,
@@ -131,5 +131,40 @@ def cal_error(test_arr, prediction_arr):
         return error_list
 
 
-save_to_npz()
-cal_error_gauge_gsmap()
+# save_to_npz()
+# cal_error_gauge_gsmap()
+
+def get_raw_precip():
+    original_nc = Dataset('data/conv2d_gsmap/gsmap_2011_2018.nc', 'r')
+
+    # check dataset
+    gsmap_precip = np.array(original_nc['precip'][:])
+    gsmap_precip = np.round(gsmap_precip, 1)
+
+    npz_url = 'data/conv2d_gsmap/map_gauge_72_stations.npz'
+    time = np.load(npz_url)['time']
+    map_lon = np.load(npz_url)['map_lon']
+    map_lat = np.load(npz_url)['map_lat']
+    map_precip = np.load(npz_url)['map_precip']
+
+    gauge_lon = np.load(npz_url)['gauge_lon']
+    gauge_lat = np.load(npz_url)['gauge_lat']
+    gauge_precip = np.load(npz_url)['gauge_precip']
+
+    abc = gsmap_precip.shape[1]*gsmap_precip.shape[2]
+    rain_gsmap = np.zeros(shape=(1766, abc))
+    for lat in range(gsmap_precip.shape[1]):
+        for lon in range(gsmap_precip.shape[2]):
+            rain_gsmap[:, lat*120+lon] = gsmap_precip[:, lat, lon]
+    
+    np.savez('data/conv2d_gsmap/map_gauge_72_stations.npz',
+             time=time,
+             map_lat=map_lat,
+             map_lon=map_lon,
+             map_precip=map_precip,
+             gauge_lat=gauge_lat,
+             gauge_lon=gauge_lon,
+             gauge_precip=gauge_precip,
+             raw_precip_gsmap=rain_gsmap)
+
+get_raw_precip()

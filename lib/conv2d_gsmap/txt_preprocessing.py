@@ -70,5 +70,21 @@ def process(file_pth):
               index=False)
 
 
-for file in data_paths:
-    process(file)
+# for file in data_paths:
+#     process(file)
+
+
+def test():
+    original_nc = Dataset('data/conv2d_gsmap/gsmap_2011_2018.nc', 'r')
+
+    # check dataset
+    gsmap_precip = np.array(original_nc['precip'][:])
+    gsmap_precip = np.round(gsmap_precip, 1)
+
+    abc = gsmap_precip.shape[1]*gsmap_precip.shape[2]
+    rain_gsmap = np.zeros(shape=(1766, abc))
+    for lat in range(gsmap_precip.shape[1]):
+        for lon in range(gsmap_precip.shape[2]):
+            rain_gsmap[:, lat*120+lon] = gsmap_precip[:, lat, lon]
+    for i in range(abc):
+        rain_gsmap[:, i] = gsmap_precip[]
