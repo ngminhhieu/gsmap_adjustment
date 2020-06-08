@@ -21,20 +21,25 @@ def create_data_prediction(**kwargs):
     gauge_lat = np.load(data_npz)['gauge_lat']
     gauge_precip = np.load(data_npz)['gauge_precip']
 
+    raw_precip_gsmap = np.load(data_npz)['raw_precip_gsmap']
+
     # input is gsmap
     input_model = np.zeros(shape=(T, seq_len, 160, 120, 1))
     # output is gauge
     output_model = np.zeros(shape=(T, seq_len, 160, 120, 1))
-    # # input is gsmap
-    # input_model = np.zeros(shape=(T, seq_len, 72, 72, 1))
-    # # output is gauge
-    # output_model = np.zeros(shape=(T, seq_len, 72, 72, 1))
 
     for i in range(len(gauge_lat)):
         lat = gauge_lat[i]
         lon = gauge_lon[i]
         temp_lat = int(round((23.95 - lat) / 0.1))
         temp_lon = int(round((lon - 100.05) / 0.1))
+
+        for index_lat in range(temp_lat-1, temp_lat+2):
+            for index_lon in range(temp_lon-1, temp_lon+2):
+                for batch in range(T):
+                    input_model[batch, :, index_lat, index_lon, 0] = raw_precip_gsmap[batch:batch:seq_len, index_lat*120+index_lon]
+                    output_model[batch, :, index_lat, index_lon, 0] = raw_precip_gsmap[batch+horizon:batch+seq_len+horizon, index_lat*120+index_lon]
+
         for batch in range(T):
             input_model[batch, :, temp_lat, temp_lon, 0] = map_precip[batch:batch+seq_len, i].copy()
             output_model[batch, :, temp_lat, temp_lon, 0] = gauge_precip[batch+horizon:batch+seq_len+horizon, i].copy()
