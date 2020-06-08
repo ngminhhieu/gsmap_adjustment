@@ -2,7 +2,7 @@ base_dir: log/conv2d/
 data:
   batch_size: 200
   # dataset: ../drive/My Drive/map_gauge_72_stations.npz
-  dataset: data/npz/map_gauge_72_stations_maemin_29.npz
+  dataset: data/npz/map_gauge_72_stations_maemin_20.npz
   test_batch_size: 1
   test_size: 0.2
   valid_size: 0.2
