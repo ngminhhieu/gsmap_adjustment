@@ -37,8 +37,8 @@ def create_data_prediction(**kwargs):
         for index_lat in range(temp_lat-1, temp_lat+2):
             for index_lon in range(temp_lon-1, temp_lon+2):
                 for batch in range(T):
-                    input_model[batch, :, index_lat, index_lon, 0] = raw_precip_gsmap[batch:batch:seq_len, index_lat*120+index_lon]
-                    output_model[batch, :, index_lat, index_lon, 0] = raw_precip_gsmap[batch+horizon:batch+seq_len+horizon, index_lat*120+index_lon]
+                    input_model[batch, :, index_lat, index_lon, 0] = raw_precip_gsmap[batch:batch+seq_len, index_lat*120+index_lon].copy()
+                    output_model[batch, :, index_lat, index_lon, 0] = raw_precip_gsmap[batch+horizon:batch+seq_len+horizon, index_lat*120+index_lon].copy()
 
         for batch in range(T):
             input_model[batch, :, temp_lat, temp_lon, 0] = map_precip[batch:batch+seq_len, i].copy()
