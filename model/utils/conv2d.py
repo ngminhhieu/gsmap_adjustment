@@ -25,14 +25,10 @@ def create_data_prediction(**kwargs):
     input_model = np.zeros(shape=(T, seq_len, 160, 120, 1))
     # output is gauge
     output_model = np.zeros(shape=(T, seq_len, 160, 120, 1))
-    # # input is gsmap
-    # input_model = np.zeros(shape=(T, seq_len, 72, 72, 1))
-    # # output is gauge
-    # output_model = np.zeros(shape=(T, seq_len, 72, 72, 1))
 
     for i in range(len(gauge_lat)):
-        lat = gauge_lat[i]
-        lon = gauge_lon[i]
+        lat = map_lat[i]
+        lon = map_lon[i]
         temp_lat = int(round((23.95 - lat) / 0.1))
         temp_lon = int(round((lon - 100.05) / 0.1))
         for batch in range(T):
