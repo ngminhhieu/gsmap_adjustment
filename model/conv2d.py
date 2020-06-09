@@ -48,7 +48,7 @@ class Conv2DSupervisor():
                    activation=self.activation,
                    name='input_layer_conv2d',
                    input_shape=(160, 120, 1)))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
 
         # Max Pooling - Go deeper
         model.add(MaxPooling2D(pool_size=(2, 2)))
@@ -57,21 +57,21 @@ class Conv2DSupervisor():
                    activation='relu',
                    padding='same',
                    name='hidden_conv2d_1'))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(
             Conv2D(64, (3, 3),
                    activation='relu',
                    padding='same',
                    name='hidden_conv2d_2'))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(
             Conv2D(64, (3, 3),
                    activation='relu',
                    padding='same',
                    name='hidden_conv2d_3'))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
 
         # Up Sampling
         model.add(UpSampling2D(size=(2, 2)))
@@ -80,21 +80,21 @@ class Conv2DSupervisor():
                    activation='relu',
                    padding='same',
                    name='hidden_conv2d_4'))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
         model.add(UpSampling2D(size=(2, 2)))
         model.add(
             Conv2D(64, (3, 3),
                    activation='relu',
                    padding='same',
                    name='hidden_conv2d_5'))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
         model.add(UpSampling2D(size=(2, 2)))
         model.add(
             Conv2D(64, (3, 3),
                    activation='relu',
                    padding='same',
                    name='hidden_conv2d_6'))
-        # model.add(BatchNormalization())
+        model.add(BatchNormalization())
 
         model.add(
             Conv2D(filters=1,
