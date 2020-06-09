@@ -35,8 +35,10 @@ def create_data_prediction(**kwargs):
         temp_lon = int(round((lon - 100.05) / 0.1))
         for index_lat in range(temp_lat-1, temp_lat+2):
             for index_lon in range(temp_lon-1, temp_lon+2):
-                input_model[:, index_lat, index_lon, 0] = raw_precip_gsmap[:, index_lat*120+index_lon]
-                output_model[:, index_lat, index_lon, 0] = raw_precip_gsmap[:, index_lat*120+index_lon]
+                # input_model[:, index_lat, index_lon, 0] = raw_precip_gsmap[:, index_lat*120+index_lon]
+                # output_model[:, index_lat, index_lon, 0] = raw_precip_gsmap[:, index_lat*120+index_lon]
+                input_model[:, index_lat, index_lon, 0] = map_precip[:, i]
+                output_model[:, index_lat, index_lon, 0] = map_precip[:, i]
             
         input_model[:, temp_lat, temp_lon, 0] = map_precip[:, i]
         output_model[:, temp_lat, temp_lon, 0] = gauge_precip[:, i]
