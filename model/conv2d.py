@@ -205,8 +205,9 @@ class Conv2DSupervisor():
         preds = preds.to_numpy()
         gt = gt.to_numpy()
         for i in range(0,3):
+            print(i)
             plt.plot(preds[:,i], label='preds')
             plt.plot(gt[:,i], label='gt')
             plt.legend()
-            plt.savefig(self.log_dir + 'result_predict.png')
+            plt.savefig(self.log_dir + 'result_predict_{}.png'.format(i))
         plt.close()
