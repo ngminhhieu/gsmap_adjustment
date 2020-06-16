@@ -200,10 +200,11 @@ class Conv2DSupervisor():
 
     def plot_result(self):
         from matplotlib import pyplot as plt
-        preds = np.load(self.log_dir + 'pd.npy')
-        gt = np.load(self.log_dir + 'gt.npy')
-        plt.plot(preds[:], label='preds')
-        plt.plot(gt[:], label='gt')
-        plt.legend()
-        plt.savefig(self.log_dir + 'result_predict.png')
+        preds = np.load(self.log_dir + 'preds.npy')
+        gt = np.load(self.log_dir + 'groundtruth.npy')
+        for i in range(0,3):
+            plt.plot(preds[:,i], label='preds')
+            plt.plot(gt[:,i], label='gt')
+            plt.legend()
+            plt.savefig(self.log_dir + 'result_predict.png')
         plt.close()

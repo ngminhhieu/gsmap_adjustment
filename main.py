@@ -48,5 +48,6 @@ if __name__ == '__main__':
         # predict
         model = Conv2DSupervisor(**config)
         model.test_prediction()
+        model.plot_result()
     else:
         raise RuntimeError("Mode needs to be train/evaluate/test!")
