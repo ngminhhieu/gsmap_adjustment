@@ -210,4 +210,4 @@ class Conv2DSupervisor():
             plt.plot(gt[:,i], label='gt')
             plt.legend()
             plt.savefig(self.log_dir + 'result_predict_{}.png'.format(i))
-        plt.close()
+            plt.close()
