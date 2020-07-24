@@ -2,11 +2,10 @@ import numpy as np
 from matplotlib import pyplot as plt
 from numpy.random import rand
 
-a = np.array([[1,2,4], [4,5,6], [10,20,30]])
-b = a[0:2, :]*3
-print(b)
+data = np.load('data/conv2d_gsmap/map_gauge_72_stations_maemin_r05.npz')
+data_2 = np.load('data/conv2d_gsmap/map_gauge_72_stations_maemin_r05.npz')
+print(data['map_lon'])
+print(data['map_lat'])
 
-z = np.array([[[1,3,4,50]]], [[[0.1,0,0.2,0.3]]])
-print(z.shape)
-z = np.reshape(z, (4,2))
-print(z)
+print(data['gauge_lon'])
+print(data['gauge_lat'])
