@@ -21,6 +21,8 @@ def create_data_prediction(**kwargs):
     gauge_lat = np.load(data_npz)['gauge_lat']
     gauge_precip = np.load(data_npz)['gauge_precip']
 
+    print("HEREEEEEEEE", gauge_lon[0])
+
     raw_precip_gsmap = np.load(data_npz)['raw_precip_gsmap']
 
     # input is gsmap
