@@ -16,7 +16,7 @@ def create_data_prediction(**kwargs):
     map_lon = np.load(data_npz)['map_lon']
     map_lat = np.load(data_npz)['map_lat']
     map_precip = np.load(data_npz)['map_precip']
-    map_precip = np.load('../drive/My Drive/min_all.npz')['map_precip']
+    # map_precip = np.load('../drive/My Drive/min_all.npz')['map_precip']
 
     gauge_lon = np.load(data_npz)['gauge_lon']
     gauge_lat = np.load(data_npz)['gauge_lat']
