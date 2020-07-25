@@ -14,8 +14,8 @@ model:
   horizon: 0
 train:
   dropout: 0
-  epochs: 300
+  epochs: 500
   optimizer: adadelta
-  patience: 15
+  patience: 50
   loss: mse
 
