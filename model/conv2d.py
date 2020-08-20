@@ -124,7 +124,7 @@ class Conv2DSupervisor():
                                           validation_data=(self.input_valid,
                                                            self.target_valid),
                                           shuffle=True,
-                                          verbose=1)
+                                          verbose=0)
 
         if training_history is not None:
             common_util._plot_training_history(training_history,
