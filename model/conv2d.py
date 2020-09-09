@@ -165,8 +165,8 @@ class Conv2DSupervisor():
         list_metrics = np.zeros(shape=(len(gauge_lat) + 1, 3))
         # MAE for only gauge data
         for i in range(0, len(gauge_lat)):
-            lat = gauge_lat[i]
-            lon = gauge_lon[i]
+            lat = map_lat[i]
+            lon = map_lon[i]
             temp_lat = int(round((23.95 - lat) / 0.1))
             temp_lon = int(round((lon - 100.05) / 0.1))
 

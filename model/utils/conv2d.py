@@ -28,8 +28,8 @@ def create_data_prediction(**kwargs):
     output_model = np.zeros(shape=(T, 160, 120, 1))
 
     for i in range(len(gauge_lat)):
-        lat = gauge_lat[i]
-        lon = gauge_lon[i]
+        lat = map_lat[i]
+        lon = map_lon[i]
         temp_lat = int(round((23.95 - lat) / 0.1))
         temp_lon = int(round((lon - 100.05) / 0.1))
         input_model[:, temp_lat, temp_lon, 0] = map_precip[:, i]
