@@ -156,15 +156,15 @@ class Conv2DSupervisor():
             predicted_data[i] = yhats[0]
 
         dataset = self.config_model['data_kwargs'].get('dataset')
-        gauge_lon = np.load(dataset)['gauge_lon']
-        gauge_lat = np.load(dataset)['gauge_lat']
+        map_lon = np.load(dataset)['gauge_lon']
+        map_lat = np.load(dataset)['map_lat']
 
         groundtruth = []
         preds = []
         total_margin = 0
-        list_metrics = np.zeros(shape=(len(gauge_lat) + 1, 3))
+        list_metrics = np.zeros(shape=(len(map_lat) + 1, 3))
         # MAE for only gauge data
-        for i in range(0, len(gauge_lat)):
+        for i in range(0, len(map_lat)):
             lat = map_lat[i]
             lon = map_lon[i]
             temp_lat = int(round((23.95 - lat) / 0.1))
