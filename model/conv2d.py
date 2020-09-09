@@ -47,11 +47,11 @@ class Conv2DSupervisor():
                    padding='same',
                    activation=self.activation,
                    name='input_layer_conv2d',
-                   input_shape=(160, 120, 2)))
+                   input_shape=(160, 120, 1)))
         model.add(BatchNormalization())
 
         # Max Pooling - Go deeper
-        model.add(MaxPooling2D(pool_size=(2, 2, 2)))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(
             Conv2D(64, (3, 3),
                    activation='relu',

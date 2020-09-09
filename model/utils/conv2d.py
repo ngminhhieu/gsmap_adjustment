@@ -24,7 +24,7 @@ def create_data_prediction(**kwargs):
     gauge_precip = np.load(data_npz)['gauge_precip']
 
     # input is gsmap
-    input_model = np.zeros(shape=(T, 160, 120, 2))
+    input_model = np.zeros(shape=(T, 160, 120, 1))
     # output is gauge
     output_model = np.zeros(shape=(T, 160, 120, 1))
 
@@ -36,7 +36,7 @@ def create_data_prediction(**kwargs):
         temp_lon = int(round((lon - 100.05) / 0.1))
         input_model[:, temp_lat, temp_lon, 0] = map_precip_all[:, i]
         output_model[:, temp_lat, temp_lon, 0] = gauge_precip[:, i]
-        input_model[:, temp_lat, temp_lon, 1] = map_precip_r05[:, i]
+        # input_model[:, temp_lat, temp_lon, 1] = map_precip_r05[:, i]
         # output_model[:, temp_lat, temp_lon, 1] = gauge_precip[:, i]
     return input_model, output_model
 
