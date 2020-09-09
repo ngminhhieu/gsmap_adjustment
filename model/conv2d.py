@@ -156,7 +156,7 @@ class Conv2DSupervisor():
             predicted_data[i] = yhats[0]
 
         dataset = self.config_model['data_kwargs'].get('dataset')
-        map_lon = np.load(dataset)['gauge_lon']
+        map_lon = np.load(dataset)['map_lon']
         map_lat = np.load(dataset)['map_lat']
 
         groundtruth = []
