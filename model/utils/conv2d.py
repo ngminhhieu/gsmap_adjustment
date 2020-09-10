@@ -15,12 +15,12 @@ def create_data_prediction(**kwargs):
 
     map_lon = np.load(data_npz)['map_lon']
     map_lat = np.load(data_npz)['map_lat']
-    # map_precip = np.load(data_npz)['map_precip']
-    map_precip_all = np.load('../drive/My Drive/precip_adjustment_data/min_all.npz')['map_precip']
-    map_precip_r05 = np.load('../drive/My Drive/precip_adjustment_data/min_r05.npz')['map_precip']
-
-    # gauge_lon = np.load(data_npz)['gauge_lon']
-    # gauge_lat = np.load(data_npz)['gauge_lat']
+    map_precip = np.load(data_npz)['map_precip']
+    map_cloud_cover = np.load(data_npz)['map_cloud_cover']
+    map_sea_level = np.load(data_npz)['map_sea_level']
+    map_surface_temp = np.load(data_npz)['map_surface_temp']
+    map_wind_u_mean = np.load(data_npz)['map_wind_u_mean']
+    map_wind_v_mean = np.load(data_npz)['map_wind_v_mean']
     gauge_precip = np.load(data_npz)['gauge_precip']
 
     # input is gsmap
@@ -28,16 +28,14 @@ def create_data_prediction(**kwargs):
     # output is gauge
     output_model = np.zeros(shape=(T, 160, 120, 1))
 
-
     for i in range(len(map_lat)):
         lat = map_lat[i]
         lon = map_lon[i]
         temp_lat = int(round((23.95 - lat) / 0.1))
         temp_lon = int(round((lon - 100.05) / 0.1))
-        input_model[:, temp_lat, temp_lon, 0] = map_precip_all[:, i]
+        input_model[:, temp_lat, temp_lon, 0] = map_precip[:, i]
         output_model[:, temp_lat, temp_lon, 0] = gauge_precip[:, i]
-        input_model[:, temp_lat, temp_lon, 1] = map_precip_r05[:, i]
-        # output_model[:, temp_lat, temp_lon, 1] = gauge_precip[:, i]
+        input_model[:, temp_lat, temp_lon, 1] = map_cloud_cover[:, i]
     return input_model, output_model
 
 
