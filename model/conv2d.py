@@ -47,7 +47,7 @@ class Conv2DSupervisor():
                    padding='same',
                    activation=self.activation,
                    name='input_layer_conv2d',
-                   input_shape=(160, 120, 6)))
+                   input_shape=(160, 120, 5)))
         model.add(BatchNormalization())
 
         # Max Pooling - Go deeper
@@ -150,7 +150,7 @@ class Conv2DSupervisor():
         from tqdm import tqdm
         iterator = tqdm(range(0, len(actual_data)))
         for i in iterator:
-            input = np.zeros(shape=(1, 160, 120, 6))
+            input = np.zeros(shape=(1, 160, 120, 5))
             input[0] = input_test[i].copy()
             yhats = self.model.predict(input)
             predicted_data[i] = yhats[0]
