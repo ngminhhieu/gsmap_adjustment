@@ -24,7 +24,7 @@ def create_data_prediction(**kwargs):
     gauge_precip = np.load(data_npz)['gauge_precip']
 
     # input is gsmap
-    input_model = np.zeros(shape=(T, 160, 120, 5))
+    input_model = np.zeros(shape=(T, 160, 120, 3))
     # output is gauge
     output_model = np.zeros(shape=(T, 160, 120, 1))
 
@@ -36,9 +36,9 @@ def create_data_prediction(**kwargs):
         input_model[:, temp_lat, temp_lon, 0] = map_precip[:, i]
         input_model[:, temp_lat, temp_lon, 1] = map_wind_u_mean[:, i]
         input_model[:, temp_lat, temp_lon, 2] = map_wind_v_mean[:, i]
-        input_model[:, temp_lat, temp_lon, 3] = map_surface_temp[:, i]
+        # input_model[:, temp_lat, temp_lon, 3] = map_surface_temp[:, i]
         # input_model[:, temp_lat, temp_lon, 4] = map_cloud_cover[:, i]
-        input_model[:, temp_lat, temp_lon, 4] = map_sea_level[:, i]
+        # input_model[:, temp_lat, temp_lon, 4] = map_sea_level[:, i]
         output_model[:, temp_lat, temp_lon, 0] = gauge_precip[:, i]
         
     return input_model, output_model
