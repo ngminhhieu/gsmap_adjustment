@@ -139,7 +139,7 @@ class Conv2DSupervisor():
             with open(os.path.join(self.log_dir, config_filename), 'w') as f:
                 yaml.dump(config, f, default_flow_style=False)
 
-    def test_prediction(self):
+    def test(self):
         print("Load model from: {}".format(self.log_dir))
         self.model.load_weights(self.log_dir + 'best_model.hdf5')
         self.model.compile(optimizer=self.optimizer, loss=self.loss)
@@ -211,3 +211,26 @@ class Conv2DSupervisor():
             plt.legend()
             plt.savefig(self.log_dir + 'result_predict_{}.png'.format(i))
             plt.close()
+
+    def cross_validation(self):
+        from sklearn.model_selection import KFold
+        kfold = KFold(n_splits=5, shuffle=True, random_state=2)
+        input_data, target_data = utils_conv2d.create_data_prediction(**kwargs)
+        for train_index, test_index in kfold.split(input_data):
+            input_train = input_data[train_index[0:0.8*len(train_index)]]
+            input_valid = input_data[train_index[0.8*len(train_index):]]
+            input_test = input_data[test_index]
+
+            target_train = target_data[train_index[0:0.8*len(train_index)]]
+            target_valid = target_data[train_index[0.8*len(train_index):]]
+            target_test = target_data[test_index]
+
+            self.input_train = input_train
+            self.input_valid = input_valid
+            self.input_test = input_test
+            self.target_train = target_train
+            self.target_valid = target_valid
+            self.target_test = target_test
+
+            self.train()
+            self.test()
