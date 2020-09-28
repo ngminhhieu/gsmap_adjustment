@@ -212,7 +212,7 @@ class Conv2DSupervisor():
             plt.savefig(self.log_dir + 'result_predict_{}.png'.format(i))
             plt.close()
 
-    def cross_validation(self):
+    def cross_validation(self, **kwargs):
         from sklearn.model_selection import KFold
         kfold = KFold(n_splits=5, shuffle=True, random_state=2)
         input_data, target_data = utils_conv2d.create_data_prediction(**kwargs)

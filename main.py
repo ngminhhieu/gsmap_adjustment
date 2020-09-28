@@ -52,6 +52,6 @@ if __name__ == '__main__':
     elif args.mode == 'k_fold':
         # predict
         model = Conv2DSupervisor(**config)
-        model.cross_validation()
+        model.cross_validation(**config)
     else:
         raise RuntimeError("Mode needs to be train/evaluate/test!")
