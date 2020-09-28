@@ -216,13 +216,16 @@ class Conv2DSupervisor():
         from sklearn.model_selection import KFold
         kfold = KFold(n_splits=5, shuffle=True, random_state=2)
         input_data, target_data = utils_conv2d.create_data_prediction(**kwargs)
+        count = 0
         for train_index, test_index in kfold.split(input_data):
-            input_train = input_data[train_index[0:0.8*len(train_index)]]
-            input_valid = input_data[train_index[0.8*len(train_index):]]
+            count += 1
+            pivot = int(0.8*len(train_index))
+            input_train = input_data[train_index[0:pivot]]
+            input_valid = input_data[train_index[pivot:]]
             input_test = input_data[test_index]
 
-            target_train = target_data[train_index[0:0.8*len(train_index)]]
-            target_valid = target_data[train_index[0.8*len(train_index):]]
+            target_train = target_data[train_index[0:pivot]]
+            target_valid = target_data[train_index[pivot:]]
             target_test = target_data[test_index]
 
             self.input_train = input_train
@@ -234,3 +237,4 @@ class Conv2DSupervisor():
 
             self.train()
             self.test()
+            print("Complete " + count + " !!!!")
