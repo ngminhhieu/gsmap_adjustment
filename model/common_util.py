@@ -166,21 +166,18 @@ def _get_logger(log_dir, name, log_filename='info.log', level=logging.INFO):
 def mae(test_arr, prediction_arr):
     with np.errstate(divide='ignore', invalid='ignore'):
         error_mae = mean_absolute_error(test_arr, prediction_arr)
-        print("MAE: %.4f" % (error_mae))
         return error_mae
 
 
 def mse(test_arr, prediction_arr):
     with np.errstate(divide='ignore', invalid='ignore'):
         error_mse = mean_squared_error(test_arr, prediction_arr)
-        print("MSE: %.4f" % (error_mse))
         return error_mse
 
 
 def rmse(test_arr, prediction_arr):
     with np.errstate(divide='ignore', invalid='ignore'):
         error_rmse = np.sqrt(mean_squared_error(test_arr, prediction_arr))
-        print("RMSE: %.4f" % (error_rmse))
         return error_rmse
 
 
@@ -188,7 +185,6 @@ def mape(test_arr, prediction_arr):
     with np.errstate(divide='ignore', invalid='ignore'):
         y_true, y_pred = np.array(test_arr), np.array(prediction_arr)
         error_mape = np.mean(np.abs((y_true - y_pred) / y_true)) * 100
-        print("MAPE: %.4f" % (error_mape))
         return error_mape
 
 
@@ -204,9 +200,6 @@ def cal_error(test_arr, prediction_arr):
         # cal mape
         error_mape = mape(test_arr, prediction_arr)
         error_list = [error_mae, error_rmse, error_mape]
-        print("MAE: %.4f" % (error_mae))
-        print("RMSE: %.4f" % (error_rmse))
-        print("MAPE: %.4f" % (error_mape))
         return error_list
 
 

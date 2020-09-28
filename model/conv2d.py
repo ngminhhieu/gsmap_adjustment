@@ -237,4 +237,4 @@ class Conv2DSupervisor():
 
             self.train()
             self.test()
-            print("Complete " + count + " !!!!")
+            print("Complete " + str(count) + " !!!!")
