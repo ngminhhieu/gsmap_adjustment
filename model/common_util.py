@@ -110,7 +110,7 @@ def _get_log_dir(kwargs):
     return log_dir
 
 
-def _save_model_history(model_history, config_model):
+def _save_model_history(model_history, config_model, log_dir):
     loss = np.array(model_history.history['loss'])
     val_loss = np.array(model_history.history['val_loss'])
     dump_model_history = pd.DataFrame(
@@ -126,19 +126,19 @@ def _save_model_history(model_history, config_model):
     if training_time_callback.logs is not None:
         dump_model_history['training_time'] = training_time_callback.logs
 
-    dump_model_history.to_csv(config_model['log_dir'] + 'training_history.csv',
+    dump_model_history.to_csv(log_dir + 'training_history.csv',
                               index=False)
 
 
-def _plot_training_history(model_history, config_model):
+def _plot_training_history(model_history, config_model, log_dir):
     plt.plot(model_history.history['loss'], label='loss')
     plt.plot(model_history.history['val_loss'], label='val_loss')
-    plt.savefig(config_model['log_dir'] + 'loss.png')
+    plt.savefig(log_dir + 'loss.png')
     plt.legend()
     plt.close()
 
     plt.plot(model_history.history['val_loss'], label='val_loss')
-    plt.savefig(config_model['log_dir'] + 'val_loss.png')
+    plt.savefig(log_dir + 'val_loss.png')
     plt.legend()
     plt.close()
 

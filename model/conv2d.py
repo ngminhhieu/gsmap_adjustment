@@ -126,18 +126,18 @@ class Conv2DSupervisor():
                                           shuffle=True,
                                           verbose=0)
 
-        # if training_history is not None:
-        #     common_util._plot_training_history(training_history,
-        #                                        self.config_model)
-        #     common_util._save_model_history(training_history,
-        #                                     self.config_model)
-        #     config = dict(self.config_model['kwargs'])
+        if training_history is not None:
+            common_util._plot_training_history(training_history,
+                                               self.config_model, self.log_dir)
+            common_util._save_model_history(training_history,
+                                            self.config_model, self.log_dir)
+            config = dict(self.config_model['kwargs'])
 
-        #     # create config file in log again
-        #     config_filename = 'config.yaml'
-        #     config['train']['log_dir'] = self.log_dir
-        #     with open(os.path.join(self.log_dir, config_filename), 'w') as f:
-        #         yaml.dump(config, f, default_flow_style=False)
+            # create config file in log again
+            config_filename = 'config.yaml'
+            config['train']['log_dir'] = self.log_dir
+            with open(os.path.join(self.log_dir, config_filename), 'w') as f:
+                yaml.dump(config, f, default_flow_style=False)
 
     def test(self):
         print("Load model from: {}".format(self.log_dir))
@@ -235,6 +235,8 @@ class Conv2DSupervisor():
             self.target_valid = target_valid
             self.target_test = target_test
 
+            self.log_dir = self.config_model['log_dir'] + str(count) + "/"
+            self.model = build_model_prediction()
             self.train()
             self.test()
             print("Complete " + str(count) + " !!!!")
