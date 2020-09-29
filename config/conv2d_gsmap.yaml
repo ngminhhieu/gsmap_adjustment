@@ -15,6 +15,6 @@ train:
   dropout: 0
   epochs: 500
   optimizer: adam
-  patience: 1
+  patience: 15
   loss: mse
 
