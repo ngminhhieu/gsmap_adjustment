@@ -128,9 +128,9 @@ class Conv2DSupervisor():
 
         if training_history is not None:
             common_util._plot_training_history(training_history,
-                                               self.config_model, self.log_dir)
+                                               self.config_model)
             common_util._save_model_history(training_history,
-                                            self.config_model, self.log_dir)
+                                            self.config_model)
             config = dict(self.config_model['kwargs'])
 
             # create config file in log again
@@ -235,10 +235,18 @@ class Conv2DSupervisor():
             self.target_valid = target_valid
             self.target_test = target_test
 
-            self.log_dir = self.config_model['log_dir'] + str(count)
-            if not os.path.exists(log_dir):
-                os.makedirs(self.log_dir)
-            self.model = build_model_prediction()
+            with open("config/conv2d_gsmap.yaml", 'r') as f:
+                config = yaml.load(f)    
+            config['base_dir'] = self.config_model['log_dir'] + str(count) + '/'
+            with open(config_path, 'w') as f:
+                yaml.dump(config, f)
+
+            self.config_model = common_util.get_config_model(**config)
+            self.log_dir = self.config_model['log_dir']
+            self.model = self.build_model_prediction()
             self.train()
             self.test()
             print("Complete " + str(count) + " !!!!")
+
+
+    

@@ -101,7 +101,6 @@ def prepare_train_valid_test(data, test_size, valid_size):
 
 def _get_log_dir(kwargs):
     log_dir = kwargs['train'].get('log_dir')
-    print("Log dirrrrr", log_dir)
     if log_dir is None:
         log_dir = kwargs.get('base_dir')
     if not os.path.exists(log_dir):
@@ -109,7 +108,7 @@ def _get_log_dir(kwargs):
     return log_dir
 
 
-def _save_model_history(model_history, config_model, log_dir):
+def _save_model_history(model_history, config_model):
     loss = np.array(model_history.history['loss'])
     val_loss = np.array(model_history.history['val_loss'])
     dump_model_history = pd.DataFrame(
@@ -129,7 +128,7 @@ def _save_model_history(model_history, config_model, log_dir):
                               index=False)
 
 
-def _plot_training_history(model_history, config_model, log_dir):
+def _plot_training_history(model_history, config_model):
     plt.plot(model_history.history['loss'], label='loss')
     plt.plot(model_history.history['val_loss'], label='val_loss')
     plt.savefig(log_dir + 'loss.png')
