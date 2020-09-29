@@ -235,7 +235,9 @@ class Conv2DSupervisor():
             self.target_valid = target_valid
             self.target_test = target_test
 
-            self.log_dir = self.config_model['log_dir'] + str(count) + "/"
+            self.log_dir = self.config_model['log_dir'] + str(count)
+            if not os.path.exists(log_dir):
+                os.makedirs(self.log_dir)
             self.model = build_model_prediction()
             self.train()
             self.test()

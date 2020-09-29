@@ -101,10 +101,9 @@ def prepare_train_valid_test(data, test_size, valid_size):
 
 def _get_log_dir(kwargs):
     log_dir = kwargs['train'].get('log_dir')
+    print("Log dirrrrr", log_dir)
     if log_dir is None:
-        run_id = 'default/'
-        base_dir = kwargs.get('base_dir')
-        log_dir = os.path.join(base_dir, run_id)
+        log_dir = kwargs.get('base_dir')
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     return log_dir
