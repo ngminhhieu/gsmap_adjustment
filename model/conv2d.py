@@ -238,7 +238,7 @@ class Conv2DSupervisor():
             with open("config/conv2d_gsmap.yaml", 'r') as f:
                 config = yaml.load(f)    
             config['base_dir'] = self.config_model['log_dir'] + str(count) + '/'
-            with open(config_path, 'w') as f:
+            with open("config/conv2d_gsmap.yaml", 'w') as f:
                 yaml.dump(config, f)
 
             self.config_model = common_util.get_config_model(**config)
