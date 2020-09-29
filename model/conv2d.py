@@ -235,11 +235,9 @@ class Conv2DSupervisor():
             self.target_valid = target_valid
             self.target_test = target_test
 
-            with open("config/conv2d_gsmap.yaml", 'r') as f:
+            with open("config/conv2d_gsmap.yaml") as f:
                 config = yaml.load(f)    
             config['base_dir'] = "log/conv2d/" + str(count) + '/'
-            with open("config/conv2d_gsmap.yaml", 'w') as f:
-                yaml.dump(config, f)
 
             self.config_model = common_util.get_config_model(**config)
             self.log_dir = self.config_model['log_dir']
@@ -248,6 +246,3 @@ class Conv2DSupervisor():
             self.train()
             self.test()
             print("Complete " + str(count) + " !!!!")
-
-
-    
