@@ -243,6 +243,7 @@ class Conv2DSupervisor():
 
             self.config_model = common_util.get_config_model(**config)
             self.log_dir = self.config_model['log_dir']
+            self.callbacks = self.config_model['callbacks']
             self.model = self.build_model_prediction()
             self.train()
             self.test()
