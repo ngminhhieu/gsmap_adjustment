@@ -1,21 +1,19 @@
 base_dir: log/conv2d/
 data:
-  batch_size: 200
-  dataset: ../drive/My Drive/conv2d_gsmap.npz
-  # dataset: data/conv2d_gsmap/npz/conv2d_gsmap.npz
-  gauge_dataset: data/conv2d_gsmap/npz/gauge_data.npz
+  batch_size: 300
+  dataset: ../drive/My Drive/precip_adjustment_data/all_data.npz
   test_batch_size: 1
   test_size: 0.2
   valid_size: 0.2
 log_level: INFO
 model:
-  rnn_units: 100
+  rnn_units: 200
   activation: relu
   seq_len: 4
-  horizon: 1
+  horizon: 0
 train:
   dropout: 0
-  epochs: 300
+  epochs: 500
   optimizer: adam
   patience: 15
   loss: mse

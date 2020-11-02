@@ -1,22 +1,20 @@
-from keras.layers import Conv2D, BatchNormalization, MaxPooling2D, UpSampling2D
+from keras.layers import Dense
 from keras.models import Sequential
 import numpy as np
 from model import common_util
-import model.utils.conv2d as utils_conv2d
+import model.utils.ann as utils_ann
 import os
 import yaml
 from pandas import read_csv
 from keras.utils import plot_model
 from keras import backend as K
-from keras.losses import mse
 
-
-class Conv2DSupervisor():
+class ANNSupervisor():
     def __init__(self, **kwargs):
         self.config_model = common_util.get_config_model(**kwargs)
 
         # load_data
-        self.data = utils_conv2d.load_dataset(**kwargs)
+        self.data = utils_ann.load_dataset(**kwargs)
         self.input_train = self.data['input_train']
         self.input_valid = self.data['input_valid']
         self.input_test = self.data['input_test']
@@ -39,75 +37,16 @@ class Conv2DSupervisor():
 
     def build_model_prediction(self):
         model = Sequential()
-
-        # Input
-        model.add(
-            Conv2D(filters=64,
-                   kernel_size=(3, 3),
-                   padding='same',
-                   activation=self.activation,
-                   name='input_layer_conv2d',
-                   input_shape=(160, 120, 3)))
-        model.add(BatchNormalization())
-
-        # Max Pooling - Go deeper
-        model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(
-            Conv2D(64, (3, 3),
-                   activation='relu',
-                   padding='same',
-                   name='hidden_conv2d_1'))
-        model.add(BatchNormalization())
-        model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(
-            Conv2D(64, (3, 3),
-                   activation='relu',
-                   padding='same',
-                   name='hidden_conv2d_2'))
-        model.add(BatchNormalization())
-        model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(
-            Conv2D(64, (3, 3),
-                   activation='relu',
-                   padding='same',
-                   name='hidden_conv2d_3'))
-        model.add(BatchNormalization())
-
-        # Up Sampling
-        model.add(UpSampling2D(size=(2, 2)))
-        model.add(
-            Conv2D(64, (3, 3),
-                   activation='relu',
-                   padding='same',
-                   name='hidden_conv2d_4'))
-        model.add(BatchNormalization())
-        model.add(UpSampling2D(size=(2, 2)))
-        model.add(
-            Conv2D(64, (3, 3),
-                   activation='relu',
-                   padding='same',
-                   name='hidden_conv2d_5'))
-        model.add(BatchNormalization())
-        model.add(UpSampling2D(size=(2, 2)))
-        model.add(
-            Conv2D(64, (3, 3),
-                   activation='relu',
-                   padding='same',
-                   name='hidden_conv2d_6'))
-        model.add(BatchNormalization())
-
-        model.add(
-            Conv2D(filters=1,
-                   kernel_size=(3, 3),
-                   padding='same',
-                   name='output_layer_conv2d',
-                   activation=self.activation))
+        model = Sequential()
+        model.add(Dense(20, input_dim=1, activation=self.activation))
+        model.add(Dense(10, activation=self.activation))
+        model.add(Dense(1, activation=self.activation))
         print(model.summary())
 
         # plot model
         from keras.utils import plot_model
         plot_model(model=model,
-                   to_file=self.log_dir + '/conv2d_model.png',
+                   to_file=self.log_dir + '/ann_model.png',
                    show_shapes=True)
         return model
 
@@ -146,57 +85,23 @@ class Conv2DSupervisor():
 
         input_test = self.input_test
         actual_data = self.target_test
-        predicted_data = np.zeros(shape=(len(actual_data), 160, 120, 1))
+        predicted_data = np.zeros(shape=(len(actual_data), 1))
         from tqdm import tqdm
         iterator = tqdm(range(0, len(actual_data)))
         for i in iterator:
-            input = np.zeros(shape=(1, 160, 120, 3))
-            input[0] = input_test[i].copy()
+            input = np.zeros(shape=(1, 1))
+            input = input_test[i].copy()
             yhats = self.model.predict(input)
             predicted_data[i] = yhats[0]
 
-        dataset = self.config_model['data_kwargs'].get('dataset')
-        map_lon = np.load(dataset)['map_lon']
-        map_lat = np.load(dataset)['map_lat']
+        list_metrics = np.zeros(shape=(len(map_lat) + 1, 2))
+        list_metrics[0, 0] = common_util.mae(actual_data, predicted_data)
+        list_metrics[0, 1] = common_util.rmse(actual_data, predicted_data)
 
-        groundtruth = []
-        preds = []
-        total_margin = 0
-        list_metrics = np.zeros(shape=(len(map_lat) + 1, 3))
-        # MAE for only gauge data
-        for i in range(0, len(map_lat)):
-            lat = map_lat[i]
-            lon = map_lon[i]
-            temp_lat = int(round((23.95 - lat) / 0.1))
-            temp_lon = int(round((lon - 100.05) / 0.1))
-
-            # gauge data
-            gt = actual_data[:, temp_lat, temp_lon, 0].copy()
-            groundtruth.append(gt)
-
-            # prediction data
-            yhat = predicted_data[:, temp_lat, temp_lon, 0].copy()
-            preds.append(yhat)
-
-            x = np.count_nonzero(yhat > 0)
-            y = np.count_nonzero(gt > 0)
-
-            list_metrics[i+1, 0] = common_util.mae(gt, yhat)
-            list_metrics[i+1, 1] = common_util.rmse(gt, yhat)
-            margin = y - x
-            total_margin = total_margin + abs(margin)
-            list_metrics[i+1, 2] = margin
-
-        # total of 72 gauges
-        list_metrics[0, 0] = common_util.mae(groundtruth, preds)
-        list_metrics[0, 1] = common_util.rmse(groundtruth, preds)
-        list_metrics[0, 2] = total_margin
-
-        groundtruth = np.array(groundtruth)
-        preds = np.array(preds)
+        groundtruth = np.array(actual_data)
+        preds = np.array(predicted_data)
         np.savetxt(self.log_dir + 'groundtruth.csv', np.transpose(groundtruth), delimiter=",")
         np.savetxt(self.log_dir + 'preds.csv', np.transpose(preds), delimiter=",")
-        #
         np.savetxt(self.log_dir + 'list_metrics.csv', list_metrics, delimiter=",")
 
     def plot_result(self):
@@ -215,7 +120,7 @@ class Conv2DSupervisor():
     def cross_validation(self, **kwargs):
         from sklearn.model_selection import KFold
         kfold = KFold(n_splits=5, shuffle=True, random_state=2)
-        input_data, target_data = utils_conv2d.create_data_prediction(**kwargs)
+        input_data, target_data = utils_ann.create_data_prediction(**kwargs)
         count = 0
         for train_index, test_index in kfold.split(input_data):
             count += 1
@@ -235,9 +140,9 @@ class Conv2DSupervisor():
             self.target_valid = target_valid
             self.target_test = target_test
 
-            with open("config/conv2d_gsmap.yaml") as f:
+            with open("config/ann.yaml") as f:
                 config = yaml.load(f)    
-            config['base_dir'] = "log/conv2d/" + str(count) + '/'
+            config['base_dir'] = "log/ann/" + str(count) + '/'
 
             self.config_model = common_util.get_config_model(**config)
             self.log_dir = self.config_model['log_dir']

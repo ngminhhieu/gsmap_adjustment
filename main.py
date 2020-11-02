@@ -6,6 +6,7 @@ import numpy as np
 import yaml
 import random as rn
 from model.conv2d import Conv2DSupervisor
+from model.ann import ANNSupervisor
 
 
 def seed():
@@ -48,5 +49,19 @@ if __name__ == '__main__':
         # predict
         model = Conv2DSupervisor(**config)
         model.test_prediction()
+        model.plot_result()
+    elif args.mode == 'k_fold':
+        # predict
+        model = Conv2DSupervisor(**config)
+        model.cross_validation(**config)
+    elif args.mode == 'ann_train':
+        # predict
+        model = ANNSupervisor(**config)
+        model.train()
+    elif args.mode == 'ann_test':
+        # predict
+        model = ANNSupervisor(**config)
+        model.test_prediction()
+        model.plot_result()
     else:
         raise RuntimeError("Mode needs to be train/evaluate/test!")
