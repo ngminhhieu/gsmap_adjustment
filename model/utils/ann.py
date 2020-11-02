@@ -25,17 +25,21 @@ def create_data_prediction(**kwargs):
 
 def load_dataset(**kwargs):
     # get preprocessed input and target
-    input_conv2d_gsmap, target_conv2d_gsmap = create_data_prediction(**kwargs)
-
+    input_ann, target_ann = create_data_prediction(**kwargs)
+    scaler = MinMaxScaler(copy=True, feature_range=(0, 1))
+    scaler.fit(input_ann)
+    input_ann = scaler.transform(input_ann)
+    target_ann = scaler.transform(target_ann)
     # get test_size, valid_size from config
     test_size = kwargs['data'].get('test_size')
     valid_size = kwargs['data'].get('valid_size')
 
     # split data to train_set, valid_set, test_size
     input_train, input_valid, input_test = common_util.prepare_train_valid_test(
-        input_conv2d_gsmap, test_size=test_size, valid_size=valid_size)
+        input_ann, test_size=test_size, valid_size=valid_size)
     target_train, target_valid, target_test = common_util.prepare_train_valid_test(
-        target_conv2d_gsmap, test_size=test_size, valid_size=valid_size)
+        target_ann, test_size=test_size, valid_size=valid_size)
+        
     data = {}
     for cat in ["train", "valid", "test"]:
         x, y = locals()["input_" + cat], locals()["target_" + cat]
