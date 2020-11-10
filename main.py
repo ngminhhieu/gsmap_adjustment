@@ -61,7 +61,7 @@ if __name__ == '__main__':
     elif args.mode == 'ann_test':
         # predict
         model = ANNSupervisor(**config)
-        model.test_prediction()
+        model.test()
         model.plot_result()
     else:
         raise RuntimeError("Mode needs to be train/evaluate/test!")

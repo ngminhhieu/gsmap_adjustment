@@ -94,14 +94,15 @@ class ANNSupervisor():
             yhats = self.model.predict(input)
             predicted_data[i] = yhats[0]
 
-        list_metrics = np.zeros(shape=(len(map_lat) + 1, 2))
-        list_metrics[0, 0] = common_util.mae(actual_data, predicted_data)
-        list_metrics[0, 1] = common_util.rmse(actual_data, predicted_data)
+        scaler = self.data["scaler"]
+        reverse_actual_data = scaler.inverse_transform(actual_data)
+        reverse_predicted_data = scaler.inverse_transform(predicted_data)
+        list_metrics = np.zeros(shape=(1, 2))
+        list_metrics[0, 0] = common_util.mae(reverse_actual_data, reverse_predicted_data)
+        list_metrics[0, 1] = common_util.rmse(reverse_actual_data, reverse_predicted_data)
 
-        groundtruth = np.array(actual_data)
-        preds = np.array(predicted_data)
-        np.savetxt(self.log_dir + 'groundtruth.csv', np.transpose(groundtruth), delimiter=",")
-        np.savetxt(self.log_dir + 'preds.csv', np.transpose(preds), delimiter=",")
+        np.savetxt(self.log_dir + 'groundtruth.csv', reverse_actual_data, delimiter=",")
+        np.savetxt(self.log_dir + 'preds.csv', reverse_predicted_data, delimiter=",")
         np.savetxt(self.log_dir + 'list_metrics.csv', list_metrics, delimiter=",")
 
     def plot_result(self):
@@ -110,12 +111,11 @@ class ANNSupervisor():
         gt = read_csv(self.log_dir + 'groundtruth.csv')
         preds = preds.to_numpy()
         gt = gt.to_numpy()
-        for i in range(0,3):
-            plt.plot(preds[i,:], label='preds')
-            plt.plot(gt[i,:], label='gt')
-            plt.legend()
-            plt.savefig(self.log_dir + 'result_predict_{}.png'.format(i))
-            plt.close()
+        plt.plot(preds[:], label='preds')
+        plt.plot(gt[:], label='gt')
+        plt.legend()
+        plt.savefig(self.log_dir + 'result_predict.png')
+        plt.close()
 
     def cross_validation(self, **kwargs):
         from sklearn.model_selection import KFold
