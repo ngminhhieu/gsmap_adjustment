@@ -60,5 +60,3 @@ def get_gsmap_data():
 
 if __name__ == '__main__':
     get_gsmap_data()
-    
-    

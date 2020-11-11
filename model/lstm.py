@@ -86,21 +86,28 @@ class LSTMSupervisor():
         self.model.compile(optimizer=self.optimizer, loss=self.loss)
 
         input_test = self.input_test
-        actual_data = self.target_test
-        preds = []
-        groundtruth = []
+        groundtruth = self.target_test
+        preds = np.empty(shape=(len(groundtruth), 1))
 
         from tqdm import tqdm
-        iterator = tqdm(range(0, len(actual_data)))
+        iterator = tqdm(range(0, len(groundtruth)))
 
         for i in tqdm(range(len(input_test))):
             yhat = self.model.predict(input_test[i])
-            preds.append(np.squeeze(yhat))
-            groundtruth.append(np.reshape(actual_data[i, 0], (actual_data.shape[0], 1)))
-
+            preds[i] = yhat
+        
         scaler = self.data["scaler"]
-        reverse_groundtruth = scaler.inverse_transform(groundtruth)
-        reverse_preds = scaler.inverse_transform(preds)
+        col = 1
+        correct_shape_gt = np.empty(shape=(int(groundtruth.shape[0]/col), col))
+        correct_shape_pd = np.empty(shape=(int(groundtruth.shape[0]/col), col))
+        for i in range(int(groundtruth.shape[0]/col)):
+            correct_shape_gt[i, :] = np.transpose(groundtruth[i*col:(i+1)*col])
+            correct_shape_pd[i, :] = np.transpose(preds[i*col:(i+1)*col])
+
+        print(correct_shape_gt.shape)
+        print(correct_shape_pd.shape)
+        reverse_groundtruth = scaler.inverse_transform(correct_shape_gt)
+        reverse_preds = scaler.inverse_transform(correct_shape_pd)
         list_metrics = np.zeros(shape=(1, 2))
         list_metrics[0, 0] = common_util.mae(reverse_groundtruth, reverse_preds)
         list_metrics[0, 1] = common_util.rmse(reverse_groundtruth, reverse_preds)
@@ -115,8 +122,9 @@ class LSTMSupervisor():
         gt = read_csv(self.log_dir + 'groundtruth.csv')
         preds = preds.to_numpy()
         gt = gt.to_numpy()
-        plt.plot(preds[:], label='preds')
-        plt.plot(gt[:], label='gt')
+
+        plt.plot(preds[-200:, 0], label='preds')
+        plt.plot(gt[-200:, 0], label='gt')
         plt.legend()
         plt.savefig(self.log_dir + 'result_predict.png')
         plt.close()
