@@ -7,6 +7,7 @@ import yaml
 import random as rn
 from model.conv2d import Conv2DSupervisor
 from model.ann import ANNSupervisor
+from model.lstm import LSTMSupervisor
 
 
 def seed():
@@ -61,6 +62,15 @@ if __name__ == '__main__':
     elif args.mode == 'ann_test':
         # predict
         model = ANNSupervisor(**config)
+        model.test()
+        model.plot_result()
+    elif args.mode == 'lstm_train':
+        # predict
+        model = ANNSupervisor(**config)
+        model.train()
+    elif args.mode == 'lstm_test':
+        # predict
+        model = LSTMSupervisor(**config)
         model.test()
         model.plot_result()
     else:
