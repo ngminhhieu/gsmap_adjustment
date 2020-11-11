@@ -96,7 +96,7 @@ class LSTMSupervisor():
         for i in tqdm(range(len(input_test))):
             yhat = self.model.predict(input_test[i])
             preds.append(np.squeeze(yhat))
-            groundtruth.append(np.reshape(actual_data[i, 0], (actual_data.shape[0], 1))
+            groundtruth.append(np.reshape(actual_data[i, 0], (actual_data.shape[0], 1)))
 
         scaler = self.data["scaler"]
         reverse_groundtruth = scaler.inverse_transform(groundtruth)
