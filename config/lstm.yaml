@@ -18,5 +18,5 @@ train:
   epochs: 500
   optimizer: adam
   patience: 15
-  loss: mse
+  loss: mae
 

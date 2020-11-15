@@ -1,4 +1,4 @@
-from keras.layers import Dense
+from keras.layers import Dense, LSTM
 from keras.models import Sequential
 import numpy as np
 from model import common_util
@@ -23,6 +23,7 @@ class LSTMSupervisor():
         self.target_test = self.data['target_test']
 
         # other configs
+        self.rnn_units = self.config_model['rnn_units']
         self.log_dir = self.config_model['log_dir']
         self.optimizer = self.config_model['optimizer']
         self.loss = self.config_model['loss']
@@ -39,11 +40,8 @@ class LSTMSupervisor():
 
     def build_model_prediction(self):
         model = Sequential()
-        model = Sequential()
-        model.add(Dense(20, input_dim=1, activation=self.activation))
-        model.add(Dense(10, activation=self.activation))
+        model.add(LSTM(self.rnn_units, activation=self.activation, input_shape=(self.seq_len, self.input_dim)))
         model.add(Dense(1, activation=self.activation))
-        print(model.summary())
 
         # plot model
         from keras.utils import plot_model
