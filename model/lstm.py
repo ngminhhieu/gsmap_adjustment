@@ -41,6 +41,7 @@ class LSTMSupervisor():
     def build_model_prediction(self):
         model = Sequential()
         model.add(LSTM(self.rnn_units, activation=self.activation, input_shape=(self.seq_len, self.input_dim)))
+        model.add(Dense(20, activation=self.activation))
         model.add(Dense(1, activation=self.activation))
 
         # plot model
