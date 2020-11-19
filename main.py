@@ -81,7 +81,8 @@ if __name__ == '__main__':
     elif args.mode == 'ed_lstm_test':
         # predict
         model = EDLSTMSupervisor(False, **config)
-        # model.test_overlap_all()
+        model.test_overlap_all()
+        # model.test_all()
         model.plot_result()
     else:
         raise RuntimeError("Mode needs to be train/evaluate/test!")

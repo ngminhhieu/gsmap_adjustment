@@ -65,9 +65,28 @@ def create_data_prediction_normal(dataset_gsmap, dataset_gauge, **kwargs):
     for col in range(dataset_gsmap.shape[1]):
         for row in range(T-seq_len-horizon):
             input_encoder[col*T + row, :, 0] = dataset_gsmap[row:row+seq_len, col]
-            input_decoder[col*T + row, :, 0] = dataset_gsmap[row+seq_len-1:row+seq_len+horizon-1, col]
+            input_decoder[col*T + row, :, 0] = dataset_gauge[row+seq_len-1:row+seq_len+horizon-1, col]
             input_decoder[col*T + row, 0, 0] = 0
             output_decoder[col*T + row, :, 0] = dataset_gauge[row+seq_len:row+seq_len+horizon, col]
+
+    return input_encoder, input_decoder, output_decoder
+
+def create_data_prediction_all(dataset_gsmap, dataset_gauge, **kwargs):
+    
+    input_dim = kwargs['model'].get('input_dim')
+    output_dim = kwargs['model'].get('output_dim')
+    seq_len = kwargs['model'].get('seq_len')
+    horizon = kwargs['model'].get('horizon')
+    T = len(dataset_gsmap)
+    input_encoder = np.zeros(shape=(T, seq_len, input_dim))
+    input_decoder = np.zeros(shape=(T, seq_len, input_dim))
+    output_decoder = np.zeros(shape=(T, seq_len, output_dim))
+
+    for row in range(T-seq_len-horizon):
+        input_encoder[row, :, :] = dataset_gsmap[row+horizon:row+seq_len+horizon].copy()
+        input_decoder[row, :, :] = dataset_gauge[row+horizon-1:row+seq_len+horizon-1].copy()
+        input_decoder[row, 0, :] = 0
+        output_decoder[row, :, :] = dataset_gauge[row+horizon:row+seq_len+horizon].copy()
 
     return input_encoder, input_decoder, output_decoder
 
@@ -75,14 +94,13 @@ def create_data_prediction_normal(dataset_gsmap, dataset_gauge, **kwargs):
 def load_dataset(**kwargs):
     dataset_gsmap = pd.read_csv('data/ann/gsmap.csv').to_numpy()
     dataset_gauge = pd.read_csv('data/ann/gauge.csv').to_numpy()
-    dataset_gsmap = dataset_gsmap[:, 0]
-    dataset_gauge = dataset_gauge[:, 0]
+    # dataset_gsmap = dataset_gsmap[:, 0]
+    # dataset_gauge = dataset_gauge[:, 0]
     
-    dataset_gsmap = np.reshape(dataset_gsmap, (dataset_gsmap.shape[0], 1))
-    dataset_gauge = np.reshape(dataset_gauge, (dataset_gauge.shape[0], 1))
-    dataset_gsmap = np.tile(dataset_gsmap, (1,72))
-    dataset_gauge = np.tile(dataset_gauge, (1,72))
-    print(dataset_gsmap)
+    # dataset_gsmap = np.reshape(dataset_gsmap, (dataset_gsmap.shape[0], 1))
+    # dataset_gauge = np.reshape(dataset_gauge, (dataset_gauge.shape[0], 1))
+    # dataset_gsmap = np.tile(dataset_gsmap, (1,72))
+    # dataset_gauge = np.tile(dataset_gauge, (1,72))
     scaler = MinMaxScaler(copy=True, feature_range=(0, 1))
     scaler.fit(dataset_gsmap)
     dataset_gsmap = scaler.transform(dataset_gsmap)

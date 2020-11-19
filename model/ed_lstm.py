@@ -1,4 +1,4 @@
-from keras.layers import Dense, LSTM, Input
+from keras.layers import Dense, LSTM, Input, concatenate
 from keras.models import Sequential, Model
 import numpy as np
 from model import common_util
@@ -8,6 +8,7 @@ import yaml
 from pandas import read_csv
 from keras.utils import plot_model
 from keras import backend as K
+from model.utils.attention_mechanism import AttentionDecoder
 
 class EDLSTMSupervisor():
     def __init__(self, is_training=True, **kwargs):
@@ -53,6 +54,9 @@ class EDLSTMSupervisor():
 
         # None la de test, neu de self.horizon thi luc test khong duoc
         decoder_inputs = Input(shape=(None, self.output_dim), name='decoder_input')
+        attention_decoder = AttentionDecoder(self.rnn_units, self.output_dim, is_monotonic=False, normalize_energy=False)
+        attention_input = concatenate([encoder_outputs, decoder_inputs], axis=-1)
+        attention_output = attention_decoder(attention_input)
         decoder_lstm = LSTM(self.rnn_units, return_sequences=True, return_state=True)
         decoder_outputs, decoder_state_h, decoder_state_c = decoder_lstm(decoder_inputs, initial_state=encoder_states)
 
@@ -221,6 +225,39 @@ class EDLSTMSupervisor():
         print(correct_shape_pd.shape)
         reverse_groundtruth = scaler.inverse_transform(correct_shape_gt)
         reverse_preds = scaler.inverse_transform(correct_shape_pd)
+        list_metrics = np.zeros(shape=(1, 2))
+        list_metrics[0, 0] = common_util.mae(reverse_groundtruth, reverse_preds)
+        list_metrics[0, 1] = common_util.rmse(reverse_groundtruth, reverse_preds)
+
+        np.savetxt(self.log_dir + 'groundtruth.csv', reverse_groundtruth, delimiter=",")
+        np.savetxt(self.log_dir + 'preds.csv', reverse_preds, delimiter=",")
+        np.savetxt(self.log_dir + 'list_metrics.csv', list_metrics, delimiter=",")
+    
+    def test_all(self):
+
+        input_encoder_test = self.input_encoder_test
+        groundtruth = self.target_decoder_test
+        preds = np.zeros(shape=(input_encoder_test.shape[0] + input_encoder_test.shape[1] - 1, input_encoder_test.shape[2]))
+        gt = np.zeros(shape=(input_encoder_test.shape[0] + input_encoder_test.shape[1] - 1, input_encoder_test.shape[2]))
+
+        from tqdm import tqdm
+        iterator = tqdm(range(0, len(groundtruth)))
+
+        for i in tqdm(range(0, len(input_encoder_test), self.horizon)):
+            input_model = np.reshape(input_encoder_test[i], (1, input_encoder_test[i].shape[0], input_encoder_test[i].shape[1]))
+            yhat = self._predict(input_model)
+            preds[i:i+self.horizon] = yhat[-1]
+            gt[i:i+self.horizon] = groundtruth[i, -1]
+        
+        scaler = self.data["scaler"]
+        # for i in range(int(gt.shape[0]/col)):
+        #     correct_shape_gt[i, :] = np.transpose(gt[i*col:(i+1)*col])
+        #     correct_shape_pd[i, :] = np.transpose(preds[i*col:(i+1)*col])
+
+        # print(correct_shape_gt.shape)
+        # print(correct_shape_pd.shape)
+        reverse_groundtruth = scaler.inverse_transform(gt)
+        reverse_preds = scaler.inverse_transform(preds)
         list_metrics = np.zeros(shape=(1, 2))
         list_metrics[0, 0] = common_util.mae(reverse_groundtruth, reverse_preds)
         list_metrics[0, 1] = common_util.rmse(reverse_groundtruth, reverse_preds)

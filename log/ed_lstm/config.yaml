@@ -9,7 +9,7 @@ model:
   activation: relu
   horizon: 1
   input_dim: 72
-  output_dim: 1
+  output_dim: 72
   rnn_units: 200
   seq_len: 6
 train:

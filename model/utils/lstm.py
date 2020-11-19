@@ -20,7 +20,7 @@ def create_data_prediction(dataset_gsmap, dataset_gauge, **kwargs):
     for col in range(dataset_gsmap.shape[1]):
         for row in range(T-seq_len-horizon):
             input_model[col*T + row, :, 0] = dataset_gsmap[row:row+seq_len, col]
-            output_model[col*T + row,  0] = dataset_gauge[row+seq_len, col]
+            output_model[col*T + row, 0] = dataset_gauge[row+seq_len, col]
 
     return input_model, output_model
 
