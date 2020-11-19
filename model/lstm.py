@@ -40,9 +40,10 @@ class LSTMSupervisor():
 
     def build_model_prediction(self):
         model = Sequential()
-        model.add(LSTM(self.rnn_units, activation=self.activation, input_shape=(self.seq_len, self.input_dim)))
-        model.add(Dense(20, activation=self.activation))
-        model.add(Dense(1, activation=self.activation))
+        model.add(LSTM(self.rnn_units, activation=self.activation, return_sequences=True, input_shape=(self.seq_len, self.input_dim)))
+        model.add(LSTM(self.rnn_units, activation=self.activation))
+        model.add(Dense(self.output_dim))
+        print(model)
 
         # plot model
         from keras.utils import plot_model
@@ -85,6 +86,7 @@ class LSTMSupervisor():
         self.model.compile(optimizer=self.optimizer, loss=self.loss)
 
         input_test = self.input_test
+        print(input_test.shape)
         groundtruth = self.target_test
         preds = np.empty(shape=(len(groundtruth), 1))
 
@@ -92,7 +94,8 @@ class LSTMSupervisor():
         iterator = tqdm(range(0, len(groundtruth)))
 
         for i in tqdm(range(len(input_test))):
-            yhat = self.model.predict(input_test[i])
+            input_model = np.reshape(input_test[i], (1, input_test[i].shape[0], input_test[i].shape[1]))
+            yhat = self.model.predict(input_model)
             preds[i] = yhat
         
         scaler = self.data["scaler"]

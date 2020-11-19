@@ -15,12 +15,12 @@ def create_data_prediction(dataset_gsmap, dataset_gauge, **kwargs):
     T = len(dataset_gsmap)
     col = dataset_gsmap.shape[1]
     input_model = np.zeros(shape=(T*col, seq_len, input_dim))
-    output_model = np.zeros(shape=(T*col, horizon, output_dim))
+    output_model = np.zeros(shape=(T*col, output_dim))
 
-    for col in range(col):
+    for col in range(dataset_gsmap.shape[1]):
         for row in range(T-seq_len-horizon):
             input_model[col*T + row, :, 0] = dataset_gsmap[row:row+seq_len, col]
-            output_model[col*T + row, :,  0] = dataset_gauge[row+seq_len, col]
+            output_model[col*T + row,  0] = dataset_gauge[row+seq_len, col]
 
     return input_model, output_model
 
@@ -28,8 +28,8 @@ def create_data_prediction(dataset_gsmap, dataset_gauge, **kwargs):
 def load_dataset(**kwargs):
     dataset_gsmap = pd.read_csv('data/ann/gsmap.csv').to_numpy()
     dataset_gauge = pd.read_csv('data/ann/gauge.csv').to_numpy()
-    dataset_gsmap = dataset_gsmap[:, 0]
-    dataset_gauge = dataset_gauge[:, 0]
+    dataset_gsmap = dataset_gsmap[:, 2]
+    dataset_gauge = dataset_gauge[:, 2]
     dataset_gsmap = np.reshape(dataset_gsmap, (dataset_gsmap.shape[0], 1))
     dataset_gauge = np.reshape(dataset_gauge, (dataset_gauge.shape[0], 1))
     scaler = MinMaxScaler(copy=True, feature_range=(0, 1))

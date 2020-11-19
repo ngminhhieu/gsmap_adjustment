@@ -12,11 +12,11 @@ model:
   input_dim: 1
   output_dim: 1
   rnn_units: 200
-  seq_len: 1
+  seq_len: 6
 train:
   dropout: 0
   epochs: 500
   log_dir: log/lstm/
-  loss: mse
+  loss: mae
   optimizer: adam
   patience: 15

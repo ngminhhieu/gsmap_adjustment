@@ -8,6 +8,7 @@ import random as rn
 from model.conv2d import Conv2DSupervisor
 from model.ann import ANNSupervisor
 from model.lstm import LSTMSupervisor
+from model.ed_lstm import EDLSTMSupervisor
 
 
 def seed():
@@ -66,12 +67,21 @@ if __name__ == '__main__':
         model.plot_result()
     elif args.mode == 'lstm_train':
         # predict
-        model = ANNSupervisor(**config)
+        model = LSTMSupervisor(**config)
         model.train()
     elif args.mode == 'lstm_test':
         # predict
         model = LSTMSupervisor(**config)
         model.test()
+        model.plot_result()
+    elif args.mode == 'ed_lstm_train':
+        # predict
+        model = EDLSTMSupervisor(True, **config)
+        model.train()
+    elif args.mode == 'ed_lstm_test':
+        # predict
+        model = EDLSTMSupervisor(False, **config)
+        # model.test_overlap_all()
         model.plot_result()
     else:
         raise RuntimeError("Mode needs to be train/evaluate/test!")
