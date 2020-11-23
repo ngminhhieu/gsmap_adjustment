@@ -54,9 +54,6 @@ class EDLSTMSupervisor():
 
         # None la de test, neu de self.horizon thi luc test khong duoc
         decoder_inputs = Input(shape=(None, self.output_dim), name='decoder_input')
-        attention_decoder = AttentionDecoder(self.rnn_units, self.output_dim, is_monotonic=False, normalize_energy=False)
-        attention_input = concatenate([encoder_outputs, decoder_inputs], axis=-1)
-        attention_output = attention_decoder(attention_input)
         decoder_lstm = LSTM(self.rnn_units, return_sequences=True, return_state=True)
         decoder_outputs, decoder_state_h, decoder_state_c = decoder_lstm(decoder_inputs, initial_state=encoder_states)
 
