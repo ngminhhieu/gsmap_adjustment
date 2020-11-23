@@ -1,4 +1,4 @@
-from keras.layers import Dense, LSTM, Input, concatenate
+from keras.layers import Dense, LSTM, Input, concatenate, dot, Activation
 from keras.models import Sequential, Model
 import numpy as np
 from model import common_util
@@ -8,7 +8,7 @@ import yaml
 from pandas import read_csv
 from keras.utils import plot_model
 from keras import backend as K
-from model.utils.attention_mechanism import AttentionDecoder
+from model.utils.attention import AttentionLayer
 
 class EDLSTMSupervisor():
     def __init__(self, is_training=True, **kwargs):
@@ -47,16 +47,27 @@ class EDLSTMSupervisor():
 
     def build_model_prediction(self, is_training):
         encoder_inputs = Input(shape=(self.seq_len, self.input_dim), name='encoder_input')
-        encoder = LSTM(self.rnn_units, return_state=True)
+        encoder = LSTM(self.rnn_units, return_sequences=True, return_state=True)
         encoder_outputs, state_h, state_c = encoder(encoder_inputs)
 
         encoder_states = [state_h, state_c]
 
-        # None la de test, neu de self.horizon thi luc test khong duoc
         decoder_inputs = Input(shape=(None, self.output_dim), name='decoder_input')
         decoder_lstm = LSTM(self.rnn_units, return_sequences=True, return_state=True)
         decoder_outputs, decoder_state_h, decoder_state_c = decoder_lstm(decoder_inputs, initial_state=encoder_states)
+        # attention = dot([decoder_outputs, encoder_outputs], axes=[2, 2])
+        # attention = Activation('softmax')(attention)
+        # context = dot([attention, encoder_outputs], axes=[2,1])
+        # decoder_outputs = concatenate([context, decoder_outputs])
 
+        # attention
+        attn_layer = AttentionLayer(input_shape=([None, self.seq_len, self.rnn_units],
+                                                    [None, self.seq_len, self.rnn_units]),
+                                    name='attention_layer')
+        attn_out, attn_states = attn_layer([encoder_outputs, decoder_outputs])
+        decoder_outputs = Concatenate(axis=-1, name='concat_layer')([decoder_outputs, attn_out])
+        
+        # output
         decoder_dense = Dense(self.output_dim, activation='relu')
         decoder_outputs = decoder_dense(decoder_outputs)
         model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
@@ -77,6 +88,14 @@ class EDLSTMSupervisor():
             decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
             decoder_outputs, state_h, state_c = decoder_lstm(decoder_inputs, initial_state=decoder_states_inputs)
             decoder_states = [state_h, state_c]
+
+            # attention
+            encoder_inf_states = Input(shape=(self._seq_len, self._rnn_units),
+                                       name='encoder_inf_states_input')
+            attn_out, attn_states = attn_layer([encoder_inf_states, decoder_outputs])
+            decoder_outputs = Concatenate(axis=-1, name='concat')([decoder_outputs, attn_out])
+
+            # output
             decoder_outputs = decoder_dense(decoder_outputs)
 
             decoder_model = Model([decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states)

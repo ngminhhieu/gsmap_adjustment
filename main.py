@@ -22,7 +22,7 @@ def seed():
     # in the TensorFlow backend have a well-defined initial state.
     # For further details, see:
     # https://www.tensorflow.org/api_docs/python/tf/set_random_seed
-    tf.random.set_seed(1234)
+    tf.compact.v1.random.set_seed(1234)
 
 
 if __name__ == '__main__':
