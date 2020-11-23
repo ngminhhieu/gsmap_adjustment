@@ -37,18 +37,25 @@ cnn_pd = pd.read_csv('./results/correlation/conv2d/default/preds.csv').to_numpy(
 cnn_gt = np.transpose(cnn_gt)
 cnn_pd = np.transpose(cnn_pd)
 cnn_corr = []
-for i in range(cnn_gt.shape[1]):
-    cnn_corr.append(np.corrcoef((cnn_pd[:,i], cnn_gt[:,i]))[0][1])
+# for i in range(cnn_gt.shape[1]):
+#     cnn_corr.append(np.corrcoef((cnn_pd[:,i], cnn_gt[:,i]))[0][1])
 
 cnn_corr = np.array(cnn_corr)
 
 lstm_gt = pd.read_csv('./log/ed_lstm/groundtruth.csv').to_numpy()
 lstm_pd = pd.read_csv('./log/ed_lstm/preds.csv').to_numpy()
 lstm_corr = []
-for i in range(lstm_gt.shape[1]):
-    lstm_corr.append(np.corrcoef((lstm_pd[:,i], lstm_gt[:,i]))[0][1])
+# for i in range(lstm_gt.shape[1]):
+#     lstm_corr.append(np.corrcoef((lstm_pd[:,i], lstm_gt[:,i]))[0][1])
 
 lstm_corr = np.array(lstm_corr)
+
+for i in range(70):
+    plt.plot(cnn_pd[-1000:, i], label='preds')
+    plt.plot(cnn_gt[-1000:, i], label='gt')
+    plt.legend()
+    plt.savefig('./test/result_predict_{}.png'.format(i))
+    plt.close()
 
 print(nashsutcliffe(cnn_pd, cnn_gt))
 print(nashsutcliffe(lstm_pd, lstm_gt))

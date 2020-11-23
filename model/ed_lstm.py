@@ -45,6 +45,77 @@ class EDLSTMSupervisor():
         else:
             self.model, self.encoder_model, self.decoder_model = self.build_model_prediction(is_training)
 
+    def _model_construction_test(self, is_training=True):
+        # Model
+        encoder_inputs = Input(shape=(self.seq_len, self._input_dim), name='encoder_input')
+        encoder = LSTM(self.rnn_units, return_sequences=True, return_state=True)
+        encoder_outputs, enc_state_h, enc_state_c = encoder(encoder_inputs)
+        # encoder_outputs, enc_state_h, enc_state_c = Residual_enc(encoder_inputs, rnn_unit=self.rnn_units,
+        #                                                             rnn_depth=self._rnn_layers,
+        #                                                             rnn_dropout=self._drop_out)
+
+        encoder_states = [enc_state_h, enc_state_c]
+
+        decoder_inputs = Input(shape=(None, self._output_dim),
+                                name='decoder_input')
+        decoder_lstm = LSTM(self.rnn_units, return_sequences=True, return_state=True)
+        decoder_outputs, decoder_state_h, decoder_state_c = decoder_lstm(decoder_inputs, initial_state=encoder_states)
+
+        # layers_dec, decoder_outputs, dec_state_h, dec_state_c = Residual_dec(decoder_inputs, rnn_unit=self.rnn_units,
+        #                                                             rnn_depth=self._rnn_layers,
+        #                                                             rnn_dropout=self._drop_out,
+        #                                                             init_states=encoder_states)
+
+        # attn_layer = AttentionLayer(input_shape=([self.batch_size, self.seq_len, self.rnn_units],
+        #                                             [self.batch_size, self.seq_len, self.rnn_units]),
+        #                             name='attention_layer')
+        attn_layer = AttentionLayer(name='attention_layer')
+        attn_out, attn_states = attn_layer([encoder_outputs, decoder_outputs])
+        decoder_outputs = Concatenate(axis=-1, name='concat_layer')([decoder_outputs, attn_out])
+
+        # dense decoder_outputs
+        decoder_dense = Dense(self._output_dim, activation='relu')
+        decoder_outputs = decoder_dense(decoder_outputs)
+
+        # Define the model that will turn
+        # `encoder_input_data` & `decoder_input_data` into `decoder_target_data`
+        model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
+        if is_training:
+            return model
+        else:
+            self._logger.info("Load model from: {}".format(self._log_dir))
+            model.load_weights(self._log_dir + 'best_model.hdf5')
+            model.compile(optimizer=self._optimizer, loss='mse', metrics=['mse', 'mae'])
+            # --------------------------------------- ENcoder model ----------------------------------------------------
+            self.encoder_model = Model(encoder_inputs, [encoder_outputs] + encoder_states)
+            plot_model(model=self.encoder_model, to_file=self._log_dir + '/encoder.png', show_shapes=True)
+
+            # --------------------------------------- Decoder model ----------------------------------------------------
+            decoder_state_input_h = Input(shape=(self.rnn_units,), name='decoder_state_input_h')
+            decoder_state_input_c = Input(shape=(self.rnn_units,), name='decoder_state_input_c')
+            decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
+
+            decoder_outputs, _, _ = layers_dec[0](decoder_inputs, initial_state=decoder_states_inputs)
+            for i in range (1, self._rnn_layers):
+                d_o, dec_state_h, dec_state_c = layers_dec[i](decoder_outputs)
+                decoder_outputs = add([decoder_outputs, d_o])
+
+            decoder_states = [dec_state_h, dec_state_c]
+
+            encoder_inf_states = Input(shape=(self.seq_len, self.rnn_units),
+                                       name='encoder_inf_states_input')
+            attn_out, attn_states = attn_layer([encoder_inf_states, decoder_outputs])
+
+            decoder_outputs = Concatenate(axis=-1, name='concat')([decoder_outputs, attn_out])
+            decoder_dense = Dense(self._output_dim, activation='relu')
+            decoder_outputs = decoder_dense(decoder_outputs)
+            self.decoder_model = Model(
+                [decoder_inputs, encoder_inf_states] + decoder_states_inputs,
+                [decoder_outputs] + decoder_states)
+
+            plot_model(model=self.decoder_model, to_file=self._log_dir + '/decoder.png', show_shapes=True)
+            return model
+
     def build_model_prediction(self, is_training):
         encoder_inputs = Input(shape=(self.seq_len, self.input_dim), name='encoder_input')
         encoder = LSTM(self.rnn_units, return_sequences=True, return_state=True)
@@ -90,7 +161,7 @@ class EDLSTMSupervisor():
             decoder_states = [state_h, state_c]
 
             # attention
-            encoder_inf_states = Input(shape=(self._seq_len, self._rnn_units),
+            encoder_inf_states = Input(shape=(self.seq_len, self.rnn_units),
                                        name='encoder_inf_states_input')
             attn_out, attn_states = attn_layer([encoder_inf_states, decoder_outputs])
             decoder_outputs = Concatenate(axis=-1, name='concat')([decoder_outputs, attn_out])
