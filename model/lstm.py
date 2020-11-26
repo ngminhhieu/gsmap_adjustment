@@ -1,13 +1,13 @@
-from keras.layers import Dense, LSTM
-from keras.models import Sequential
+from tensorflow.keras.layers import Dense, LSTM
+from tensorflow.keras.models import Sequential
 import numpy as np
 from model import common_util
 import model.utils.lstm as utils_lstm
 import os
 import yaml
 from pandas import read_csv
-from keras.utils import plot_model
-from keras import backend as K
+from tensorflow.keras.utils import plot_model
+from tensorflow.keras import backend as K
 # from model.utils.attention_decoder import AttentionDecoder
 
 class LSTMSupervisor():
@@ -47,9 +47,8 @@ class LSTMSupervisor():
         model.add(Dense(self.output_dim))
 
         # plot model
-        from keras.utils import plot_model
         plot_model(model=model,
-                   to_file=self.log_dir + '/lstm_model.png',
+                   to_file=self.log_dir + '/model.png',
                    show_shapes=True)
         return model
 

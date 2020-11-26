@@ -6,8 +6,8 @@ import model.utils.ed_lstm as utils_ed_lstm
 import os
 import yaml
 from pandas import read_csv
-from keras.utils import plot_model
-from keras import backend as K
+from tensorflow.keras.utils import plot_model
+from tensorflow.keras import backend as K
 from model.utils.attention import AttentionLayer
 from tqdm import tqdm
 

@@ -9,7 +9,6 @@ from pandas import read_csv
 from tensorflow.keras.utils import plot_model
 from tensorflow.keras import backend as K
 from tensorflow.keras.losses import mse
-# from tensorflow.keras.utils import plot_model
 
 class Conv2DSupervisor():
     def __init__(self, **kwargs):
@@ -104,9 +103,9 @@ class Conv2DSupervisor():
                    activation=self.activation))
         print(model.summary())
 
-        # plot_model(model=model,
-        #            to_file=self.log_dir + '/conv2d_model.png',
-        #            show_shapes=True)
+        plot_model(model=model,
+                   to_file=self.log_dir + '/model.png',
+                   show_shapes=True)
         return model
 
     def train(self):
