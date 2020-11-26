@@ -49,7 +49,7 @@ if __name__ == '__main__':
         model.train()
     elif args.mode == 'cnn_test':
         model = Conv2DSupervisor(**config)
-        model.test_prediction()
+        model.test()
         model.plot_result()
     elif args.mode == 'ann_train':
         model = ANNSupervisor(**config)

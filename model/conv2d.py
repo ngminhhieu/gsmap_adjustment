@@ -9,6 +9,8 @@ from pandas import read_csv
 from tensorflow.keras.utils import plot_model
 from tensorflow.keras import backend as K
 from tensorflow.keras.losses import mse
+from tqdm import tqdm
+
 
 class Conv2DSupervisor():
     def __init__(self, **kwargs):
@@ -144,7 +146,6 @@ class Conv2DSupervisor():
         input_test = self.input_test
         actual_data = self.target_test
         predicted_data = np.zeros(shape=(len(actual_data), 160, 120, 1))
-        from tqdm import tqdm
         iterator = tqdm(range(0, len(actual_data)))
         for i in iterator:
             input = np.zeros(shape=(1, 160, 120, 4))

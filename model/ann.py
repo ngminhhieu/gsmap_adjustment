@@ -8,6 +8,8 @@ import yaml
 from pandas import read_csv
 from tensorflow.keras.utils import plot_model
 from tensorflow.keras import backend as K
+from tqdm import tqdm
+
 
 class ANNSupervisor():
     def __init__(self, **kwargs):
@@ -85,7 +87,6 @@ class ANNSupervisor():
         input_test = self.input_test
         actual_data = self.target_test
         predicted_data = np.zeros(shape=(len(actual_data), 1))
-        from tqdm import tqdm
         iterator = tqdm(range(0, len(actual_data)))
         for i in iterator:
             input = np.zeros(shape=(1, 1))

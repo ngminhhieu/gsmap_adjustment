@@ -8,6 +8,7 @@ import yaml
 from pandas import read_csv
 from tensorflow.keras.utils import plot_model
 from tensorflow.keras import backend as K
+from tqdm import tqdm
 # from model.utils.attention_decoder import AttentionDecoder
 
 class LSTMSupervisor():
@@ -86,14 +87,11 @@ class LSTMSupervisor():
         self.model.compile(optimizer=self.optimizer, loss=self.loss)
 
         input_test = self.input_test
-        print(input_test.shape)
         groundtruth = self.target_test
         preds = np.empty(shape=(len(groundtruth), 1))
 
-        from tqdm import tqdm
-        iterator = tqdm(range(0, len(groundtruth)))
-
-        for i in tqdm(range(len(input_test))):
+        iterator = tqdm(range(0, len(input_test)))
+        for i in iterator:
             input_model = np.reshape(input_test[i], (1, input_test[i].shape[0], input_test[i].shape[1]))
             yhat = self.model.predict(input_model)
             preds[i] = yhat

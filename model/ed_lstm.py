@@ -142,7 +142,8 @@ class EDLSTMSupervisor():
         preds = np.zeros(shape=(input_encoder_test.shape[0] + input_encoder_test.shape[1] - 1, 1))
         gt = np.zeros(shape=(input_encoder_test.shape[0] + input_encoder_test.shape[1] - 1, 1))
 
-        for i in tqdm(range(0, len(input_encoder_test), self.horizon)):
+        iterator = tqdm(range(0, len(input_encoder_test), self.horizon))
+        for i in iterator:
             input_model = np.reshape(input_encoder_test[i], (1, input_encoder_test[i].shape[0], input_encoder_test[i].shape[1]))
             yhat = self._predict_attention(input_model)
             preds[i:i+self.horizon] = yhat[-1]
