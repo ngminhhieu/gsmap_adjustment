@@ -8,7 +8,7 @@ import yaml
 from pandas import read_csv
 from keras.utils import plot_model
 from keras import backend as K
-from model.utils.attention_decoder import AttentionDecoder
+# from model.utils.attention_decoder import AttentionDecoder
 
 class LSTMSupervisor():
     def __init__(self, **kwargs):
@@ -42,7 +42,7 @@ class LSTMSupervisor():
     def build_model_prediction(self):
         model = Sequential()
         model.add(LSTM(self.rnn_units, activation=self.activation, return_sequences=True, input_shape=(self.seq_len, self.input_dim)))
-        model.add(AttentionDecoder(self.rnn_units, self.output_dim))
+        # model.add(AttentionDecoder(self.rnn_units, self.output_dim))
         model.add(LSTM(self.rnn_units, activation=self.activation))
         model.add(Dense(self.output_dim))
 

@@ -40,50 +40,37 @@ if __name__ == '__main__':
                         help='Run mode.')
     args = parser.parse_args()
 
-    # load config for seq2seq model
     if args.config_file != False:
         with open(args.config_file) as f:
             config = yaml.load(f)
 
-    if args.mode == 'conv2d_train':
+    if args.mode == 'cnn_train':
         model = Conv2DSupervisor(**config)
         model.train()
-    elif args.mode == 'conv2d_test':
-        # predict
+    elif args.mode == 'cnn_test':
         model = Conv2DSupervisor(**config)
         model.test_prediction()
         model.plot_result()
-    elif args.mode == 'k_fold':
-        # predict
-        model = Conv2DSupervisor(**config)
-        model.cross_validation(**config)
     elif args.mode == 'ann_train':
-        # predict
         model = ANNSupervisor(**config)
         model.train()
     elif args.mode == 'ann_test':
-        # predict
         model = ANNSupervisor(**config)
         model.test()
         model.plot_result()
     elif args.mode == 'lstm_train':
-        # predict
         model = LSTMSupervisor(**config)
         model.train()
     elif args.mode == 'lstm_test':
-        # predict
         model = LSTMSupervisor(**config)
         model.test()
         model.plot_result()
     elif args.mode == 'ed_lstm_train':
-        # predict
         model = EDLSTMSupervisor(True, **config)
         model.train()
     elif args.mode == 'ed_lstm_test':
-        # predict
         model = EDLSTMSupervisor(False, **config)
         model.test_overlap_all()
-        # model.test_all()
         model.plot_result()
     else:
         raise RuntimeError("Mode needs to be train/evaluate/test!")

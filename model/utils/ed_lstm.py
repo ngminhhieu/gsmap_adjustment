@@ -4,28 +4,6 @@ from sklearn.preprocessing import MinMaxScaler
 from keras import backend as K
 import pandas as pd
 
-def create_data_prediction_overlap(dataset_gsmap, dataset_gauge, **kwargs):
-
-    # data_npz = kwargs['data'].get('dataset')
-    # dataset = np.load(data_npz)['dataset']
-    input_dim = kwargs['model'].get('input_dim')
-    output_dim = kwargs['model'].get('output_dim')
-    seq_len = kwargs['model'].get('seq_len')
-    horizon = kwargs['model'].get('horizon')
-    T = len(dataset_gsmap)
-    col = 1
-    input_encoder = np.zeros(shape=((T-seq_len-horizon)*col, seq_len, input_dim))
-    input_decoder = np.zeros(shape=((T-seq_len-horizon)*col, seq_len, output_dim))
-    output_decoder = np.zeros(shape=((T-seq_len-horizon)*col, seq_len, output_dim))
-
-    for col in range(1):
-        for row in range(T-seq_len-horizon):
-            input_encoder[col*T + row, :, :] = dataset_gsmap[row+horizon:row+seq_len+horizon, :].copy()
-            input_decoder[col*T + row, :, :] = dataset_gauge[row+horizon-1:row+seq_len+horizon-1, -output_dim:].copy()
-            input_decoder[col*T + row, 0, :] = 0
-            output_decoder[col*T + row, :, :] = dataset_gauge[row+horizon:row+seq_len+horizon, -output_dim:].copy()
-
-    return input_encoder, input_decoder, output_decoder
 
 def create_data_prediction_overlap_all(dataset_gsmap, dataset_gauge, **kwargs):
     
@@ -47,27 +25,6 @@ def create_data_prediction_overlap_all(dataset_gsmap, dataset_gauge, **kwargs):
             input_decoder[col*T + row, :, 0] = dataset_gauge[row+horizon-1:row+seq_len+horizon-1, col].copy()
             input_decoder[col*T + row, 0, 0] = 0
             output_decoder[col*T + row, :, 0] = dataset_gauge[row+horizon:row+seq_len+horizon, col].copy()
-
-    return input_encoder, input_decoder, output_decoder
-
-def create_data_prediction_normal(dataset_gsmap, dataset_gauge, **kwargs):
-    
-    input_dim = kwargs['model'].get('input_dim')
-    output_dim = kwargs['model'].get('output_dim')
-    seq_len = kwargs['model'].get('seq_len')
-    horizon = kwargs['model'].get('horizon')
-    T = len(dataset_gsmap)
-    col = dataset_gsmap.shape[1]
-    input_encoder = np.zeros(shape=((T-seq_len-horizon)*col, seq_len, input_dim))
-    input_decoder = np.zeros(shape=((T-seq_len-horizon)*col, seq_len, input_dim))
-    output_decoder = np.zeros(shape=((T-seq_len-horizon)*col, horizon, output_dim))
-
-    for col in range(dataset_gsmap.shape[1]):
-        for row in range(T-seq_len-horizon):
-            input_encoder[col*T + row, :, 0] = dataset_gsmap[row:row+seq_len, col]
-            input_decoder[col*T + row, :, 0] = dataset_gauge[row+seq_len-1:row+seq_len+horizon-1, col]
-            input_decoder[col*T + row, 0, 0] = 0
-            output_decoder[col*T + row, :, 0] = dataset_gauge[row+seq_len:row+seq_len+horizon, col]
 
     return input_encoder, input_decoder, output_decoder
 
@@ -107,9 +64,6 @@ def load_dataset(**kwargs):
     dataset_gauge = scaler.transform(dataset_gauge)
 
     input_encoder, input_decoder, target_decoder = create_data_prediction_overlap_all(dataset_gsmap, dataset_gauge, **kwargs)
-    # input_lstm = scaler.transform(input_lstm)
-    # target_lstm = scaler.transform(target_lstm)
-    # get test_size, valid_size from config
     test_size = kwargs['data'].get('test_size')
     valid_size = kwargs['data'].get('valid_size')
 
