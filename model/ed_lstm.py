@@ -138,7 +138,6 @@ class EDLSTMSupervisor():
     
     def test_overlap_all(self):
         input_encoder_test = self.input_encoder_test
-        input_encoder_test = input_encoder_test[:200]
         groundtruth = self.target_decoder_test
         preds = np.zeros(shape=(input_encoder_test.shape[0] + input_encoder_test.shape[1] - 1, 1))
         gt = np.zeros(shape=(input_encoder_test.shape[0] + input_encoder_test.shape[1] - 1, 1))
