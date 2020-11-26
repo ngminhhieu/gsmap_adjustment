@@ -1,5 +1,5 @@
-from keras.layers import Dense, LSTM, Input, concatenate, dot, Activation
-from keras.models import Sequential, Model
+from tensorflow.keras.layers import Dense, LSTM, Input, Concatenate, dot, Activation
+from tensorflow.keras.models import Sequential, Model
 import numpy as np
 from model import common_util
 import model.utils.ed_lstm as utils_ed_lstm
@@ -142,6 +142,7 @@ class EDLSTMSupervisor():
         decoder_dense = Dense(self.output_dim, activation='relu')
         decoder_outputs = decoder_dense(decoder_outputs)
         model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
+        # plot_model(model=model, to_file=self.log_dir + '/model.png', show_shapes=True)
 
         if is_training:
             return model
@@ -151,7 +152,7 @@ class EDLSTMSupervisor():
             model.compile(optimizer=self.optimizer, loss='mse')
 
             # Inference encoder_model
-            encoder_model = Model(encoder_inputs, encoder_states)
+            encoder_model = Model(encoder_inputs, [encoder_outputs] + encoder_states)
 
             # Inference decoder_model
             decoder_state_input_h = Input(shape=(self.rnn_units,))
@@ -169,10 +170,10 @@ class EDLSTMSupervisor():
             # output
             decoder_outputs = decoder_dense(decoder_outputs)
 
-            decoder_model = Model([decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states)
+            decoder_model = Model([encoder_inf_states, decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states)
 
-            plot_model(model=encoder_model, to_file=self.log_dir + '/encoder.png', show_shapes=True)
-            plot_model(model=decoder_model, to_file=self.log_dir + '/decoder.png', show_shapes=True)
+            # plot_model(model=encoder_model, to_file=self.log_dir + '/encoder.png', show_shapes=True)
+            # plot_model(model=decoder_model, to_file=self.log_dir + '/decoder.png', show_shapes=True)
 
             return model, encoder_model, decoder_model
 
@@ -287,19 +288,18 @@ class EDLSTMSupervisor():
         # self.model.load_weights(self.log_dir + 'best_model.hdf5')
         # self.model.compile(optimizer=self.optimizer, loss=self.loss)
         input_encoder_test = self.input_encoder_test
+        input_encoder_test = input_encoder_test[:200]
         groundtruth = self.target_decoder_test
         preds = np.zeros(shape=(input_encoder_test.shape[0] + input_encoder_test.shape[1] - 1, 1))
         gt = np.zeros(shape=(input_encoder_test.shape[0] + input_encoder_test.shape[1] - 1, 1))
 
         from tqdm import tqdm
-        iterator = tqdm(range(0, len(groundtruth)))
-
         for i in tqdm(range(0, len(input_encoder_test), self.horizon)):
             input_model = np.reshape(input_encoder_test[i], (1, input_encoder_test[i].shape[0], input_encoder_test[i].shape[1]))
             yhat = self._predict(input_model)
             preds[i:i+self.horizon] = yhat[-1]
             gt[i:i+self.horizon] = groundtruth[i, -1]
-        
+            
         scaler = self.data["scaler"]
         col = 72
         correct_shape_gt = np.empty(shape=(int(preds.shape[0]/col), col))
@@ -353,21 +353,63 @@ class EDLSTMSupervisor():
         np.savetxt(self.log_dir + 'preds.csv', reverse_preds, delimiter=",")
         np.savetxt(self.log_dir + 'list_metrics.csv', list_metrics, delimiter=",")
 
+    # def _predict(self, source):
+    #     states_value = self.encoder_model.predict(source)
+    #     target_seq = np.zeros((1, 1, self.output_dim))
+    #     preds = np.zeros(shape=(self.horizon, self.output_dim),
+    #                     dtype='float32')
+    #     for i in range(self.horizon):
+    #         output = self.decoder_model.predict([target_seq] + states_value)
+    #         yhat = output[0]
+    #         # store prediction
+    #         preds[i] = yhat
+    #         # update target sequence
+    #         target_seq = yhat
+    #         # Update states
+    #         states_value = output[1:]
+    #     return preds
+
+    # def _predict(self, source):
+    #     output = self.encoder_model.predict(source)
+    #     encoder_inf_state_input = output[0]
+    #     states_value = output[1:]
+    #     # Generate empty target sequence of length 1.
+    #     target_seq = np.zeros((1, 1, self.output_dim))
+
+    #     yhat = np.zeros(shape=(self.horizon, 1),
+    #                     dtype='float32')
+    #     for i in range(self.horizon):
+    #         output_tokens, h, c = self.decoder_model.predict(
+    #             [target_seq, encoder_inf_state_input] + states_value)
+    #         output_tokens = output_tokens[0, -1, 0]
+    #         yhat[i] = output_tokens
+
+    #         target_seq = np.zeros((1, 1, self.output_dim))
+    #         target_seq[0, 0, 0] = output_tokens
+
+    #         # Update states
+    #         states_value = [h, c]
+    #     return yhat[-self.horizon:]
+
     def _predict(self, source):
-        states_value = self.encoder_model.predict(source)
+        outputs, h, c = self.encoder_model.predict(source)
+        # Generate empty target sequence of length 1.
         target_seq = np.zeros((1, 1, self.output_dim))
-        preds = np.zeros(shape=(self.horizon, self.output_dim),
+
+        yhat = np.zeros(shape=(self.horizon, self.output_dim),
                         dtype='float32')
+
+        states_value = [h, c]
         for i in range(self.horizon):
-            output = self.decoder_model.predict([target_seq] + states_value)
-            yhat = output[0]
-            # store prediction
-            preds[i] = yhat
-            # update target sequence
-            target_seq = yhat
+            output_tokens, h, c = self.decoder_model.predict([outputs, target_seq] + states_value)
+            output_tokens = output_tokens[0, -1, 0]
+            yhat[i] = output_tokens
+
+            target_seq[0, 0, 0] = output_tokens
+
             # Update states
-            states_value = output[1:]
-        return preds
+            states_value = [h, c]
+        return yhat
 
     def plot_result(self):
         from matplotlib import pyplot as plt
