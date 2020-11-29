@@ -167,6 +167,32 @@ def mae(test_arr, prediction_arr):
         error_mae = mean_absolute_error(test_arr, prediction_arr)
         return error_mae
 
+def nashsutcliffe(test_arr, prediction_arr):
+    """
+    Nash-Sutcliffe model efficinecy
+        .. math::
+         NSE = 1-\\frac{\\sum_{i=1}^{N}(e_{i}-s_{i})^2}{\\sum_{i=1}^{N}(e_{i}-\\bar{e})^2} 
+    :test_arr: Observed data to compared with prediction_arr data.
+    :type: list
+    :prediction_arr: prediction_arr data to compared with test_arr data
+    :type: list
+    :return: Nash-Sutcliff model efficiency
+    :rtype: float
+    """
+    if len(test_arr) == len(prediction_arr):
+        s, e = np.array(prediction_arr), np.array(test_arr)
+        # s,e=prediction_arr,test_arr
+        mean_observed = np.nanmean(e)
+        # compute numerator and denominator
+        numerator = np.nansum((e - s) ** 2)
+        denominator = np.nansum((e - mean_observed)**2)
+        # compute coefficient
+        return 1 - (numerator / denominator)
+
+    else:
+        logging.warning("test_arr and prediction_arr lists does not have the same length.")
+        return np.nan
+
 
 def mse(test_arr, prediction_arr):
     with np.errstate(divide='ignore', invalid='ignore'):

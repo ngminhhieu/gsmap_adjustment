@@ -10,6 +10,7 @@ from tensorflow.keras.utils import plot_model
 from tensorflow.keras import backend as K
 from model.utils.attention import AttentionLayer
 from tqdm import tqdm
+import datetime
 
 
 class EDLSTMSupervisor():
@@ -66,8 +67,8 @@ class EDLSTMSupervisor():
         if is_training:
             return model
         else:
-            print("Load model from: {}".format(log_dir))
-            model.load_weights(log_dir + 'best_model.hdf5')
+            print("Load model from: {}".format(self.log_dir))
+            model.load_weights(self.log_dir + 'best_model.hdf5')
             model.compile(optimizer=self.optimizer, loss='mse')
 
             # Inference encoder_model
@@ -83,7 +84,7 @@ class EDLSTMSupervisor():
 
             decoder_model = Model([decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states)
 
-            # plot_model(model=encoder_model, to_file=self.log_dir + '/encoder.png', show_shapes=True)
+            # plot_model(model=encoder_model, to_file=self.self.log_dir + '/encoder.png', show_shapes=True)
             # plot_model(model=decoder_model, to_file=self.log_dir + '/decoder.png', show_shapes=True)
 
             return model, encoder_model, decoder_model
@@ -139,9 +140,11 @@ class EDLSTMSupervisor():
 
         reverse_groundtruth = scaler.inverse_transform(correct_shape_gt)
         reverse_preds = scaler.inverse_transform(correct_shape_pd)
-        list_metrics = np.zeros(shape=(1, 2))
-        list_metrics[0, 0] = common_util.mae(reverse_groundtruth, reverse_preds)
-        list_metrics[0, 1] = common_util.rmse(reverse_groundtruth, reverse_preds)
+        list_metrics = np.zeros(shape=(1, 4))
+        list_metrics[0, 0] = str(datetime.datetime.now())
+        list_metrics[0, 1] = common_util.mae(reverse_groundtruth, reverse_preds)
+        list_metrics[0, 2] = common_util.rmse(reverse_groundtruth, reverse_preds)
+        list_metrics[0, 3] = common_util.nashsutcliffe(reverse_groundtruth, reverse_preds)
 
         np.savetxt(self.log_dir + 'groundtruth.csv', reverse_groundtruth, delimiter=",")
         np.savetxt(self.log_dir + 'preds.csv', reverse_preds, delimiter=",")
@@ -163,9 +166,11 @@ class EDLSTMSupervisor():
         scaler = self.data["scaler"]
         reverse_groundtruth = scaler.inverse_transform(gt)
         reverse_preds = scaler.inverse_transform(preds)
-        list_metrics = np.zeros(shape=(1, 2))
-        list_metrics[0, 0] = common_util.mae(reverse_groundtruth, reverse_preds)
-        list_metrics[0, 1] = common_util.rmse(reverse_groundtruth, reverse_preds)
+        list_metrics = np.zeros(shape=(1, 4))
+        list_metrics[0, 0] = str(datetime.datetime.now())
+        list_metrics[0, 1] = common_util.mae(reverse_groundtruth, reverse_preds)
+        list_metrics[0, 2] = common_util.rmse(reverse_groundtruth, reverse_preds)
+        list_metrics[0, 3] = common_util.nashsutcliffe(reverse_groundtruth, reverse_preds)
 
         np.savetxt(self.log_dir + 'groundtruth.csv', reverse_groundtruth, delimiter=",")
         np.savetxt(self.log_dir + 'preds.csv', reverse_preds, delimiter=",")
