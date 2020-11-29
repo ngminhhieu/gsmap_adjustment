@@ -41,6 +41,7 @@ class EDLSTMSupervisor():
         self.horizon = self.config_model['horizon']
         self.input_dim = self.config_model['input_dim']
         self.output_dim = self.config_model['output_dim']
+        self.dropout = self.config_model['dropout']
 
         if is_training:
             self.model = self.build_model_prediction(is_training)
@@ -48,14 +49,14 @@ class EDLSTMSupervisor():
             self.model, self.encoder_model, self.decoder_model = self.build_model_prediction(is_training)
 
     def build_model_prediction(self, is_training):
-        encoder_inputs = Input(shape=(None, input_dim), name='encoder_input')
-        encoder = LSTM(rnn_units, return_state=True, dropout=dropout)
+        encoder_inputs = Input(shape=(self.seq_len, self.input_dim), name='encoder_input')
+        encoder = LSTM(self.rnn_units, return_state=True, dropout=self.dropout)
         encoder_outputs, state_h, state_c = encoder(encoder_inputs)
 
         encoder_states = [state_h, state_c]
 
-        decoder_inputs = Input(shape=(None, output_dim), name='decoder_input')
-        decoder_lstm = LSTM(rnn_units, return_sequences=True, return_state=True, dropout=dropout)
+        decoder_inputs = Input(shape=(None, self.output_dim), name='decoder_input')
+        decoder_lstm = LSTM(self.rnn_units, return_sequences=True, return_state=True, dropout=self.dropout)
         decoder_outputs, decoder_state_h, decoder_state_c = decoder_lstm(decoder_inputs, initial_state=encoder_states)
 
         decoder_dense = Dense(output_dim, activation='relu')
@@ -67,14 +68,14 @@ class EDLSTMSupervisor():
         else:
             print("Load model from: {}".format(log_dir))
             model.load_weights(log_dir + 'best_model.hdf5')
-            model.compile(optimizer=optimizer, loss='mse')
+            model.compile(optimizer=self.optimizer, loss='mse')
 
             # Inference encoder_model
             encoder_model = Model(encoder_inputs, encoder_states)
 
             # Inference decoder_model
-            decoder_state_input_h = Input(shape=(rnn_units,))
-            decoder_state_input_c = Input(shape=(rnn_units,))
+            decoder_state_input_h = Input(shape=(self.rnn_units,))
+            decoder_state_input_c = Input(shape=(self.rnn_units,))
             decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
             decoder_outputs, state_h, state_c = decoder_lstm(decoder_inputs, initial_state=decoder_states_inputs)
             decoder_states = [state_h, state_c]
