@@ -72,5 +72,12 @@ if __name__ == '__main__':
         model = EDLSTMSupervisor(False, **config)
         model.test_overlap_all()
         model.plot_result()
+    elif args.mode == 'ed_lstm_attention_train':
+        model = EDLSTMSupervisor(True, **config)
+        model.train()
+    elif args.mode == 'ed_lstm_attention_test':
+        model = EDLSTMSupervisor(False, **config)
+        model.test_overlap_all()
+        model.plot_result()
     else:
         raise RuntimeError("Mode needs to be train/evaluate/test!")

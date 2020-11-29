@@ -48,39 +48,60 @@ class EDLSTMSupervisor():
             self.model, self.encoder_model, self.decoder_model = self.build_model_prediction(is_training)
 
     def build_model_prediction(self, is_training):
-        encoder_inputs = Input(shape=(None, input_dim), name='encoder_input')
-        encoder = LSTM(rnn_units, return_state=True, dropout=dropout)
+        encoder_inputs = Input(shape=(self.seq_len, self.input_dim), name='encoder_input')
+        encoder = LSTM(self.rnn_units, return_sequences=True, return_state=True)
         encoder_outputs, state_h, state_c = encoder(encoder_inputs)
 
         encoder_states = [state_h, state_c]
 
-        decoder_inputs = Input(shape=(None, output_dim), name='decoder_input')
-        decoder_lstm = LSTM(rnn_units, return_sequences=True, return_state=True, dropout=dropout)
+        decoder_inputs = Input(shape=(None, self.output_dim), name='decoder_input')
+        decoder_lstm = LSTM(self.rnn_units, return_sequences=True, return_state=True)
         decoder_outputs, decoder_state_h, decoder_state_c = decoder_lstm(decoder_inputs, initial_state=encoder_states)
+        # attention = dot([decoder_outputs, encoder_outputs], axes=[2, 2])
+        # attention = Activation('softmax')(attention)
+        # context = dot([attention, encoder_outputs], axes=[2,1])
+        # decoder_outputs = concatenate([context, decoder_outputs])
 
-        decoder_dense = Dense(output_dim, activation='relu')
+        # attention
+        attn_layer = AttentionLayer(input_shape=([None, self.seq_len, self.rnn_units],
+                                                    [None, self.seq_len, self.rnn_units]),
+                                    name='attention_layer')
+        attn_out, attn_states = attn_layer([encoder_outputs, decoder_outputs])
+        decoder_outputs = Concatenate(axis=-1, name='concat_layer')([decoder_outputs, attn_out])
+        
+        # output
+        decoder_dense = Dense(self.output_dim, activation='relu')
         decoder_outputs = decoder_dense(decoder_outputs)
         model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
+        # plot_model(model=model, to_file=self.log_dir + '/model.png', show_shapes=True)
 
         if is_training:
             return model
         else:
-            print("Load model from: {}".format(log_dir))
-            model.load_weights(log_dir + 'best_model.hdf5')
-            model.compile(optimizer=optimizer, loss='mse')
+            print("Load model from: {}".format(self.log_dir))
+            model.load_weights(self.log_dir + 'best_model.hdf5')
+            model.compile(optimizer=self.optimizer, loss='mse')
 
             # Inference encoder_model
-            encoder_model = Model(encoder_inputs, encoder_states)
+            encoder_model = Model(encoder_inputs, [encoder_outputs] + encoder_states)
 
             # Inference decoder_model
-            decoder_state_input_h = Input(shape=(rnn_units,))
-            decoder_state_input_c = Input(shape=(rnn_units,))
+            decoder_state_input_h = Input(shape=(self.rnn_units,))
+            decoder_state_input_c = Input(shape=(self.rnn_units,))
             decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
             decoder_outputs, state_h, state_c = decoder_lstm(decoder_inputs, initial_state=decoder_states_inputs)
             decoder_states = [state_h, state_c]
+
+            # attention
+            encoder_inf_states = Input(shape=(self.seq_len, self.rnn_units),
+                                       name='encoder_inf_states_input')
+            attn_out, attn_states = attn_layer([encoder_inf_states, decoder_outputs])
+            decoder_outputs = Concatenate(axis=-1, name='concat')([decoder_outputs, attn_out])
+
+            # output
             decoder_outputs = decoder_dense(decoder_outputs)
 
-            decoder_model = Model([decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states)
+            decoder_model = Model([encoder_inf_states, decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states)
 
             # plot_model(model=encoder_model, to_file=self.log_dir + '/encoder.png', show_shapes=True)
             # plot_model(model=decoder_model, to_file=self.log_dir + '/decoder.png', show_shapes=True)
@@ -169,24 +190,27 @@ class EDLSTMSupervisor():
         np.savetxt(self.log_dir + 'groundtruth.csv', reverse_groundtruth, delimiter=",")
         np.savetxt(self.log_dir + 'preds.csv', reverse_preds, delimiter=",")
         np.savetxt(self.log_dir + 'list_metrics.csv', list_metrics, delimiter=",")
+        
 
-
-    def _predict(self, source):
-        states_value = self.encoder_model.predict(source)
+    def _predict_attention(self, source):
+        outputs, h, c = self.encoder_model.predict(source)
+        # Generate empty target sequence of length 1.
         target_seq = np.zeros((1, 1, self.output_dim))
-        preds = np.zeros(shape=(self.horizon, self.output_dim),
-                        dtype='float32')
-        for i in range(self.horizon):
-            output = self.decoder_model.predict([target_seq] + states_value)
-            yhat = output[0]
-            # store prediction
-            preds[i] = yhat
-            # update target sequence
-            target_seq = yhat
-            # Update states
-            states_value = output[1:]
-        return preds
 
+        yhat = np.zeros(shape=(self.horizon, self.output_dim),
+                        dtype='float32')
+
+        states_value = [h, c]
+        for i in range(self.horizon):
+            output_tokens, h, c = self.decoder_model.predict([outputs, target_seq] + states_value)
+            output_tokens = output_tokens[0, -1, 0]
+            yhat[i] = output_tokens
+
+            target_seq[0, 0, 0] = output_tokens
+
+            # Update states
+            states_value = [h, c]
+        return yhat
 
     def plot_result(self):
         from matplotlib import pyplot as plt
