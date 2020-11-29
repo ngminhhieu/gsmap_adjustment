@@ -59,7 +59,7 @@ class EDLSTMSupervisor():
         decoder_lstm = LSTM(self.rnn_units, return_sequences=True, return_state=True, dropout=self.dropout)
         decoder_outputs, decoder_state_h, decoder_state_c = decoder_lstm(decoder_inputs, initial_state=encoder_states)
 
-        decoder_dense = Dense(output_dim, activation='relu')
+        decoder_dense = Dense(self.output_dim, activation='relu')
         decoder_outputs = decoder_dense(decoder_outputs)
         model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
 
