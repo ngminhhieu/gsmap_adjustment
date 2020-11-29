@@ -159,11 +159,12 @@ class EDLSTMSupervisor():
 
         reverse_groundtruth = scaler.inverse_transform(correct_shape_gt)
         reverse_preds = scaler.inverse_transform(correct_shape_pd)
-        list_metrics = np.zeros(shape=(1, 4))
-        list_metrics[0, 0] = str(datetime.datetime.now())
-        list_metrics[0, 1] = common_util.mae(reverse_groundtruth, reverse_preds)
-        list_metrics[0, 2] = common_util.rmse(reverse_groundtruth, reverse_preds)
-        list_metrics[0, 3] = common_util.nashsutcliffe(reverse_groundtruth, reverse_preds)
+        list_metrics = np.zeros(shape=(1, 3))
+        list_metrics[0, 0] = common_util.mae(reverse_groundtruth, reverse_preds)
+        list_metrics[0, 1] = common_util.rmse(reverse_groundtruth, reverse_preds)
+        list_metrics[0, 2] = common_util.nashsutcliffe(reverse_groundtruth, reverse_preds)
+        list_metrics = list_metrics.tolist()
+        list_metrics = [str(datetime.datetime.now())] + list_metrics
 
         np.savetxt(self.log_dir + 'groundtruth.csv', reverse_groundtruth, delimiter=",")
         np.savetxt(self.log_dir + 'preds.csv', reverse_preds, delimiter=",")
@@ -185,11 +186,12 @@ class EDLSTMSupervisor():
         scaler = self.data["scaler"]
         reverse_groundtruth = scaler.inverse_transform(gt)
         reverse_preds = scaler.inverse_transform(preds)
-       list_metrics = np.zeros(shape=(1, 4))
-        list_metrics[0, 0] = str(datetime.datetime.now())
-        list_metrics[0, 1] = common_util.mae(reverse_groundtruth, reverse_preds)
-        list_metrics[0, 2] = common_util.rmse(reverse_groundtruth, reverse_preds)
-        list_metrics[0, 3] = common_util.nashsutcliffe(reverse_groundtruth, reverse_preds)
+       list_metrics = np.zeros(shape=(1, 3))
+        list_metrics[0, 0] = common_util.mae(reverse_groundtruth, reverse_preds)
+        list_metrics[0, 1] = common_util.rmse(reverse_groundtruth, reverse_preds)
+        list_metrics[0, 2] = common_util.nashsutcliffe(reverse_groundtruth, reverse_preds)
+        list_metrics = list_metrics.tolist()
+        list_metrics = [str(datetime.datetime.now())] + list_metrics
 
         np.savetxt(self.log_dir + 'groundtruth.csv', reverse_groundtruth, delimiter=",")
         np.savetxt(self.log_dir + 'preds.csv', reverse_preds, delimiter=",")

@@ -160,7 +160,7 @@ class Conv2DSupervisor():
         groundtruth = []
         preds = []
         total_margin = 0
-        list_metrics = np.zeros(shape=(len(map_lat) + 1, 4))
+        list_metrics = np.zeros(shape=(len(map_lat) + 1, 3))
         # MAE for only gauge data
         for i in range(0, len(map_lat)):
             lat = map_lat[i]
@@ -179,16 +179,16 @@ class Conv2DSupervisor():
             x = np.count_nonzero(yhat > 0)
             y = np.count_nonzero(gt > 0)
 
-            list_metrics[i+1, 1] = common_util.mae(gt, yhat)
-            list_metrics[i+1, 2] = common_util.rmse(gt, yhat)
+            list_metrics[i+1, 0] = common_util.mae(gt, yhat)
+            list_metrics[i+1, 1] = common_util.rmse(gt, yhat)
+            list_metrics[i+1, 2] = common_util.nashsutcliffe(gt, yhat)
             margin = y - x
             total_margin = total_margin + abs(margin)
 
         # total of 72 gauges
-        list_metrics[0, 0] = str(datetime.datetime.now())
-        list_metrics[0, 1] = common_util.mae(groundtruth, preds)
-        list_metrics[0, 2] = common_util.rmse(groundtruth, preds)
-        list_metrics[0, 3] = common_util.nashsutcliffe(groundtruth, preds)
+        list_metrics[0, 0] = common_util.mae(groundtruth, preds)
+        list_metrics[0, 1] = common_util.rmse(groundtruth, preds)
+        list_metrics[0, 2] = common_util.nashsutcliffe(groundtruth, preds)
 
         groundtruth = np.array(groundtruth)
         preds = np.array(preds)
