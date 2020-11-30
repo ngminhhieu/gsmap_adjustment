@@ -119,6 +119,7 @@ class EDLSTMSupervisor():
     
     def test_overlap_all(self):
         input_encoder_test = self.input_encoder_test
+        input_encoder_test = input_encoder_test[:200]
         groundtruth = self.target_decoder_test
         preds = np.zeros(shape=(input_encoder_test.shape[0] + input_encoder_test.shape[1] - 1, 1))
         gt = np.zeros(shape=(input_encoder_test.shape[0] + input_encoder_test.shape[1] - 1, 1))
@@ -145,11 +146,11 @@ class EDLSTMSupervisor():
         list_metrics[0, 1] = common_util.rmse(reverse_groundtruth, reverse_preds)
         list_metrics[0, 2] = common_util.nashsutcliffe(reverse_groundtruth, reverse_preds)
         list_metrics = list_metrics.tolist()
-        list_metrics = [str(datetime.datetime.now())] + list_metrics
+        common_util.save_metrics(self.log_dir + "list_metrics.csv", list_metrics)
 
         np.savetxt(self.log_dir + 'groundtruth.csv', reverse_groundtruth, delimiter=",")
         np.savetxt(self.log_dir + 'preds.csv', reverse_preds, delimiter=",")
-        np.savetxt(self.log_dir + 'list_metrics.csv', list_metrics, delimiter=",")
+        # np.savetxt(self.log_dir + 'list_metrics.csv', list_metrics, delimiter=",")
     
     def test_all(self):
 

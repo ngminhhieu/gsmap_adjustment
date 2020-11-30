@@ -228,10 +228,10 @@ def cal_error(test_arr, prediction_arr):
         return error_list
 
 
-def save_metrics(error_list, log_dir, alg):
+def save_metrics(file_path, error_list):
     now = datetime.now()
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     error_list.insert(0, dt_string)
-    with open(log_dir + alg + "_metrics.csv", 'a') as file:
+    with open(file_path, 'a') as file:
         writer = csv.writer(file)
         writer.writerow(error_list)
