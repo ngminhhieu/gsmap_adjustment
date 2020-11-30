@@ -12,7 +12,7 @@ from model.utils.attention import AttentionLayer
 from tqdm import tqdm
 
 
-class EDLSTMSupervisor():
+class EDLSTMAttentionSupervisor():
     def __init__(self, is_training=True, **kwargs):
         self.config_model = common_util.get_config_model(**kwargs)
 

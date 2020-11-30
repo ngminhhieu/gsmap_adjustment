@@ -9,6 +9,7 @@ from model.conv2d import Conv2DSupervisor
 from model.ann import ANNSupervisor
 from model.lstm import LSTMSupervisor
 from model.ed_lstm import EDLSTMSupervisor
+from model.ed_lstm_attention import EDLSTMAttentionSupervisor
 
 
 def seed():
@@ -73,10 +74,10 @@ if __name__ == '__main__':
         model.test_overlap_all()
         model.plot_result()
     elif args.mode == 'ed_lstm_attention_train':
-        model = EDLSTMSupervisor(True, **config)
+        model = EDLSTMAttentionSupervisor(True, **config)
         model.train()
     elif args.mode == 'ed_lstm_attention_test':
-        model = EDLSTMSupervisor(False, **config)
+        model = EDLSTMAttentionSupervisor(False, **config)
         model.test_overlap_all()
         model.plot_result()
     else:
