@@ -229,7 +229,7 @@ def cal_error(test_arr, prediction_arr):
 
 
 def save_metrics(file_path, error_list):
-    now = datetime.now()
+    now = datetime.datetime.now()
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     error_list.insert(0, dt_string)
     with open(file_path, 'a') as file:
