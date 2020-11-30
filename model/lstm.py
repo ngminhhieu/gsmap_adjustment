@@ -113,11 +113,10 @@ class LSTMSupervisor():
         list_metrics[0, 1] = common_util.rmse(reverse_groundtruth, reverse_preds)
         list_metrics[0, 2] = common_util.nashsutcliffe(reverse_groundtruth, reverse_preds)
         list_metrics = list_metrics.tolist()
-        list_metrics = [str(datetime.datetime.now())] + list_metrics
-
+        list_metrics = list_metrics.tolist()
+        common_util.save_metrics(self.log_dir + "list_metrics.csv", list_metrics)
         np.savetxt(self.log_dir + 'groundtruth.csv', reverse_groundtruth, delimiter=",")
         np.savetxt(self.log_dir + 'preds.csv', reverse_preds, delimiter=",")
-        np.savetxt(self.log_dir + 'list_metrics.csv', list_metrics, delimiter=",")
 
     def plot_result(self):
         from matplotlib import pyplot as plt
