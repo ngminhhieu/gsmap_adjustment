@@ -97,13 +97,14 @@ class ANNSupervisor():
         scaler = self.data["scaler"]
         reverse_actual_data = scaler.inverse_transform(actual_data)
         reverse_predicted_data = scaler.inverse_transform(predicted_data)
-        list_metrics = np.zeros(shape=(1, 2))
+        list_metrics = np.zeros(shape=(1, 3))
         list_metrics[0, 0] = common_util.mae(reverse_actual_data, reverse_predicted_data)
         list_metrics[0, 1] = common_util.rmse(reverse_actual_data, reverse_predicted_data)
-
-        np.savetxt(self.log_dir + 'groundtruth.csv', reverse_actual_data, delimiter=",")
-        np.savetxt(self.log_dir + 'preds.csv', reverse_predicted_data, delimiter=",")
-        np.savetxt(self.log_dir + 'list_metrics.csv', list_metrics, delimiter=",")
+        list_metrics[0, 2] = common_util.nashsutcliffe(reverse_actual_data, reverse_predicted_data)
+        list_metrics = list_metrics.tolist()
+        common_util.save_metrics(self.log_dir + "list_metrics.csv", list_metrics)
+        np.savetxt(self.log_dir + 'groundtruth.csv', reverse_groundtruth, delimiter=",")
+        np.savetxt(self.log_dir + 'preds.csv', reverse_preds, delimiter=",")
 
     def plot_result(self):
         from matplotlib import pyplot as plt

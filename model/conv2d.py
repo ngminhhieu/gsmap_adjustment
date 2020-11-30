@@ -194,7 +194,6 @@ class Conv2DSupervisor():
         preds = np.array(preds)
         np.savetxt(self.log_dir + 'groundtruth.csv', np.transpose(groundtruth), delimiter=",")
         np.savetxt(self.log_dir + 'preds.csv', np.transpose(preds), delimiter=",")
-        #
         np.savetxt(self.log_dir + 'list_metrics.csv', list_metrics, delimiter=",")
 
     def plot_result(self):
