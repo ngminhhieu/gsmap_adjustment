@@ -5,10 +5,8 @@ from keras import backend as K
 import pandas as pd
 
 
-def create_data_prediction_overlap_all(dataset_gsmap, dataset_gauge, **kwargs):
+def create_data_prediction_overlap_all(dataset_gsmap, wind_u_mean, wind_v_mean, dataset_gauge, **kwargs):
     
-    # data_npz = kwargs['data'].get('dataset')
-    # dataset = np.load(data_npz)['dataset']
     input_dim = kwargs['model'].get('input_dim')
     output_dim = kwargs['model'].get('output_dim')
     seq_len = kwargs['model'].get('seq_len')
@@ -22,6 +20,8 @@ def create_data_prediction_overlap_all(dataset_gsmap, dataset_gauge, **kwargs):
     for col in range(dataset_gsmap.shape[1]):
         for row in range(T-seq_len-horizon):
             input_encoder[col*T + row, :, 0] = dataset_gsmap[row+horizon:row+seq_len+horizon, col].copy()
+            input_encoder[col*T + row, :, 1] = wind_u_mean[row+horizon:row+seq_len+horizon, col].copy()
+            input_encoder[col*T + row, :, 2] = wind_v_mean[row+horizon:row+seq_len+horizon, col].copy()
             input_decoder[col*T + row, :, 0] = dataset_gauge[row+horizon-1:row+seq_len+horizon-1, col].copy()
             input_decoder[col*T + row, 0, 0] = 0
             output_decoder[col*T + row, :, 0] = dataset_gauge[row+horizon:row+seq_len+horizon, col].copy()
@@ -50,14 +50,13 @@ def create_data_prediction_all(dataset_gsmap, dataset_gauge, **kwargs):
 
 def load_dataset(**kwargs):
     dataset_gsmap = pd.read_csv('data/ann/gsmap.csv').to_numpy()
-    dataset_gsmap = dataset_gsmap.flatten()
+    dataset_gsmap = dataset_gsmap.reshape([-1, 1])
     wind_u_mean = pd.read_csv('data/ann/wind_u_mean.csv').to_numpy()
-    wind_u_mean = wind_u_mean.flatten()
+    wind_u_mean = wind_u_mean.reshape([-1, 1])
     wind_v_mean = pd.read_csv('data/ann/wind_v_mean.csv').to_numpy()
-    wind_v_mean = wind_v_mean.flatten()
-    dataset_gsmap = np.concatenate((dataset_gsmap, wind_u_mean, wind_v_mean), axis=1)
+    wind_v_mean = wind_v_mean.reshape([-1, 1])
     dataset_gauge = pd.read_csv('data/ann/gauge.csv').to_numpy()
-    dataset_gauge = dataset_gauge.flatten()
+    dataset_gauge = dataset_gauge.reshape([-1, 1])
     # dataset_gsmap = dataset_gsmap[:, 0]
     # dataset_gauge = dataset_gauge[:, 0]
     
@@ -69,8 +68,10 @@ def load_dataset(**kwargs):
     scaler.fit(dataset_gsmap)
     dataset_gsmap = scaler.transform(dataset_gsmap)
     dataset_gauge = scaler.transform(dataset_gauge)
+    wind_u_mean = scaler.transform(wind_u_mean)
+    wind_v_mean = scaler.transform(wind_v_mean)
 
-    input_encoder, input_decoder, target_decoder = create_data_prediction_overlap_all(dataset_gsmap, dataset_gauge, **kwargs)
+    input_encoder, input_decoder, target_decoder = create_data_prediction_overlap_all(dataset_gsmap, wind_u_mean, wind_v_mean, dataset_gauge, **kwargs)
     test_size = kwargs['data'].get('test_size')
     valid_size = kwargs['data'].get('valid_size')
 
