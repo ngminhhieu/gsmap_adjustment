@@ -50,7 +50,14 @@ def create_data_prediction_all(dataset_gsmap, dataset_gauge, **kwargs):
 
 def load_dataset(**kwargs):
     dataset_gsmap = pd.read_csv('data/ann/gsmap.csv').to_numpy()
+    dataset_gsmap = dataset_gsmap.flatten()
+    wind_u_mean = pd.read_csv('data/ann/wind_u_mean.csv').to_numpy()
+    wind_u_mean = wind_u_mean.flatten()
+    wind_v_mean = pd.read_csv('data/ann/wind_v_mean.csv').to_numpy()
+    wind_v_mean = wind_v_mean.flatten()
+    dataset_gsmap = np.concatenate((dataset_gsmap, wind_u_mean, wind_v_mean), axis=1)
     dataset_gauge = pd.read_csv('data/ann/gauge.csv').to_numpy()
+    dataset_gauge = dataset_gauge.flatten()
     # dataset_gsmap = dataset_gsmap[:, 0]
     # dataset_gauge = dataset_gauge[:, 0]
     
