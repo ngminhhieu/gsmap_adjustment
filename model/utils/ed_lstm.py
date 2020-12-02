@@ -74,19 +74,19 @@ def create_data_prediction_all(dataset_gsmap, dataset_gauge, **kwargs):
 
 
 def load_dataset(**kwargs):
-    dataset_gsmap = pd.read_csv('data/ann/gsmap.csv').to_numpy()
+    dataset_gsmap = pd.read_csv('data/ann/gsmap.csv', header=None).to_numpy()
     dataset_gsmap = dataset_gsmap.reshape([-1, 1])
-    wind_u_mean = pd.read_csv('data/ann/wind_u_mean.csv').to_numpy()
+    wind_u_mean = pd.read_csv('data/ann/wind_u_mean.csv', header=None).to_numpy()
     wind_u_mean = wind_u_mean.reshape([-1, 1])
-    wind_v_mean = pd.read_csv('data/ann/wind_v_mean.csv').to_numpy()
+    wind_v_mean = pd.read_csv('data/ann/wind_v_mean.csv', header=None).to_numpy()
     wind_v_mean = wind_v_mean.reshape([-1, 1])
-    surface_temp = pd.read_csv('data/ann/surface_temp.csv').to_numpy()
+    surface_temp = pd.read_csv('data/ann/surface_temp.csv', header=None).to_numpy()
     surface_temp = surface_temp.reshape([-1, 1])
-    precip_trend = pd.read_csv('data/ann/precip_trend.csv').to_numpy()
+    precip_trend = pd.read_csv('data/ann/precip_trend.csv', header=None).to_numpy()
     precip_trend = precip_trend.reshape([-1, 1])
-    precip_seasonal = pd.read_csv('data/ann/precip_seasonal.csv').to_numpy()
+    precip_seasonal = pd.read_csv('data/ann/precip_seasonal.csv', header=None).to_numpy()
     precip_seasonal = precip_seasonal.reshape([-1, 1])
-    dataset_gauge = pd.read_csv('data/ann/gauge.csv').to_numpy()
+    dataset_gauge = pd.read_csv('data/ann/gauge.csv', header=None).to_numpy()
     dataset_gauge = dataset_gauge.reshape([-1, 1])
     # dataset_gsmap = dataset_gsmap[:, 0]
     # dataset_gauge = dataset_gauge[:, 0]

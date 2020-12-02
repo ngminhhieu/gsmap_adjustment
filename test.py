@@ -23,13 +23,16 @@ from pandas import read_csv
 from matplotlib import pyplot
 import numpy as np
 from statsmodels.tsa.seasonal import seasonal_decompose
+
 series = read_csv('./data/ann/gsmap.csv', names=range(0, 72))
+trend = np.empty(shape=(len(series), len(series.columns)))
+seasonal = np.empty(shape=(len(series), len(series.columns)))
+print(trend.shape)
 series.index = pd.DatetimeIndex(freq='w', start=0, periods=len(series))
-result = seasonal_decompose(series[0])
-trend = result.trend
-seasonal = result.seasonal
-trend = trend.fillna(0)
-print(seasonal.isnull().sum(axis = 0))
-print(trend.isnull().sum(axis = 0))
-trend.to_csv('./data/ann/precip_trend.csv', index=False)
-seasonal.to_csv('./data/ann/precip_seasonal.csv', index=False)
+for i in range(len(series.columns)):
+    result = seasonal_decompose(series[i])
+    trend[:, i] = result.trend.fillna(0)
+    seasonal[:, i] = result.seasonal
+
+np.savetxt('./data/ann/precip_seasonal.csv', trend, delimiter=',')
+np.savetxt('./data/ann/precip_trend.csv', trend, delimiter=',')
