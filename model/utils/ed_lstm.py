@@ -15,9 +15,9 @@ def create_data_prediction_overlap_all(dataset_gsmap, wind_u_mean, wind_v_mean,
     horizon = kwargs['model'].get('horizon')
     T = len(dataset_gsmap)
     col = dataset_gsmap.shape[1]
-    input_encoder = np.zeros(shape=(T * col, seq_len, input_dim))
-    input_decoder = np.zeros(shape=(T * col, seq_len, output_dim))
-    output_decoder = np.zeros(shape=(T * col, seq_len, output_dim))
+    input_encoder = np.empty(shape=((T - seq_len - horizon) * col, seq_len, input_dim))
+    input_decoder = np.empty(shape=((T - seq_len - horizon) * col, seq_len, output_dim))
+    output_decoder = np.empty(shape=((T - seq_len - horizon) * col, seq_len, output_dim))
 
     for col in range(dataset_gsmap.shape[1]):
         for row in range(T - seq_len - horizon):
