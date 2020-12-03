@@ -15,24 +15,24 @@ def create_data_prediction_overlap_all(dataset_gsmap, wind_u_mean, wind_v_mean,
     horizon = kwargs['model'].get('horizon')
     T = len(dataset_gsmap)
     col = dataset_gsmap.shape[1]
-    input_encoder = np.empty(shape=((T - seq_len - horizon) * col, seq_len, input_dim))
-    input_decoder = np.empty(shape=((T - seq_len - horizon) * col, seq_len, output_dim))
-    output_decoder = np.empty(shape=((T - seq_len - horizon) * col, seq_len, output_dim))
+    input_encoder = np.empty(shape=(T * (col- seq_len - horizon), seq_len, input_dim))
+    input_decoder = np.empty(shape=((T * (col- seq_len - horizon), seq_len, output_dim))
+    output_decoder = np.empty(shape=((T * (col- seq_len - horizon), seq_len, output_dim))
 
-    for col in range(dataset_gsmap.shape[1]):
-        for row in range(T - seq_len - horizon):
-            input_encoder[col * T + row, :,
-                          0] = dataset_gsmap[row + horizon:row + seq_len +
-                                             horizon, col].copy()
-            input_encoder[col * T + row, :,
-                          1] = wind_u_mean[row + horizon:row + seq_len +
-                                           horizon, col].copy()
-            input_encoder[col * T + row, :,
-                          2] = wind_v_mean[row + horizon:row + seq_len +
-                                           horizon, col].copy()
-            input_encoder[col * T + row, :,
-                          3] = surface_temp[row + horizon:row + seq_len +
-                                            horizon, col].copy()
+    for row in range(T):
+        for col in range(col - seq_len - horizon):
+            input_encoder[row*col + col, :,
+                          0] = dataset_gsmap[col + horizon:col + seq_len +
+                                             horizon, row].copy()
+            input_encoder[row*col + col, :,
+                          1] = wind_u_mean[col + horizon:col + seq_len +
+                                             horizon, row].copy()
+            input_encoder[row*col + col, :,
+                          2] = wind_v_mean[col + horizon:col + seq_len +
+                                             horizon, row].copy()
+            input_encoder[row*col + col, :,
+                          3] = surface_temp[col + horizon:col + seq_len +
+                                             horizon, row].copy()
             # input_encoder[col * T + row, :,
             #               1] = precip_seasonal[row + horizon:row + seq_len +
             #                                 horizon, col].copy()
