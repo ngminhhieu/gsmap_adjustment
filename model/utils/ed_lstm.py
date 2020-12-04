@@ -24,15 +24,15 @@ def create_data_prediction_overlap_all(dataset_gsmap, wind_u_mean, wind_v_mean,
             input_encoder[row*col + col, :,
                           0] = dataset_gsmap[col + horizon:col + seq_len +
                                              horizon, row].copy()
-            input_encoder[row*col + col, :,
-                          1] = wind_u_mean[col + horizon:col + seq_len +
-                                             horizon, row].copy()
-            input_encoder[row*col + col, :,
-                          2] = wind_v_mean[col + horizon:col + seq_len +
-                                             horizon, row].copy()
-            input_encoder[row*col + col, :,
-                          3] = surface_temp[col + horizon:col + seq_len +
-                                             horizon, row].copy()
+            # input_encoder[row*col + col, :,
+            #               1] = wind_u_mean[col + horizon:col + seq_len +
+            #                                  horizon, row].copy()
+            # input_encoder[row*col + col, :,
+            #               2] = wind_v_mean[col + horizon:col + seq_len +
+            #                                  horizon, row].copy()
+            # input_encoder[row*col + col, :,
+            #               3] = surface_temp[col + horizon:col + seq_len +
+            #                                  horizon, row].copy()
             # input_encoder[col * T + row, :,
             #               1] = precip_seasonal[row + horizon:row + seq_len +
             #                                 horizon, col].copy()
@@ -75,7 +75,7 @@ def create_data_prediction_all(dataset_gsmap, dataset_gauge, **kwargs):
 
 def load_dataset(**kwargs):
     dataset_gsmap = pd.read_csv('data/ann/gsmap.csv', header=None).to_numpy()
-    dataset_gsmap = dataset_gsmap.reshape([-1, 1])
+    # dataset_gsmap = dataset_gsmap.reshape([-1, 1])
     wind_u_mean = pd.read_csv('data/ann/wind_u_mean.csv', header=None).to_numpy()
     wind_u_mean = wind_u_mean.reshape([-1, 1])
     wind_v_mean = pd.read_csv('data/ann/wind_v_mean.csv', header=None).to_numpy()
