@@ -58,10 +58,5 @@ import scipy.stats
 #     plt.plot(data[:, i])
 #     plt.show()
 
-
-x = np.arange(5.)
-y = np.arange(5.)
-print(scipy.stats.pearsonr(x, y))
-
-plt.scatter(x, y)
-plt.show()
+a = np.array([[1,2,4], [5,6,10], [4,1,2]])
+print(np.reshape(np.ravel(a, order='F'), (-1,1)))
