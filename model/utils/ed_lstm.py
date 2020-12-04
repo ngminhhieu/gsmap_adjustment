@@ -16,8 +16,8 @@ def create_data_prediction_overlap_all(dataset_gsmap, wind_u_mean, wind_v_mean,
     T = len(dataset_gsmap)
     col = dataset_gsmap.shape[1]
     input_encoder = np.empty(shape=(T * (col- seq_len - horizon), seq_len, input_dim))
-    input_decoder = np.empty(shape=((T * (col- seq_len - horizon), seq_len, output_dim))
-    output_decoder = np.empty(shape=((T * (col- seq_len - horizon), seq_len, output_dim))
+    input_decoder = np.empty(shape=(T * (col- seq_len - horizon), seq_len, output_dim))
+    output_decoder = np.empty(shape=(T * (col- seq_len - horizon), seq_len, output_dim))
 
     for row in range(T):
         for col in range(col - seq_len - horizon):
@@ -39,11 +39,11 @@ def create_data_prediction_overlap_all(dataset_gsmap, wind_u_mean, wind_v_mean,
             # input_encoder[col * T + row, :,
             #               2] = precip_trend[row + horizon:row + seq_len +
             #                                 horizon, col].copy()
-            input_decoder[col * T + row, :,
+            input_decoder[row*col + col, :,
                           0] = dataset_gauge[row + horizon - 1:row + seq_len +
                                              horizon - 1, col].copy()
-            input_decoder[col * T + row, 0, 0] = 0
-            output_decoder[col * T + row, :,
+            input_decoder[row*col + col, 0, 0] = 0
+            output_decoder[row*col + col, :,
                            0] = dataset_gauge[row + horizon:row + seq_len +
                                               horizon, col].copy()
 
