@@ -27,18 +27,18 @@ from matplotlib import pyplot as plt
 import random
 import scipy.stats
 
-# series = read_csv('./data/ann/gsmap.csv', names=range(0, 72))
-# trend = np.empty(shape=(len(series), len(series.columns)))
-# seasonal = np.empty(shape=(len(series), len(series.columns)))
-# print(trend.shape)
-# series.index = pd.DatetimeIndex(freq='w', start=0, periods=len(series))
-# for i in range(len(series.columns)):
-#     result = seasonal_decompose(series[i])
-#     trend[:, i] = result.trend.fillna(0)
-#     seasonal[:, i] = result.seasonal
+series = read_csv('./data/ann/gsmap.csv', names=range(0, 72))
+trend = np.empty(shape=(len(series), len(series.columns)))
+seasonal = np.empty(shape=(len(series), len(series.columns)))
+print(trend.shape)
+series.index = pd.DatetimeIndex(freq='w', start=0, periods=len(series))
+for i in range(len(series.columns)):
+    result = seasonal_decompose(series[i])
+    trend[:, i] = result.trend.fillna(0)
+    seasonal[:, i] = result.seasonal
 
-# np.savetxt('./data/ann/precip_seasonal.csv', trend, delimiter=',')
-# np.savetxt('./data/ann/precip_trend.csv', trend, delimiter=',')
+np.savetxt('./data/ann/precip_seasonal.csv', seasonal, delimiter=',')
+np.savetxt('./data/ann/precip_trend.csv', trend, delimiter=',')
 
 # data = np.empty(shape=(200, 3))
 # for i in range(len(data)):
@@ -59,9 +59,9 @@ import scipy.stats
 #     plt.show()
 
 
-x = np.arange(5.)
-y = np.arange(5.)
-print(scipy.stats.pearsonr(x, y))
+# x = np.arange(5.)
+# y = np.arange(5.)
+# print(scipy.stats.pearsonr(x, y))
 
-plt.scatter(x, y)
-plt.show()
+# plt.scatter(x, y)
+# plt.show()
