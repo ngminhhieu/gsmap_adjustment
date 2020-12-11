@@ -30,14 +30,14 @@ def create_data_prediction_overlap_all(dataset_gsmap, wind_u_mean, wind_v_mean,
             input_encoder[col * T + row, :,
                           2] = wind_v_mean[row + horizon:row + seq_len +
                                            horizon, col].copy()
+            # input_encoder[col * T + row, :,
+            #               3] = surface_temp[row + horizon:row + seq_len +
+            #                                 horizon, col].copy()
             input_encoder[col * T + row, :,
-                          3] = surface_temp[row + horizon:row + seq_len +
+                          3] = precip_seasonal[row + horizon:row + seq_len +
                                             horizon, col].copy()
             input_encoder[col * T + row, :,
-                          4] = precip_seasonal[row + horizon:row + seq_len +
-                                            horizon, col].copy()
-            input_encoder[col * T + row, :,
-                          5] = precip_trend[row + horizon:row + seq_len +
+                          4] = precip_trend[row + horizon:row + seq_len +
                                             horizon, col].copy()
             input_decoder[col * T + row, :,
                           0] = dataset_gauge[row + horizon - 1:row + seq_len +
