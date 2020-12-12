@@ -30,15 +30,15 @@ def create_data_prediction_overlap_all(dataset_gsmap, wind_u_mean, wind_v_mean,
             input_encoder[col * T + row, :,
                           2] = wind_v_mean[row + horizon:row + seq_len +
                                            horizon, col].copy()
+            # input_encoder[col * T + row, :,
+            #               3] = surface_temp[row + horizon:row + seq_len +
+            #                                 horizon, col].copy()
             input_encoder[col * T + row, :,
-                          3] = surface_temp[row + horizon:row + seq_len +
+                          3] = precip_seasonal[row + horizon:row + seq_len +
                                             horizon, col].copy()
-            # input_encoder[col * T + row, :,
-            #               1] = precip_seasonal[row + horizon:row + seq_len +
-            #                                 horizon, col].copy()
-            # input_encoder[col * T + row, :,
-            #               2] = precip_trend[row + horizon:row + seq_len +
-            #                                 horizon, col].copy()
+            input_encoder[col * T + row, :,
+                          4] = precip_trend[row + horizon:row + seq_len +
+                                            horizon, col].copy()
             input_decoder[col * T + row, :,
                           0] = dataset_gauge[row + horizon - 1:row + seq_len +
                                              horizon - 1, col].copy()
@@ -75,19 +75,19 @@ def create_data_prediction_all(dataset_gsmap, dataset_gauge, **kwargs):
 
 def load_dataset(**kwargs):
     dataset_gsmap = pd.read_csv('data/ann/gsmap.csv', header=None).to_numpy()
-    dataset_gsmap = np.reshape(np.ravel(dataset_gsmap, order='F'), (-1,1))
+    dataset_gsmap = dataset_gsmap.reshape([-1, 1])
     wind_u_mean = pd.read_csv('data/ann/wind_u_mean.csv', header=None).to_numpy()
-    wind_u_mean = np.reshape(np.ravel(wind_u_mean, order='F'), (-1,1))
+    wind_u_mean = wind_u_mean.reshape([-1, 1])
     wind_v_mean = pd.read_csv('data/ann/wind_v_mean.csv', header=None).to_numpy()
-    wind_v_mean = np.reshape(np.ravel(wind_v_mean, order='F'), (-1,1))
+    wind_v_mean = wind_v_mean.reshape([-1, 1])
     surface_temp = pd.read_csv('data/ann/surface_temp.csv', header=None).to_numpy()
-    surface_temp = np.reshape(np.ravel(surface_temp, order='F'), (-1,1))
+    surface_temp = surface_temp.reshape([-1, 1])
     precip_trend = pd.read_csv('data/ann/precip_trend.csv', header=None).to_numpy()
-    precip_trend = np.reshape(np.ravel(precip_trend, order='F'), (-1,1))
+    precip_trend = precip_trend.reshape([-1, 1])
     precip_seasonal = pd.read_csv('data/ann/precip_seasonal.csv', header=None).to_numpy()
-    precip_seasonal = np.reshape(np.ravel(precip_seasonal, order='F'), (-1,1))
+    precip_seasonal = precip_seasonal.reshape([-1, 1])
     dataset_gauge = pd.read_csv('data/ann/gauge.csv', header=None).to_numpy()
-    dataset_gauge = np.reshape(np.ravel(dataset_gauge, order='F'), (-1,1))
+    dataset_gauge = dataset_gauge.reshape([-1, 1])
     # dataset_gsmap = dataset_gsmap[:, 0]
     # dataset_gauge = dataset_gauge[:, 0]
 
@@ -110,14 +110,40 @@ def load_dataset(**kwargs):
         precip_trend, dataset_gauge, **kwargs)
     test_size = kwargs['data'].get('test_size')
     valid_size = kwargs['data'].get('valid_size')
+    train_size = 1 - test_size - valid_size
 
     # split data to train_set, valid_set, test_size
-    input_encoder_train, input_encoder_valid, input_encoder_test = common_util.prepare_train_valid_test(
-        input_encoder, test_size=test_size, valid_size=valid_size)
-    input_decoder_train, input_decoder_valid, input_decoder_test = common_util.prepare_train_valid_test(
-        input_decoder, test_size=test_size, valid_size=valid_size)
-    target_decoder_train, target_decoder_valid, target_decoder_test = common_util.prepare_train_valid_test(
-        target_decoder, test_size=test_size, valid_size=valid_size)
+    my_dataset = pd.read_csv('data/ann/gsmap.csv', header=None).to_numpy()
+    input_encoder_train = np.empty(shape=(int(input_encoder.shape[0]*train_size), input_encoder.shape[1], input_encoder.shape[2]))
+    input_encoder_valid = np.empty(shape=(int(input_encoder.shape[0]*valid_size), input_encoder.shape[1], input_encoder.shape[2]))
+    input_encoder_test = np.empty(shape=(int(input_encoder.shape[0]*test_size), input_encoder.shape[1], input_encoder.shape[2]))
+    input_decoder_train = np.empty(shape=(int(input_decoder.shape[0]*train_size), input_decoder.shape[1], input_decoder.shape[2]))
+    input_decoder_valid = np.empty(shape=(int(input_decoder.shape[0]*valid_size), input_decoder.shape[1], input_decoder.shape[2]))
+    input_decoder_test = np.empty(shape=(int(input_decoder.shape[0]*test_size), input_decoder.shape[1], input_decoder.shape[2]))
+    target_decoder_train = np.empty(shape=(int(target_decoder.shape[0]*train_size), target_decoder.shape[1], target_decoder.shape[2]))
+    target_decoder_valid = np.empty(shape=(int(target_decoder.shape[0]*valid_size), target_decoder.shape[1], target_decoder.shape[2]))
+    target_decoder_test = np.empty(shape=(int(target_decoder.shape[0]*test_size), target_decoder.shape[1], target_decoder.shape[2]))
+    gauges = my_dataset.shape[1]
+    for i in range(gauges):
+        train_pivot = int(len(my_dataset)*train_size)
+        valid_pivot = int(len(my_dataset)*(train_size+valid_size))
+        test_pivot = int(len(my_dataset)*(train_size+valid_size+test_size))
+        input_encoder_train[i*train_size:(i+1)*train_size] = input_encoder[i*gauges:i*gauges+train_pivot])
+        input_encoder_valid[i*train_size:(i+1)*train_size] = input_encoder[i*gauges+train_pivot:i*gauges+train_pivot+valid_pivot])
+        input_encoder_test[i*train_size:(i+1)*train_size] = input_encoder[i*gauges+train_pivot+valid_pivot:i*gauges+train_pivot+valid_pivot+test_pivot])
+        input_decoder_train[i*train_size:(i+1)*train_size] = input_decoder[i*gauges:i*gauges+train_pivot])
+        input_decoder_valid[i*train_size:(i+1)*train_size] = input_decoder[i*gauges+train_pivot:i*gauges+train_pivot+valid_pivot])
+        input_decoder_test[i*train_size:(i+1)*train_size] = input_decoder[i*gauges+train_pivot+valid_pivot:i*gauges+train_pivot+valid_pivot+test_pivot])
+        target_decoder_train[i*train_size:(i+1)*train_size] = target_decoder[i*gauges:i*gauges+train_pivot])
+        target_decoder_valid[i*train_size:(i+1)*train_size] = target_decoder[i*gauges+train_pivot:i*gauges+train_pivot+valid_pivot])
+        target_decoder_test[i*train_size:(i+1)*train_size] = target_decoder[i*gauges+train_pivot+valid_pivot:i*gauges+train_pivot+valid_pivot+test_pivot])
+
+    # input_encoder_train, input_encoder_valid, input_encoder_test = common_util.prepare_train_valid_test(
+    #     input_encoder, test_size=test_size, valid_size=valid_size)
+    # input_decoder_train, input_decoder_valid, input_decoder_test = common_util.prepare_train_valid_test(
+    #     input_decoder, test_size=test_size, valid_size=valid_size)
+    # target_decoder_train, target_decoder_valid, target_decoder_test = common_util.prepare_train_valid_test(
+    #     target_decoder, test_size=test_size, valid_size=valid_size)
 
     data = {}
     for cat in ["train", "valid", "test"]:
