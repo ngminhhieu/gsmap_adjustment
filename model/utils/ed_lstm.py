@@ -128,15 +128,15 @@ def load_dataset(**kwargs):
         train_pivot = int(len(my_dataset)*train_size)
         valid_pivot = int(len(my_dataset)*(train_size+valid_size))
         test_pivot = int(len(my_dataset)*(train_size+valid_size+test_size))
-        input_encoder_train[i*train_size:(i+1)*train_size] = input_encoder[i*gauges:i*gauges+train_pivot]
-        input_encoder_valid[i*train_size:(i+1)*train_size] = input_encoder[i*gauges+train_pivot:i*gauges+train_pivot+valid_pivot]
-        input_encoder_test[i*train_size:(i+1)*train_size] = input_encoder[i*gauges+train_pivot+valid_pivot:i*gauges+train_pivot+valid_pivot+test_pivot]
-        input_decoder_train[i*train_size:(i+1)*train_size] = input_decoder[i*gauges:i*gauges+train_pivot]
-        input_decoder_valid[i*train_size:(i+1)*train_size] = input_decoder[i*gauges+train_pivot:i*gauges+train_pivot+valid_pivot]
-        input_decoder_test[i*train_size:(i+1)*train_size] = input_decoder[i*gauges+train_pivot+valid_pivot:i*gauges+train_pivot+valid_pivot+test_pivot]
-        target_decoder_train[i*train_size:(i+1)*train_size] = target_decoder[i*gauges:i*gauges+train_pivot]
-        target_decoder_valid[i*train_size:(i+1)*train_size] = target_decoder[i*gauges+train_pivot:i*gauges+train_pivot+valid_pivot]
-        target_decoder_test[i*train_size:(i+1)*train_size] = target_decoder[i*gauges+train_pivot+valid_pivot:i*gauges+train_pivot+valid_pivot+test_pivot]
+        input_encoder_train[i*train_pivot:(i+1)*train_pivot] = input_encoder[i*gauges:i*gauges+train_pivot]
+        input_encoder_valid[i*valid_pivot:(i+1)*valid_pivot] = input_encoder[i*gauges+train_pivot:i*gauges+train_pivot+valid_pivot]
+        input_encoder_test[i*test_pivot:(i+1)*test_pivot] = input_encoder[i*gauges+train_pivot+valid_pivot:i*gauges+train_pivot+valid_pivot+test_pivot]
+        input_decoder_train[i*train_pivot:(i+1)*train_pivot] = input_decoder[i*gauges:i*gauges+train_pivot]
+        input_decoder_valid[i*valid_pivot:(i+1)*valid_pivot] = input_decoder[i*gauges+train_pivot:i*gauges+train_pivot+valid_pivot]
+        input_decoder_test[i*test_pivot:(i+1)*test_pivot] = input_decoder[i*gauges+train_pivot+valid_pivot:i*gauges+train_pivot+valid_pivot+test_pivot]
+        target_decoder_train[i*train_pivot:(i+1)*train_pivot] = target_decoder[i*gauges:i*gauges+train_pivot]
+        target_decoder_valid[i*valid_pivot:(i+1)*valid_pivot] = target_decoder[i*gauges+train_pivot:i*gauges+train_pivot+valid_pivot]
+        target_decoder_test[i*test_pivot:(i+1)*test_pivot] = target_decoder[i*gauges+train_pivot+valid_pivot:i*gauges+train_pivot+valid_pivot+test_pivot]
 
     # input_encoder_train, input_encoder_valid, input_encoder_test = common_util.prepare_train_valid_test(
     #     input_encoder, test_size=test_size, valid_size=valid_size)
