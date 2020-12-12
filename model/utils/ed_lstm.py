@@ -126,8 +126,8 @@ def load_dataset(**kwargs):
     gauges = my_dataset.shape[1]
     for i in range(gauges):
         train_pivot = int(len(my_dataset)*train_size)
-        valid_pivot = int(len(my_dataset)*(train_size+valid_size))
-        test_pivot = int(len(my_dataset)*(train_size+valid_size+test_size))
+        valid_pivot = int(len(my_dataset)*valid_size)
+        test_pivot = int(len(my_dataset)*test_size)
         input_encoder_train[i*train_pivot:(i+1)*train_pivot] = input_encoder[i*gauges:i*gauges+train_pivot]
         input_encoder_valid[i*valid_pivot:(i+1)*valid_pivot] = input_encoder[i*gauges+train_pivot:i*gauges+train_pivot+valid_pivot]
         input_encoder_test[i*test_pivot:(i+1)*test_pivot] = input_encoder[i*gauges+train_pivot+valid_pivot:i*gauges+train_pivot+valid_pivot+test_pivot]
