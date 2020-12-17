@@ -79,7 +79,7 @@ def create_data_prediction_all(dataset_gsmap, dataset_gauge, **kwargs):
 def load_dataset(**kwargs):
     dataset_gsmap = pd.read_csv('data/ann/gsmap.csv', header=None).to_numpy()
     dataset_gsmap = dataset_gsmap.reshape([-1, 1])
-    data_correlation = pd.read_csv('data/ann/data_correlation.csv', header=None).to_numpy()
+    data_correlation = pd.read_csv('data/ann/correlation.csv', header=None).to_numpy()
     data_correlation = data_correlation.reshape([-1, 1])
     wind_u_mean = pd.read_csv('data/ann/wind_u_mean.csv', header=None).to_numpy()
     wind_u_mean = wind_u_mean.reshape([-1, 1])
