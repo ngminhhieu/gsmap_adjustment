@@ -50,7 +50,5 @@ for gauge_index in range(gauge_data.shape[1]):
                 max_lon = lon_index
     print(max_corr)
     correlation[:, gauge_index] = gsmap_precip[:, max_lat, max_lon]
-    import sys
-    sys.exit()
-
+    print(gauge_index)
 np.savetxt('./data/ann/correlation.csv', correlation , delimiter=",")
