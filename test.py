@@ -26,37 +26,31 @@ from statsmodels.tsa.seasonal import seasonal_decompose
 from matplotlib import pyplot as plt
 import random
 import scipy.stats
+import netCDF4 as nc
 
-# series = read_csv('./data/ann/gsmap.csv', names=range(0, 72))
-# trend = np.empty(shape=(len(series), len(series.columns)))
-# seasonal = np.empty(shape=(len(series), len(series.columns)))
-# print(trend.shape)
-# series.index = pd.DatetimeIndex(freq='w', start=0, periods=len(series))
-# for i in range(len(series.columns)):
-#     result = seasonal_decompose(series[i])
-#     trend[:, i] = result.trend.fillna(0)
-#     seasonal[:, i] = result.seasonal
+ds = nc.Dataset('./data/conv2d_gsmap/gsmap_2011_2018.nc')
+gsmap_precip = ds['precip'][:]
+gsmap_lat = ds['lat'][:]
+gsmap_lon = ds['lon'][:]
+gauge_data = read_csv('./data/ann/gauge.csv', header=None).to_numpy()
+correlation = np.empty(shape=(gauge_data.shape[0], gauge_data.shape[1]))
+max_corr = 0
+max_lat = 0
+max_lon = 0
+for gauge_index in range(gauge_data.shape[1]):
+    gauge_precip = gauge_data[:, gauge_index]
+    for lat_index in range(len(gsmap_lat)):
+        for lon_index in range(len(gsmap_lon)):
+            map_precip = gsmap_precip[:, lat_index, lon_index]
+            r = np.corrcoef(map_precip, gauge_precip)
+            r = r[0, 1]
+            if abs(max_corr) <= abs(r):
+                max_corr = r
+                max_lat = lat_index
+                max_lon = lon_index
+    print(max_corr)
+    correlation[:, gauge_index] = gsmap_precip[:, max_lat, max_lon]
+    import sys
+    sys.exit()
 
-# np.savetxt('./data/ann/precip_seasonal.csv', seasonal, delimiter=',')
-# np.savetxt('./data/ann/precip_trend.csv', trend, delimiter=',')
-
-# data = np.empty(shape=(200, 3))
-# for i in range(len(data)):
-#     data[i, 0] = i
-#     data[i, 1] = i%4
-
-# for ran in range(50):
-#     ran = random.randint(0, 10)
-#     data[ran, 0] = ran
-
-# data[0:20, 2] = data[0:20, 1]
-# data[20:100, 2] = data[20:100, 1] + 2
-# data[100:200, 2] = data[100:200, 1] -3
-# np.savetxt('./data/ann/test.csv', data, delimiter=',')
-
-# for i in range(3):
-#     plt.plot(data[:, i])
-#     plt.show()
-
-a = np.array([[1,2,4], [5,6,10], [4,1,2]])
-print(np.reshape(np.ravel(a, order='F'), (-1,1)))
+np.savetxt('./data/ann/correlation.csv', correlation , delimiter=",")
