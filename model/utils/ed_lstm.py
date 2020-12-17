@@ -7,7 +7,7 @@ import pandas as pd
 
 def create_data_prediction_overlap_all(dataset_gsmap, wind_u_mean, wind_v_mean,
                                        surface_temp, precip_seasonal,
-                                       precip_trend, dataset_gauge, **kwargs):
+                                       precip_trend, dataset_gauge, data_correlation, **kwargs):
 
     input_dim = kwargs['model'].get('input_dim')
     output_dim = kwargs['model'].get('output_dim')
@@ -30,15 +30,18 @@ def create_data_prediction_overlap_all(dataset_gsmap, wind_u_mean, wind_v_mean,
             input_encoder[col * T + row, :,
                           2] = wind_v_mean[row + horizon:row + seq_len +
                                            horizon, col].copy()
+            input_encoder[col * T + row, :,
+                          3] = data_correlation[row + horizon:row + seq_len +
+                                            horizon, col].copy()
             # input_encoder[col * T + row, :,
             #               3] = surface_temp[row + horizon:row + seq_len +
             #                                 horizon, col].copy()
-            input_encoder[col * T + row, :,
-                          3] = precip_seasonal[row + horizon:row + seq_len +
-                                            horizon, col].copy()
-            input_encoder[col * T + row, :,
-                          4] = precip_trend[row + horizon:row + seq_len +
-                                            horizon, col].copy()
+            # input_encoder[col * T + row, :,
+            #               3] = precip_seasonal[row + horizon:row + seq_len +
+            #                                 horizon, col].copy()
+            # input_encoder[col * T + row, :,
+            #               4] = precip_trend[row + horizon:row + seq_len +
+            #                                 horizon, col].copy()
             input_decoder[col * T + row, :,
                           0] = dataset_gauge[row + horizon - 1:row + seq_len +
                                              horizon - 1, col].copy()
@@ -76,6 +79,8 @@ def create_data_prediction_all(dataset_gsmap, dataset_gauge, **kwargs):
 def load_dataset(**kwargs):
     dataset_gsmap = pd.read_csv('data/ann/gsmap.csv', header=None).to_numpy()
     dataset_gsmap = dataset_gsmap.reshape([-1, 1])
+    data_correlation = pd.read_csv('data/ann/data_correlation.csv', header=None).to_numpy()
+    data_correlation = data_correlation.reshape([-1, 1])
     wind_u_mean = pd.read_csv('data/ann/wind_u_mean.csv', header=None).to_numpy()
     wind_u_mean = wind_u_mean.reshape([-1, 1])
     wind_v_mean = pd.read_csv('data/ann/wind_v_mean.csv', header=None).to_numpy()
@@ -107,7 +112,7 @@ def load_dataset(**kwargs):
 
     input_encoder, input_decoder, target_decoder = create_data_prediction_overlap_all(
         dataset_gsmap, wind_u_mean, wind_v_mean, surface_temp, precip_seasonal,
-        precip_trend, dataset_gauge, **kwargs)
+        precip_trend, dataset_gauge, data_correlation, **kwargs)
     test_size = kwargs['data'].get('test_size')
     valid_size = kwargs['data'].get('valid_size')
 
