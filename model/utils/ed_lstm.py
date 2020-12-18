@@ -30,9 +30,9 @@ def create_data_prediction_overlap_all(dataset_gsmap, wind_u_mean, wind_v_mean,
             input_encoder[col * T + row, :,
                           2] = wind_v_mean[row + horizon:row + seq_len +
                                            horizon, col].copy()
-            input_encoder[col * T + row, :,
-                          3] = data_correlation[row + horizon:row + seq_len +
-                                            horizon, col].copy()
+            # input_encoder[col * T + row, :,
+            #               3] = data_correlation[row + horizon:row + seq_len +
+            #                                 horizon, col].copy()
             # input_encoder[col * T + row, :,
             #               3] = surface_temp[row + horizon:row + seq_len +
             #                                 horizon, col].copy()
@@ -77,40 +77,23 @@ def create_data_prediction_all(dataset_gsmap, dataset_gauge, **kwargs):
 
 
 def load_dataset(**kwargs):
-    dataset_gsmap = pd.read_csv('data/ann/gsmap.csv', header=None).to_numpy()
+    dataset_gsmap = pd.read_csv('data/ann/gsmap_group.csv', header=None).to_numpy()
     dataset_gsmap = dataset_gsmap.reshape([-1, 1])
     data_correlation = pd.read_csv('data/ann/correlation.csv', header=None).to_numpy()
     data_correlation = data_correlation.reshape([-1, 1])
-    wind_u_mean = pd.read_csv('data/ann/wind_u_mean.csv', header=None).to_numpy()
+    wind_u_mean = pd.read_csv('data/ann/wind_u_mean_group.csv', header=None).to_numpy()
     wind_u_mean = wind_u_mean.reshape([-1, 1])
-    wind_v_mean = pd.read_csv('data/ann/wind_v_mean.csv', header=None).to_numpy()
+    wind_v_mean = pd.read_csv('data/ann/wind_v_mean_group.csv', header=None).to_numpy()
     wind_v_mean = wind_v_mean.reshape([-1, 1])
-    surface_temp = pd.read_csv('data/ann/surface_temp.csv', header=None).to_numpy()
+    surface_temp = pd.read_csv('data/ann/surface_temp_group.csv', header=None).to_numpy()
     surface_temp = surface_temp.reshape([-1, 1])
     precip_trend = pd.read_csv('data/ann/precip_trend.csv', header=None).to_numpy()
     precip_trend = precip_trend.reshape([-1, 1])
     precip_seasonal = pd.read_csv('data/ann/precip_seasonal.csv', header=None).to_numpy()
     precip_seasonal = precip_seasonal.reshape([-1, 1])
-    dataset_gauge = pd.read_csv('data/ann/gauge.csv', header=None).to_numpy()
+    dataset_gauge = pd.read_csv('data/ann/gauge_group.csv', header=None).to_numpy()
     dataset_gauge = dataset_gauge.reshape([-1, 1])
     
-    dataset_gsmap_group = pd.read_csv('data/ann/gsmap_group.csv', header=None).to_numpy()
-    dataset_gsmap_group = dataset_gsmap.reshape([-1, 1])
-    wind_u_mean_group = pd.read_csv('data/ann/wind_u_mean_group.csv', header=None).to_numpy()
-    wind_u_mean_group = wind_u_mean.reshape([-1, 1])
-    wind_v_mean_group = pd.read_csv('data/ann/wind_v_mean_group.csv', header=None).to_numpy()
-    wind_v_mean_group = wind_v_mean.reshape([-1, 1])
-    surface_temp_group = pd.read_csv('data/ann/surface_temp_group.csv', header=None).to_numpy()
-    surface_temp_group = surface_temp.reshape([-1, 1])
-    dataset_gauge_group = pd.read_csv('data/ann/gauge_group.csv', header=None).to_numpy()
-    dataset_gauge_group = dataset_gauge.reshape([-1, 1])
-    # dataset_gsmap = dataset_gsmap[:, 0]
-    # dataset_gauge = dataset_gauge[:, 0]
-
-    # dataset_gsmap = np.reshape(dataset_gsmap, (dataset_gsmap.shape[0], 1))
-    # dataset_gauge = np.reshape(dataset_gauge, (dataset_gauge.shape[0], 1))
-    # dataset_gsmap = np.tile(dataset_gsmap, (1,72))
-    # dataset_gauge = np.tile(dataset_gauge, (1,72))
     scaler = MinMaxScaler(copy=True, feature_range=(0, 1))
     scaler.fit(dataset_gsmap)
     dataset_gsmap = scaler.transform(dataset_gsmap)
@@ -121,19 +104,10 @@ def load_dataset(**kwargs):
     precip_seasonal = scaler.transform(precip_seasonal)
     precip_trend = scaler.transform(precip_trend)
 
-    scaler.fit(dataset_gsmap_group)
-    dataset_gsmap = scaler.transform(dataset_gsmap_group)
-    dataset_gauge = scaler.transform(dataset_gauge_group)
-    wind_u_mean = scaler.transform(wind_u_mean_group)
-    wind_v_mean = scaler.transform(wind_v_mean_group)
-    surface_temp = scaler.transform(surface_temp_group)
-
-    # input_encoder, input_decoder, target_decoder = create_data_prediction_overlap_all(
-    #     dataset_gsmap, wind_u_mean, wind_v_mean, surface_temp, precip_seasonal,
-    #     precip_trend, dataset_gauge, data_correlation, **kwargs)
     input_encoder, input_decoder, target_decoder = create_data_prediction_overlap_all(
-        dataset_gsmap_group, wind_u_mean_group, wind_v_mean_group, surface_temp_group, precip_seasonal,
-        precip_trend, dataset_gauge_group, data_correlation, **kwargs)
+        dataset_gsmap, wind_u_mean, wind_v_mean, surface_temp, precip_seasonal,
+        precip_trend, dataset_gauge, data_correlation, **kwargs)
+
     test_size = kwargs['data'].get('test_size')
     valid_size = kwargs['data'].get('valid_size')
 
