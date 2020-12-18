@@ -93,6 +93,17 @@ def load_dataset(**kwargs):
     precip_seasonal = precip_seasonal.reshape([-1, 1])
     dataset_gauge = pd.read_csv('data/ann/gauge.csv', header=None).to_numpy()
     dataset_gauge = dataset_gauge.reshape([-1, 1])
+    
+    dataset_gsmap_group = pd.read_csv('data/ann/gsmap_group.csv', header=None).to_numpy()
+    dataset_gsmap_group = dataset_gsmap.reshape([-1, 1])
+    wind_u_mean_group = pd.read_csv('data/ann/wind_u_mean_group.csv', header=None).to_numpy()
+    wind_u_mean_group = wind_u_mean.reshape([-1, 1])
+    wind_v_mean_group = pd.read_csv('data/ann/wind_v_mean_group.csv', header=None).to_numpy()
+    wind_v_mean_group = wind_v_mean.reshape([-1, 1])
+    surface_temp_group = pd.read_csv('data/ann/surface_temp_group.csv', header=None).to_numpy()
+    surface_temp_group = surface_temp.reshape([-1, 1])
+    dataset_gauge_group = pd.read_csv('data/ann/gauge_group.csv', header=None).to_numpy()
+    dataset_gauge_group = dataset_gauge.reshape([-1, 1])
     # dataset_gsmap = dataset_gsmap[:, 0]
     # dataset_gauge = dataset_gauge[:, 0]
 
@@ -110,9 +121,19 @@ def load_dataset(**kwargs):
     precip_seasonal = scaler.transform(precip_seasonal)
     precip_trend = scaler.transform(precip_trend)
 
+    scaler.fit(dataset_gsmap_group)
+    dataset_gsmap = scaler.transform(dataset_gsmap_group)
+    dataset_gauge = scaler.transform(dataset_gauge_group)
+    wind_u_mean = scaler.transform(wind_u_mean_group)
+    wind_v_mean = scaler.transform(wind_v_mean_group)
+    surface_temp = scaler.transform(surface_temp_group)
+
+    # input_encoder, input_decoder, target_decoder = create_data_prediction_overlap_all(
+    #     dataset_gsmap, wind_u_mean, wind_v_mean, surface_temp, precip_seasonal,
+    #     precip_trend, dataset_gauge, data_correlation, **kwargs)
     input_encoder, input_decoder, target_decoder = create_data_prediction_overlap_all(
-        dataset_gsmap, wind_u_mean, wind_v_mean, surface_temp, precip_seasonal,
-        precip_trend, dataset_gauge, data_correlation, **kwargs)
+        dataset_gsmap_group, wind_u_mean_group, wind_v_mean_group, surface_temp_group, precip_seasonal,
+        precip_trend, dataset_gauge_group, data_correlation, **kwargs)
     test_size = kwargs['data'].get('test_size')
     valid_size = kwargs['data'].get('valid_size')
 
