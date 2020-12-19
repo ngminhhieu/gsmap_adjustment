@@ -33,12 +33,12 @@ def create_data_prediction_overlap_all(dataset_gsmap, wind_u_mean, wind_v_mean,
             # input_encoder[col * T + row, :,
             #               3] = surface_temp[row + horizon:row + seq_len +
             #                                 horizon, col].copy()
-            input_encoder[col * T + row, :,
-                          3] = precip_seasonal[row + horizon:row + seq_len +
-                                            horizon, col].copy()
-            input_encoder[col * T + row, :,
-                          4] = precip_trend[row + horizon:row + seq_len +
-                                            horizon, col].copy()
+            # input_encoder[col * T + row, :,
+            #               3] = precip_seasonal[row + horizon:row + seq_len +
+            #                                 horizon, col].copy()
+            # input_encoder[col * T + row, :,
+            #               4] = precip_trend[row + horizon:row + seq_len +
+            #                                 horizon, col].copy()
             input_decoder[col * T + row, :,
                           0] = dataset_gauge[row + horizon - 1:row + seq_len +
                                              horizon - 1, col].copy()
@@ -74,19 +74,19 @@ def create_data_prediction_all(dataset_gsmap, dataset_gauge, **kwargs):
 
 
 def load_dataset(**kwargs):
-    dataset_gsmap = pd.read_csv('data/ann/gsmap.csv', header=None).to_numpy()
+    dataset_gsmap = pd.read_csv('data/ann/gsmap_group.csv', header=None).to_numpy()
     dataset_gsmap = np.reshape(np.ravel(dataset_gsmap, order='F'), (-1,1))
-    wind_u_mean = pd.read_csv('data/ann/wind_u_mean.csv', header=None).to_numpy()
+    wind_u_mean = pd.read_csv('data/ann/wind_u_mean_group.csv', header=None).to_numpy()
     wind_u_mean = np.reshape(np.ravel(wind_u_mean, order='F'), (-1,1))
-    wind_v_mean = pd.read_csv('data/ann/wind_v_mean.csv', header=None).to_numpy()
+    wind_v_mean = pd.read_csv('data/ann/wind_v_mean_group.csv', header=None).to_numpy()
     wind_v_mean = np.reshape(np.ravel(wind_v_mean, order='F'), (-1,1))
-    surface_temp = pd.read_csv('data/ann/surface_temp.csv', header=None).to_numpy()
+    surface_temp = pd.read_csv('data/ann/surface_temp_group.csv', header=None).to_numpy()
     surface_temp = np.reshape(np.ravel(surface_temp, order='F'), (-1,1))
     precip_trend = pd.read_csv('data/ann/precip_trend.csv', header=None).to_numpy()
     precip_trend = np.reshape(np.ravel(precip_trend, order='F'), (-1,1))
     precip_seasonal = pd.read_csv('data/ann/precip_seasonal.csv', header=None).to_numpy()
     precip_seasonal = np.reshape(np.ravel(precip_seasonal, order='F'), (-1,1))
-    dataset_gauge = pd.read_csv('data/ann/gauge.csv', header=None).to_numpy()
+    dataset_gauge = pd.read_csv('data/ann/gauge_group.csv', header=None).to_numpy()
     dataset_gauge = np.reshape(np.ravel(dataset_gauge, order='F'), (-1,1))
     # dataset_gsmap = dataset_gsmap[:, 0]
     # dataset_gauge = dataset_gauge[:, 0]
