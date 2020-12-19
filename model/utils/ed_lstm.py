@@ -113,7 +113,7 @@ def load_dataset(**kwargs):
     train_size = 1 - test_size - valid_size
 
     # split data to train_set, valid_set, test_size
-    my_dataset = pd.read_csv('data/ann/gsmap.csv', header=None).to_numpy()
+    my_dataset = pd.read_csv('data/ann/gsmap_group.csv', header=None).to_numpy()
     input_encoder_train = np.empty(shape=(int(input_encoder.shape[0]*train_size), input_encoder.shape[1], input_encoder.shape[2]))
     input_encoder_valid = np.empty(shape=(int(input_encoder.shape[0]*valid_size), input_encoder.shape[1], input_encoder.shape[2]))
     input_encoder_test = np.empty(shape=(int(input_encoder.shape[0]*test_size), input_encoder.shape[1], input_encoder.shape[2]))
