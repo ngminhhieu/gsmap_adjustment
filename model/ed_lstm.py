@@ -131,7 +131,7 @@ class EDLSTMSupervisor():
             gt[i:i+self.horizon] = groundtruth[i, -1]
             
         scaler = self.data["scaler"]
-        col = 72
+        col = read_csv('./data/ann/gsmap_group.csv', header=None).to_numpy().shape[1]
         correct_shape_gt = np.empty(shape=(int(preds.shape[0]/col), col))
         correct_shape_pd = np.empty(shape=(int(preds.shape[0]/col), col))
         for i in range(int(gt.shape[0]/col)):
