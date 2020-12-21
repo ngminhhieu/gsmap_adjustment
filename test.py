@@ -45,7 +45,6 @@ from sklearn.cluster import KMeans
 # np.savetxt('./data/ann/precip_trend.csv', trend, delimiter=',')
 
 gauge_dataset = read_csv('./data/ann/gauge.csv', names=range(0, 72)).to_numpy()
-print(gauge_dataset.shape)
 gauge_coordinate = np.empty(shape=(72, 3))
 
 for i in range(len(gauge_lat)):
@@ -66,8 +65,9 @@ wind_u_mean_group = np.empty(shape=(len(gauge_dataset), count))
 wind_v_mean_group = np.empty(shape=(len(gauge_dataset), count))
 surface_temp_group = np.empty(shape=(len(gauge_dataset), count))
 count = 0
-for value, index in enumerate(kmeans.labels_):
-    if value == 0:
+labels = kmeans.labels_
+for index in range(len(labels)):
+    if labels[index] == 0:
         gsmap_dataset_group[:, count] = map_precip[:, index]
         gauge_dataset_group[:, count] = gauge_dataset[:, index]
         wind_u_mean_group[:, count] = map_wind_u_mean[:, index]
