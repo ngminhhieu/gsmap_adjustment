@@ -134,9 +134,10 @@ class EDLSTMSupervisor():
         col = 72
         correct_shape_gt = np.empty(shape=(int(preds.shape[0]/col), col))
         correct_shape_pd = np.empty(shape=(int(preds.shape[0]/col), col))
-        for i in range(int(gt.shape[0]/col)):
-            correct_shape_gt[i, :] = np.transpose(gt[i*col:(i+1)*col])
-            correct_shape_pd[i, :] = np.transpose(preds[i*col:(i+1)*col])
+        pivot = int(gt.shape[0]/col)
+        for c in range(col):
+            correct_shape_gt[:, c] = gt[c*pivot:(c+1)*pivot]
+            correct_shape_pd[:, c] = preds[c*pivot:(c+1)*pivot]
 
         reverse_groundtruth = scaler.inverse_transform(correct_shape_gt)
         reverse_preds = scaler.inverse_transform(correct_shape_pd)
