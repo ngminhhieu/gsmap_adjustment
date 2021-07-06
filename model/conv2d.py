@@ -118,14 +118,23 @@ class Conv2DSupervisor():
                            loss=self.loss,
                            metrics=['mse', 'mae'])
         
-        training_history = self.model.fit(self.input_train,
-                                          self.target_train,
-                                          batch_size=self.batch_size,
-                                          epochs=self.epochs,
-                                          callbacks=self.callbacks,
-                                          validation_data=(self.input_valid, self.target_valid),
-                                          shuffle=True,
-                                          verbose=2)
+        # training_history = self.model.fit(self.input_train,
+        #                                   self.target_train,
+        #                                   batch_size=self.batch_size,
+        #                                   epochs=self.epochs,
+        #                                   callbacks=self.callbacks,
+        #                                   validation_data=(self.input_valid, self.target_valid),
+        #                                   shuffle=True,
+        #                                   verbose=2)
+        training_history = self.model.fit_generator(self.gauge_generator(self.input_train, self.target_train),
+                                                    steps_per_epoch = len(self.input_train)//self.batch_size,
+                                                    validation_data = self.gauge_generator(self.input_test, self.target_test),
+                                                    validation_steps = len(self.input_test)//self.batch_size,
+                                                    epochs = self.epochs,
+                                                    verbose = 1,
+                                                    shuffle = False,
+                                                    initial_epoch = 0,
+                                                    )
 
         if training_history is not None:
             common_util._plot_training_history(training_history,
@@ -139,7 +148,21 @@ class Conv2DSupervisor():
             config['train']['log_dir'] = self.log_dir
             with open(os.path.join(self.log_dir, config_filename), 'w') as f:
                 yaml.dump(config, f, default_flow_style=False)
-
+                
+    def gauge_generator(self, samples, labels):
+        import random
+        while True:
+            input_list = []
+            target_list = []
+            while(len(input_list) < self.batch_size):
+                sample = random.choice(samples)
+                sample_index = np.where(samples == sample)[0][0]
+                label = labels[sample_index]
+                input_list.append(sample)
+                target_list.append(label)
+            
+            yield((np.array(input_list), target_list))
+            
     def test_prediction(self):
         print("Load model from: {}".format(self.log_dir))
         self.model.load_weights(self.log_dir + 'best_model.hdf5')
